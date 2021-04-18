@@ -1,20 +1,25 @@
 package com.group7.server.model;
 
+import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-//TODO: Implement fields of the player model
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@SequenceGenerator(name = "idgen", sequenceName = "PLAYER_SEQ")
 @Entity
 @Table(name="PLAYER")
-public class Player {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID")
-    private long id;
+public class Player extends BaseModel {
+    @Column(name = "USERNAME", unique = true)
+    private String username;
+
+    @Column(name = "PASSWORD", unique = true)
+    private String password;
+
+    @Column(name = "EMAIL", unique = true)
+    private String email;
 }
