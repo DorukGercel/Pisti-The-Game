@@ -22,4 +22,11 @@ public class Player extends BaseModel {
 
     @Column(name = "EMAIL", unique = true)
     private String email;
+
+    @ManyToMany
+    @JoinTable(
+            name = "GAME",
+            joinColumns = @JoinColumn(name = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "ID"))
+    Set<Game> played_games;
 }
