@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -22,14 +23,6 @@ public class Game extends BaseModel {
     @Temporal(TemporalType.TIMESTAMP)
     private java.util.Date end_time;
 
-    @Column(name = "END_SCORE")
-    private int end_score;
-
-    @ManyToOne(mappedBy = "played_games")
-    Set<Player> players;
-
-    @ManyToOne
-    @JoinColumn(name = "ID", nullable = false)
-    private LeaderBoard leaderboard;
-
+    @OneToMany(mappedBy = "game")
+    Set<ActivePlayer> active_players;
 }

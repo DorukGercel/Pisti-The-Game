@@ -32,7 +32,12 @@ public class ActivePlayer {
     @PrimaryKeyJoinColumn(name = "ID", referencedColumnName = "id")
     private Player player;
 
+    @ManyToOne
+    @JoinColumn(name = "game_id")
+    private Game game;
+
     public ActivePlayer(Player player){
         this.player = player;
     }
+
 }

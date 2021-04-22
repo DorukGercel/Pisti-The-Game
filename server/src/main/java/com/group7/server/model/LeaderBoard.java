@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -13,6 +14,7 @@ import javax.persistence.*;
 @Entity
 @Table(name="LEADERBOARD")
 public class LeaderBoard extends BaseModel {
-    @OneToMany(mappedBy = "leaderboard")
-    private Set<Game> games;
+    // TODO Decide the relation
+    @OneToMany
+    private Set<Player> players;
 }
