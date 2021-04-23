@@ -23,8 +23,7 @@ public class PlayerServiceImpl implements PlayerService {
         try {
             mAuthenticationService.register(player);
             return StatusCode.SUCCESS;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return StatusCode.FAIL;
         }
     }
@@ -34,14 +33,14 @@ public class PlayerServiceImpl implements PlayerService {
         try {
             String token;
             Long sessionId;
-            if((token = mAuthenticationService.authenticate(player)) != null && (sessionId = initializeActivePlayer(player)) != null) {
+            if((token = mAuthenticationService.authenticate(player)) != null &&
+                    (sessionId = initializeActivePlayer(player)) != null) {
                 credentials[0] = token;
                 credentials[1] = sessionId;
                 return StatusCode.SUCCESS;
             }
             return StatusCode.FAIL;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return StatusCode.FAIL;
         }
     }
@@ -53,8 +52,7 @@ public class PlayerServiceImpl implements PlayerService {
             System.out.println(dbActivePlayer.get());
             mActivePlayerRepository.deleteById(id);
             return StatusCode.SUCCESS;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return StatusCode.FAIL;
         }
 
