@@ -1,7 +1,11 @@
-CENG453 Spring 2021 Term Project
+**CENG453 Spring 2021 Term Project
+**
 
-Group 7
+**Group 7
+**
 
-Authors:
+**Authors:
+**
+
 Rabia Varol 2237881
 Doruk Gerçel 2310027
