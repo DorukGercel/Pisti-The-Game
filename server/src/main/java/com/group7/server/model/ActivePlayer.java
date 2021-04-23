@@ -2,11 +2,7 @@ package com.group7.server.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.sql.Delete;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
