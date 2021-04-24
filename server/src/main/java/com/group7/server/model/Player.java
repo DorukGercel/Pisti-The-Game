@@ -11,23 +11,35 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SequenceGenerator(name = "idgen", sequenceName = "PLAYER_SEQ")
 @Entity
 @Table(name="PLAYER")
+/** Model of the player created after registration which includes credentials*/
 public class Player extends BaseModel
         implements UserDetails, CredentialsContainer {
+
+    /** Unique username of the player*/
     @Column(name = "USERNAME", unique = true)
     private String username;
 
+    /** Password of the player*/
     @Column(name = "PASSWORD")
     private String password;
 
+    /** Unique email of the player*/
     @Column(name = "EMAIL", unique = true)
     private String email;
 
+    /**
+     * Methods implemented below are
+     * necessary for authentication
+     * and authorization properties
+     * of the player.
+     * */
     @Override
     public void eraseCredentials() {
         password = null;
