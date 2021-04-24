@@ -20,7 +20,7 @@ public class PlayerController {
     private final PlayerService mPlayerService;
 
     /**
-     * Handles player's register request. Utilizes playerService's method to deal with the request.
+     * Handles player's register request. Utilizes PlayerService's method to deal with the request.
      *
      * @param authRequest the request which includes the necessary credentials of the player to register to the system;
      *                    username, password and email cannot be null.
@@ -46,7 +46,7 @@ public class PlayerController {
     }
 
     /**
-     * Handles player's login request. Utilizes playerService's method to deal with the request.
+     * Handles player's login request. Utilizes PlayerService's method to deal with the request.
      *
      * @param authRequest the request which includes the necessary credentials of the player to login to the system;
      *                    username, password and email cannot be null.
@@ -76,7 +76,7 @@ public class PlayerController {
     }
 
     /**
-     * Handles player's logout request. Utilizes playerService's method to deal with the request.
+     * Handles player's logout request. Utilizes PlayerService's method to deal with the request.
      *
      * @param deleteRequest the request which includes the session id of the player who sends the request.
      * @return the authentication response according to the success of the operation.
