@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
+/** Performs the repository related operations by using security services*/
 @Service
 @RequiredArgsConstructor
 public class UserDetailsManagerImpl implements UserDetailsManager {
@@ -19,6 +20,7 @@ public class UserDetailsManagerImpl implements UserDetailsManager {
     private final PlayerRepository mPlayerRepository;
     private final PasswordEncoder mPasswordEncoder;
 
+    /** Saves the given user to the repository with password encryption*/
     @Override
     public void createUser(final UserDetails user) {
         Player player = (Player) user;
@@ -27,6 +29,7 @@ public class UserDetailsManagerImpl implements UserDetailsManager {
         mPlayerRepository.save(player);
     }
 
+    /** Updates the given user in the repository*/
     @Override
     public void updateUser(final UserDetails user) {
         Player oldUser = (Player) loadUserByUsername(user.getUsername());
@@ -35,11 +38,13 @@ public class UserDetailsManagerImpl implements UserDetailsManager {
         mPlayerRepository.save(newUser);
     }
 
+    /** Deletes the given user from the repository*/
     @Override
     public void deleteUser(final String username) {
         mPlayerRepository.deleteByUsername(username);
     }
 
+    /** Performs the password reset operation*/
     @Override
     public void changePassword(final String oldPassword, final String newPassword) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -53,11 +58,13 @@ public class UserDetailsManagerImpl implements UserDetailsManager {
         }
     }
 
+    /** Checks whether user exists with the given username*/
     @Override
     public boolean userExists(final String username) {
         return mPlayerRepository.existsByUsername(username);
     }
 
+    /** Returns the user from the repository with the given username*/
     @Override
     public UserDetails loadUserByUsername(final String username) {
         return mPlayerRepository.findByUsername(username)

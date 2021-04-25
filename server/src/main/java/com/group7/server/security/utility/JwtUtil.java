@@ -14,8 +14,10 @@ import java.util.List;
 import static io.jsonwebtoken.security.Keys.hmacShaKeyFor;
 import static java.util.stream.Collectors.toList;
 
+/** Performs JWT related operations.*/
 public class JwtUtil {
 
+    /** Generates a JWT token with the given arguments.*/
     public static String generateToken(Authentication user, String secretKey, Integer expirationDay) {
 
         return Jwts.builder()
@@ -27,6 +29,7 @@ public class JwtUtil {
                 .compact();
     }
 
+    /** Lists the authorities of the given user.*/
     private static List<String> getAuthorities(Authentication user) {
         return user.getAuthorities()
                 .stream()
@@ -34,6 +37,7 @@ public class JwtUtil {
                 .collect(toList());
     }
 
+    /** Calculates the date of expiration of the JWT token by using the day parameter.*/
     private static Date calculateExpirationDate(Integer expirationDay) {
         Instant expirationTime = LocalDate.now()
                 .plusDays(expirationDay)
@@ -44,6 +48,7 @@ public class JwtUtil {
         return Date.from(expirationTime);
     }
 
+    /** Extracts the user from active users by using JWT token and secret key.*/
     public static String extractUsername(final String jwtToken, final String secretKey) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(hmacShaKeyFor(secretKey.getBytes()))
