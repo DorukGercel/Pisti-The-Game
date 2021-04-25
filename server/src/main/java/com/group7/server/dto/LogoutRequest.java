@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 
+/** DTO used for logout requests*/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-/**DTO used for logout requests*/
 public class LogoutRequest {
 
-    /**Session id of the active player who requests logout*/
+    /** Session id of the active player who requests logout*/
     @NotEmpty
     private Long sessionId;
 }

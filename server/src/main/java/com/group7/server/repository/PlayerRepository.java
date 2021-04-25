@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
+/** Repository of the registered players*/
 @Repository
-/**Repository of the registered players*/
 public interface PlayerRepository
         extends JpaRepository<Player, Long> {
     Optional<Player> findById(long id);

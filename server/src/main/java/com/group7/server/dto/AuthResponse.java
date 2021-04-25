@@ -8,16 +8,16 @@ import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotEmpty;
 
+/** DTO used as a super class for auth related responses*/
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-/**DTO used as a super class for auth related responses*/
 public class AuthResponse {
-    /**Indicates the success of the requested operation*/
+    /** Indicates the success of the requested operation*/
     @NotEmpty
     private StatusCode statusCode;
 
-    /**Indicates the error that occurred, null if operation was successful.*/
+    /** Indicates the error that occurred, null if operation was successful.*/
     @Nullable
     private String errorMessage;
 }

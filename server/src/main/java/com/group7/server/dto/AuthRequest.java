@@ -5,20 +5,20 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 
+/** DTO used for register and login requests*/
 @Data
 @AllArgsConstructor
-/**DTO used for register and login requests*/
 public class AuthRequest {
     //TODO: Use either user name or password
-    /**Username of the player to register/login*/
+    /** Username of the player to register/login*/
     @NotEmpty
     private String username;
 
-    /**Password of the player to register/login*/
+    /** Password of the player to register/login*/
     @NotEmpty
     private String password;
 
-    /**Email of the player to register/login*/
+    /** Email of the player to register/login*/
     @NotEmpty
     private String email;
 

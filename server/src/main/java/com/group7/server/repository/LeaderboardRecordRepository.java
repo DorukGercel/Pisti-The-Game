@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/** Repository of the leaderboard records*/
 @Repository
-/**Repository of the leaderboard records*/
 public interface LeaderboardRecordRepository
         extends JpaRepository<LeaderboardRecord, Long> {
     @Query("select p from Player p")

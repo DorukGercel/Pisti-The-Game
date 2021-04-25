@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
+/** Repository of the active (online) players*/
 @Repository
-/**Repository of the active (online) players*/
 public interface ActivePlayerRepository
         extends JpaRepository<ActivePlayer, Long> {
     @Transactional

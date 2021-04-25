@@ -5,11 +5,11 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+/** Model of the player who is online (logged in) and includes session-wide information*/
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "ACTIVE_PLAYER")
-/** Model of the player who is online (logged in) and includes session-wide information*/
 public class ActivePlayer extends BaseModel {
 
     /** Reference to the owner player*/

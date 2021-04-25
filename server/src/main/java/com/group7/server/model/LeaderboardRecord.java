@@ -4,6 +4,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.Date;
 
+/** Model of the leaderboard record created upon finish of a game*/
 @Data
 @Getter
 @Setter
@@ -11,7 +12,6 @@ import java.util.Date;
 @SequenceGenerator(name = "idgen", sequenceName = "LEADERBOARD_RECORD_SEQ")
 @Entity
 @Table(name="LEADERBOARD_RECORD")
-/** Model of the leaderboard record created upon finish of a game*/
 public class LeaderboardRecord extends BaseModel {
     /** Reference to the player who played the game */
     @OneToOne
