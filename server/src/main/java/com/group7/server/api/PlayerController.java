@@ -78,18 +78,18 @@ public class PlayerController {
     /**
      * Handles player's logout request. Utilizes PlayerService's method to deal with the request.
      *
-     * @param deleteRequest the request which includes the session id of the player who sends the request.
+     * @param logoutRequest the request which includes the session id of the player who sends the request.
      * @return the authentication response according to the success of the operation.
      *                    If operation is successful; returns success status code;
      *                                              ; error message is null.
      *                    If operation is not successful; returns fail status code and the error message.
      */
     @DeleteMapping("/logout")
-    public AuthResponse logout(@RequestBody DeleteRequest deleteRequest){
-        StatusCode statusCode = mPlayerService.logout(deleteRequest.getSessionId());
+    public AuthResponse logout(@RequestBody LogoutRequest logoutRequest){
+        StatusCode statusCode = mPlayerService.logout(logoutRequest.getSessionId());
 
         if (statusCode.equals(StatusCode.SUCCESS)) {
-            return new DeleteResponse(StatusCode.SUCCESS, null);
+            return new LogoutResponse(StatusCode.SUCCESS, null);
         }
         return new AuthResponse(StatusCode.FAIL, "Logout attempt failed!");
     }

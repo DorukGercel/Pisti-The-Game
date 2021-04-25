@@ -6,13 +6,17 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 
 @Data
+/**DTO used for login responses*/
 public class LoginResponse extends AuthResponse{
+    /**JWT token generated uniquely to the player, must be saved as bearer token*/
     @NotEmpty
     private String token;
 
+    /**Session id of the active player in the db table*/
     @NotEmpty
     private Long sessionId;
 
+    /**All args constructor*/
     public LoginResponse(StatusCode statusCode, String errorMessage, String token, Long sessionId){
         super(statusCode, errorMessage);
         this.token = token;

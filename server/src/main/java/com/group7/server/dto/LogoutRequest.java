@@ -9,7 +9,10 @@ import javax.validation.constraints.NotEmpty;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeleteRequest {
+/**DTO used for logout requests*/
+public class LogoutRequest {
+
+    /**Session id of the active player who requests logout*/
     @NotEmpty
     private Long sessionId;
 }

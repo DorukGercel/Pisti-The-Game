@@ -18,8 +18,8 @@ import java.util.Optional;
 @Service
 public class PlayerServiceImpl implements PlayerService {
 
-    private final AuthenticationService mAuthenticationService;
-    private final PlayerRepository mPlayerRepository;
+    private final AuthenticationService  mAuthenticationService;
+    private final PlayerRepository       mPlayerRepository;
     private final ActivePlayerRepository mActivePlayerRepository;
 
     /**
