@@ -26,11 +26,16 @@ public class ActivePlayer extends BaseModel {
     @Column(name = "SCORE")
     private int score;
 
+    //TODO: Add to schema
+    /** Currently attached game*/
+    @Column(name = "GAME_ID")
+    private long gameId;
+
     /** Constructor with the owner player argument*/
     public ActivePlayer(Player player){
         this.player = player;
-        this.level = 1;
+        this.level = 0;
         this.score = 0;
+        this.gameId = -1L;
     }
-
 }

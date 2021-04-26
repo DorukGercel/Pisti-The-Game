@@ -47,11 +47,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public String authenticate(final Player player) {
         try {
             Authentication usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(player.getUsername(), player.getPassword());
-            System.out.println("1");
             Authentication user = mAuthenticationProvider.authenticate(usernamePasswordAuthenticationToken);
-            System.out.println("2");
             String token = JwtUtil.generateToken(user, mSecretKey, 15);
-            System.out.println("3");
             return token;
         } catch (AuthenticationException e) {
             e.printStackTrace();
