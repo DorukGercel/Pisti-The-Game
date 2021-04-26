@@ -1,4 +1,4 @@
-package com.group7.server.dto;
+package com.group7.server.dto.authentication;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

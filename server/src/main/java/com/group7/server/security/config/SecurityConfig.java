@@ -38,6 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/player/register").permitAll()
                 .antMatchers("/api/player/login").permitAll()
+                .antMatchers("/api/game/startGame").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

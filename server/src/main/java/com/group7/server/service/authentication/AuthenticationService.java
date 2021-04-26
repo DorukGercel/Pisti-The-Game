@@ -1,4 +1,4 @@
-package com.group7.server.service;
+package com.group7.server.service.authentication;
 
 import com.group7.server.model.Player;
 

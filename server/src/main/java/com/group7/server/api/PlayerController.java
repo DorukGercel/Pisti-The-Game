@@ -1,9 +1,9 @@
 package com.group7.server.api;
 
-import com.group7.server.dto.*;
 import com.group7.server.definitions.StatusCode;
+import com.group7.server.dto.authentication.*;
 import com.group7.server.model.Player;
-import com.group7.server.service.PlayerService;
+import com.group7.server.service.authentication.PlayerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
