@@ -2,6 +2,7 @@ package com.group7.server.service.leaderboard;
 
 import com.group7.server.model.LeaderboardRecord;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -12,8 +13,5 @@ public interface LeaderboardRecordService {
     LeaderboardRecord createRecord(LeaderboardRecord record);
     LeaderboardRecord updateRecord(LeaderboardRecord record);
     void deleteRecord(LeaderboardRecord record);
-    List<LeaderboardRecord> getAllTimeRecords();
-    List<LeaderboardRecord> getWeeklyRecords();
-    List<LeaderboardRecord> getMonthlyRecords();
-
+    List<LeaderboardRecord> getRecordsByDate(String period);
 }

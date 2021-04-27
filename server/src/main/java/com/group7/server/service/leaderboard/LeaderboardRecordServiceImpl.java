@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.time.Duration;
@@ -79,65 +80,43 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
     }
 
     /**
-     * Retrieve all records from the leaderboard record table.
+     * Retrieve all records according to given period from the leaderboard record table.
      *
-     * @return list of all leaderboard records
-     */
-    @Override
-    public List<LeaderboardRecord> getAllTimeRecords() {
-        return mLeaderboardRecordRepository.findAll();
-    }
-
-    /**
-     * Retrieve all records in the last 7 days from the leaderboard record table.
-     *
-     * @return List of the last 7 days' leaderboard records
+     * @param period it can be "weekly", "monthly" or "allTimes"
+     * @return List of leaderboard records
      *              If exception does not occur, returns List of LeaderboardRecord objects.
      *              If exception does not occurs, returns null.
      */
     @Override
-    public List<LeaderboardRecord> getWeeklyRecords() {
+    public List<LeaderboardRecord> getRecordsByDate(String period) {
         try {
+            List<LeaderboardRecord> records = null;
             Date now = new java.util.Date();
-            Date sevenDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(7)));
             Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String nowDate = formatter.format(now);
-            String sevenDaysAgoDate = formatter.format(sevenDaysAgo);
-            List<LeaderboardRecord> last7daysRecords = mLeaderboardRecordRepository.findByEndDateBetween(
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(sevenDaysAgoDate));
-            return last7daysRecords;
-        } catch (Exception e) {
-            System.out.println("Exception occurred during Date parsing");
-            e.printStackTrace();
-            return null;
-        }
-
-    }
-
-    /**
-     * Retrieve all records in the last 30 days from the leaderboard record table.
-     *
-     * @return List of the last 30 days' leaderboard records
-     *              If exception does not occur, returns List of LeaderboardRecord objects.
-     *              If exception does not occurs, returns null.
-     */
-    @Override
-    public List<LeaderboardRecord> getMonthlyRecords() {
-        try {
-            Date now = new java.util.Date();
-            Date thirtyDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(30)));
-            Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String nowDate = formatter.format(now);
-            String thirtyDaysAgoDate = formatter.format(thirtyDaysAgo);
-            List<LeaderboardRecord> last30daysRecords = mLeaderboardRecordRepository.findByEndDateBetween(
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(thirtyDaysAgoDate));
-            return last30daysRecords;
+            if (period.equals("weekly")) {
+                Date sevenDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(7)));
+                String sevenDaysAgoDate = formatter.format(sevenDaysAgo);
+                records = mLeaderboardRecordRepository.findByEndDateBetween(
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(sevenDaysAgoDate));
+            } else if (period.equals("monthly")) {
+                Date thirtyDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(30)));
+                String thirtyDaysAgoDate = formatter.format(thirtyDaysAgo);
+                records = mLeaderboardRecordRepository.findByEndDateBetween(
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(thirtyDaysAgoDate));
+            } else {
+                /* period == "allTimes" */
+                records = mLeaderboardRecordRepository.findAll();
+            }
+            return records;
         } catch (Exception e) {
             System.out.println("Exception occurred during Date parsing");
             e.printStackTrace();
             return null;
         }
     }
+
+
 }
