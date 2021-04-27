@@ -1,4 +1,4 @@
-package com.group7.server.service;
+package com.group7.server.service.leaderboard;
 
 import com.group7.server.model.LeaderboardRecord;
 

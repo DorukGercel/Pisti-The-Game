@@ -1,15 +1,23 @@
-package com.group7.server.service;
+package com.group7.server.service.leaderboard;
 
-import com.group7.server.model.LeaderboardRecord;
 import com.group7.server.model.Player;
+import com.group7.server.model.LeaderboardRecord;
 import com.group7.server.repository.LeaderboardRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.time.Duration;
+import java.time.Instant;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 
-
+/**
+ * Responsible for providing utilities to the LeaderboardRecordController.
+ *
+ */
 @RequiredArgsConstructor
 @Service
 public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
@@ -69,19 +77,67 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
             return;
         }
     }
-    // TODO implement remaining methods
+
+    /**
+     * Retrieve all records from the leaderboard record table.
+     *
+     * @return list of all leaderboard records
+     */
     @Override
     public List<LeaderboardRecord> getAllTimeRecords() {
-        return null;
+        return mLeaderboardRecordRepository.findAll();
     }
 
+    /**
+     * Retrieve all records in the last 7 days from the leaderboard record table.
+     *
+     * @return List of the last 7 days' leaderboard records
+     *              If exception does not occur, returns List of LeaderboardRecord objects.
+     *              If exception does not occurs, returns null.
+     */
     @Override
     public List<LeaderboardRecord> getWeeklyRecords() {
-        return null;
+        try {
+            Date now = new java.util.Date();
+            Date sevenDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(7)));
+            Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String nowDate = formatter.format(now);
+            String sevenDaysAgoDate = formatter.format(sevenDaysAgo);
+            List<LeaderboardRecord> last7daysRecords = mLeaderboardRecordRepository.findByEndDateBetween(
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(sevenDaysAgoDate));
+            return last7daysRecords;
+        } catch (Exception e) {
+            System.out.println("Exception occurred during Date parsing");
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
+    /**
+     * Retrieve all records in the last 30 days from the leaderboard record table.
+     *
+     * @return List of the last 30 days' leaderboard records
+     *              If exception does not occur, returns List of LeaderboardRecord objects.
+     *              If exception does not occurs, returns null.
+     */
     @Override
     public List<LeaderboardRecord> getMonthlyRecords() {
-        return null;
+        try {
+            Date now = new java.util.Date();
+            Date thirtyDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(30)));
+            Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String nowDate = formatter.format(now);
+            String thirtyDaysAgoDate = formatter.format(thirtyDaysAgo);
+            List<LeaderboardRecord> last30daysRecords = mLeaderboardRecordRepository.findByEndDateBetween(
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(thirtyDaysAgoDate));
+            return last30daysRecords;
+        } catch (Exception e) {
+            System.out.println("Exception occurred during Date parsing");
+            e.printStackTrace();
+            return null;
+        }
     }
 }
