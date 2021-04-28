@@ -1,7 +1,6 @@
 package com.group7.server.repository;
 
 import com.group7.server.model.ActivePlayer;
-import com.group7.server.model.Player;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

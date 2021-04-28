@@ -1,6 +1,7 @@
 package com.group7.server.repository;
 
 import com.group7.server.model.ActivePlayer;
+import com.group7.server.model.Player;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class ActivePlayerRepositoryTestStub implements ActivePlayerRepository{
+
+    public final Long NEW_TO_GAME_PLAYER_ID = 1L;
+    public final Long GAME_ASSIGNED_PLAYER_ID = 100L;
 
     @Override
     public void deleteById(long sessionId) {
@@ -73,7 +77,20 @@ public class ActivePlayerRepositoryTestStub implements ActivePlayerRepository{
 
     @Override
     public Optional<ActivePlayer> findById(Long aLong) {
-        return Optional.empty();
+        if (aLong > 0) {
+            // Return active player if id is valid
+            ActivePlayer activePlayer = new ActivePlayer(new Player());
+            activePlayer.setId(aLong);
+            if (aLong.equals(GAME_ASSIGNED_PLAYER_ID)){
+                // Game assigned condition
+                activePlayer.setGameId(0);
+            }
+            return Optional.of(activePlayer);
+        }
+        else {
+            // Return null if id not valid
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -135,4 +152,5 @@ public class ActivePlayerRepositoryTestStub implements ActivePlayerRepository{
     public <S extends ActivePlayer> boolean exists(Example<S> example) {
         return false;
     }
+
 }

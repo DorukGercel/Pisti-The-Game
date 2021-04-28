@@ -1,9 +1,7 @@
 package com.group7.server.service.authentication;
 
 import com.group7.server.definitions.StatusCode;
-import com.group7.server.model.ActivePlayer;
 import com.group7.server.model.Player;
-import com.group7.server.repository.ActivePlayerRepository;
 import com.group7.server.repository.ActivePlayerRepositoryTestStub;
 import com.group7.server.repository.PlayerRepositoryTestStub;
 import com.group7.server.security.UserDetailsManagerImpl;
@@ -14,9 +12,9 @@ import com.group7.server.security.config.SecurityConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,7 +28,8 @@ import static org.junit.Assert.assertEquals;
         JwtRequestFilter.class,
         PlayerRepositoryTestStub.class,
         ActivePlayerRepositoryTestStub.class})
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@WebAppConfiguration
+
 public class PlayerServiceTest {
 
     private PlayerService mPlayerService;
@@ -57,14 +56,22 @@ public class PlayerServiceTest {
     public void testLogin() {
         // Can't login because of empty credentials
         Player testPlayer = new Player("Doruk", "lolValley", "d@g.com");
-        Object[] object = null;
-        StatusCode statusCode = mPlayerService.login(testPlayer, object);
+        Object[] credentials = null;
+        StatusCode statusCode = mPlayerService.login(testPlayer, credentials);
         assertEquals(statusCode, StatusCode.FAIL);
 
         // Can't login because of no db value
-        object = new Object[2];
-        statusCode = mPlayerService.login(testPlayer, object);
+        credentials = new Object[2];
+        statusCode = mPlayerService.login(testPlayer, credentials);
         assertEquals(statusCode, StatusCode.FAIL);
+    }
+
+    @Test
+    public void testLogout() {
+        // Can't logout as no login performed
+        StatusCode statusCode = mPlayerService.logout(1L);
+        assertEquals(statusCode, StatusCode.FAIL);
+
     }
 }
 
