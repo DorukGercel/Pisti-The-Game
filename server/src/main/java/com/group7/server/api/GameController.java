@@ -1,12 +1,14 @@
 package com.group7.server.api;
 
+import com.group7.server.definitions.GameEnvironment;
 import com.group7.server.definitions.StatusCode;
-import com.group7.server.dto.game.GameResponse;
-import com.group7.server.dto.game.InitGameRequest;
-import com.group7.server.dto.game.InitGameResponse;
+import com.group7.server.dto.game.*;
 import com.group7.server.service.game.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Responsible for game related requests of the players.
@@ -39,5 +41,15 @@ public class GameController {
             return new InitGameResponse(statusCode, null, gameId[0]);
         }
         return new GameResponse(statusCode, "New game creation failed!");
+    }
+
+    @PutMapping("/interactGame")
+    public GameResponse interactGame(@RequestBody InteractRequest interactRequest){
+        List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
+        StatusCode statusCode = mGameService.interactGame(interactRequest.getSessionId(), interactRequest.getGameId(), interactRequest.getCardNo(), gameEnvironmentList);
+        if(statusCode.equals(StatusCode.SUCCESS)){
+            return new InteractResponse(statusCode, null, gameEnvironmentList.get(0), gameEnvironmentList.get(1));
+        }
+        return new GameResponse(statusCode, "Interaction with the game failed!");
     }
 }
