@@ -1,12 +1,15 @@
 package com.group7.server.service.game;
 
 import com.group7.server.definitions.Game;
+import com.group7.server.definitions.GameEnvironment;
 import com.group7.server.definitions.GameTable;
 import com.group7.server.definitions.StatusCode;
 import com.group7.server.model.ActivePlayer;
 import com.group7.server.repository.ActivePlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -51,6 +54,27 @@ public class GameServiceImpl implements GameService{
             return StatusCode.FAIL;
         } catch (Exception e){
             e.printStackTrace();
+            return StatusCode.FAIL;
+        }
+    }
+
+    @Override
+    public StatusCode interactGame(Long sessionId, Long gameId, Short cardNo, List<GameEnvironment> gameEnvironments) {
+        try {
+            Optional<ActivePlayer> dbActivePlayer = mActivePlayerRepository.findById(sessionId);
+            Game currentGame;
+            if(dbActivePlayer.isPresent() &&
+                    gameId.equals(dbActivePlayer.get().getGameId()) &&
+                    ((currentGame = mGameTable.getGame(gameId)) != null) &&
+                    (cardNo <= 51) && (gameEnvironments != null)){
+                Game.MoveType moveType = (cardNo < 0) ? Game.MoveType.INITIAL : Game.MoveType.CARD;
+                List<GameEnvironment> gameEnvironmentList = currentGame.interactSinglePlayer(moveType, cardNo);
+                gameEnvironments.addAll(gameEnvironmentList);
+                return StatusCode.SUCCESS;
+            }
+            return StatusCode.FAIL;
+        }
+        catch (Exception e){
             return StatusCode.FAIL;
         }
     }

@@ -1,9 +1,9 @@
 package com.group7.server.definitions;
 
 import lombok.Data;
-import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,13 +16,13 @@ import java.util.List;
 public class Game {
 
     /** Predefined number of cards*/
-    private final Integer             NO_CARDS = 52;
+    private final Short             NO_CARDS = 52;
     /** Predefined number of players*/
-    private final Integer             NO_PLAYERS = 2;
+    private final Short             NO_PLAYERS = 2;
     /** Predefined number of players*/
-    private final Integer             NO_NON_PLAYER_DECKS = 2;
+    private final Short             NO_NON_PLAYER_DECKS = 2;
     /** Predefined number of deal cards*/
-    private final Integer             NO_DEAL_CARDS = 4;
+    private final Short             NO_DEAL_CARDS = 4;
     /**
      * Cards in the game. Each inner list is owned by
      * different place/player in the game.
@@ -34,7 +34,7 @@ public class Game {
     /** Scores of each player*/
     private       List<List<Short>>   mScores;
     /** Current game level of the active game*/
-    private       Integer             mLevel;
+    private       Short               mLevel;
     /** Indicates whether player plays vs PC or another player*/
     private       Mode                mMode;
     /** Indicates the turn of the player# or pc*/
@@ -55,16 +55,17 @@ public class Game {
 
         this.mScores = new ArrayList<>(NO_PLAYERS);
         for (int i = 0; i < NO_PLAYERS; i++){
-            this.mScores.add(new ArrayList<>(2));
+            List<Short> scoreList = Arrays.asList((short) 0,(short) 0);
+            this.mScores.add(scoreList);
         }
     }
 
-
-    public void interactSinglePlayer(MoveType moveType, Short cardNo){
+    public List<GameEnvironment> interactSinglePlayer(MoveType moveType, Short cardNo){
         if (moveType.equals(MoveType.INITIAL)){
-
+            return createEnvironment(createPlayerEnvironment(false), createPcEnvironment(false));
         } else {
             simulateGame(cardNo);
+            return null;
         }
     }
 
@@ -103,6 +104,30 @@ public class Game {
 
     private void pcDecideCard() {
 
+    }
+
+    private List<GameEnvironment> createEnvironment(GameEnvironment playerEnv, GameEnvironment pcEnv) {
+        List<GameEnvironment> environment = new ArrayList<>();
+        environment.add(playerEnv);
+        environment.add(pcEnv);
+
+        return environment;
+    }
+
+    private GameEnvironment createPlayerEnvironment(boolean isPisti) {
+        List<Short> handCards = new ArrayList<>(getDeck(Side.PLAYER));
+        List<Short> middleCards = new ArrayList<>(getMiddleDeck());
+        List<Short> scores = new ArrayList<>(getScores(Side.PLAYER));
+
+        return GameEnvironment.buildPlayerEnvironment(handCards, middleCards, scores, isPisti);
+    }
+
+    private GameEnvironment createPcEnvironment(boolean isPisti) {
+        Short noHandCards = (short) getDeck(Side.PC).size();
+        List<Short> middleCards = new ArrayList<>(getMiddleDeck());
+        List<Short> scores = new ArrayList<>(getScores(Side.PLAYER));
+
+        return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti);
     }
 
     /** Initializes all decks of cards in the game; helper of constructor*/
