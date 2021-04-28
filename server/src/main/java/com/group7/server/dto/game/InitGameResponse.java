@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class InitGameResponse extends GameResponse {
-    /**Id of the game that is created with the request*/
+    /** Id of the game that is created with the request*/
     @NotEmpty
     private Long gameId;
 

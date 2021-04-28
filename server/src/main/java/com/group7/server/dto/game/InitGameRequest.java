@@ -11,7 +11,6 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InitGameRequest {
-
     /** Session id of the active player who requests to start new game*/
     @NotEmpty
     private Long sessionId;

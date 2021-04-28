@@ -7,7 +7,6 @@ import javax.validation.constraints.NotNull;
 
 /** Model of the player who is online (logged in) and includes session-wide information*/
 @Data
-@NoArgsConstructor
 @Entity
 @Table(name = "ACTIVE_PLAYER")
 public class ActivePlayer extends BaseModel {
@@ -33,6 +32,13 @@ public class ActivePlayer extends BaseModel {
     @NotNull
     @Column(name = "GAME_ID")
     private long gameId;
+
+    public ActivePlayer(){
+        this.player = null;
+        this.level = 0;
+        this.score = 0;
+        this.gameId = -1L;
+    }
 
     /** Constructor with the owner player argument*/
     public ActivePlayer(Player player){
