@@ -1,6 +1,7 @@
 package com.group7.server.security;
 
 import com.group7.server.model.Player;
+import com.group7.server.repository.ActivePlayerRepository;
 import com.group7.server.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;

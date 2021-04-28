@@ -13,6 +13,7 @@ public interface PlayerRepository
         extends JpaRepository<Player, Long> {
     Optional<Player> findById(long id);
     Optional<Player> findByUsername(String username);
+    Optional<Player> findByEmail(String email);
 
     @Transactional
     void deleteByUsername(String username);

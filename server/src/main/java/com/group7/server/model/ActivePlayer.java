@@ -19,15 +19,18 @@ public class ActivePlayer extends BaseModel {
     private Player player;
 
     /** Current game level*/
+    @NotNull
     @Column(name = "LEVEL")
     private int level;
 
     /** Current overall score*/
+    @NotNull
     @Column(name = "SCORE")
     private int score;
 
     //TODO: Add to schema
     /** Currently attached game*/
+    @NotNull
     @Column(name = "GAME_ID")
     private long gameId;
 

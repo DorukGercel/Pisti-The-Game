@@ -19,7 +19,7 @@ import java.util.Optional;
 public class PlayerServiceImpl implements PlayerService {
 
     private final AuthenticationService  mAuthenticationService;
-    private final PlayerRepository       mPlayerRepository;
+    private final PlayerRepository mPlayerRepository;
     private final ActivePlayerRepository mActivePlayerRepository;
 
     /**
@@ -61,7 +61,8 @@ public class PlayerServiceImpl implements PlayerService {
             String token;
             Long sessionId;
             if(((token = mAuthenticationService.authenticate(player)) != null) &&
-                    ((sessionId = initializeActivePlayer(player)) != null)) {
+                    ((sessionId = initializeActivePlayer(player)) != null) &&
+                    (credentials != null) && (credentials.length == 2)) {
                 /* Assigns credentials if the operations are successful*/
                 credentials[0] = token;
                 credentials[1] = sessionId;
