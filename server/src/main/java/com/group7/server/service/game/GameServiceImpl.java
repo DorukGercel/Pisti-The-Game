@@ -1,5 +1,6 @@
 package com.group7.server.service.game;
 
+import com.group7.server.definitions.Game;
 import com.group7.server.definitions.GameTable;
 import com.group7.server.definitions.StatusCode;
 import com.group7.server.model.ActivePlayer;

@@ -12,7 +12,7 @@ import java.util.Map;
 @Component
 public class CardTable {
 
-    private final Map<Integer, Card> mCardMap;
+    private final Map<Short, Card> mCardMap;
 
     /** Constructor of the table; called when app starts*/
     public CardTable(){
@@ -21,13 +21,13 @@ public class CardTable {
     }
 
     /** Return the card itself with that card number*/
-    public Card getCard(int cardNo){
+    public Card getCard(short cardNo){
         return mCardMap.get(cardNo);
     }
 
     /** Forms the map, helper function of the constructor*/
     private void initCards(){
-        int cardNo = 0;
+        short cardNo = 0;
         for(Card.Suit suit : Card.Suit.values()) {
             for (Card.Rank rank : Card.Rank.values()) {
                 mCardMap.put(cardNo++, new Card(suit, rank));
