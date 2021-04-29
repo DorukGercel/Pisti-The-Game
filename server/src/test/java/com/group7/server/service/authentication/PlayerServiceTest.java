@@ -44,7 +44,7 @@ public class PlayerServiceTest {
 
     @Test
     public void testRegister(){
-        // Creat a user that can be successfully registered
+        // Create a user that can be successfully registered
         Player testPlayer = new Player("Doruk", "lolValley", "d@g.com");
         StatusCode statusCode = mPlayerService.register(testPlayer);
         assertEquals(statusCode, StatusCode.SUCCESS);

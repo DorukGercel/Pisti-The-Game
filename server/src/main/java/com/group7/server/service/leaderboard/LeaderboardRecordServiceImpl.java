@@ -35,9 +35,13 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
     @Override
     public LeaderboardRecord createRecord(LeaderboardRecord record) {
         List<Player> players = mLeaderboardRecordRepository.getAllPlayers();
-        for(int i = 0; i< players.size(); i++){
-            if(!record.getPlayer().getId().equals(players.get(i).getId())) {
-                return mLeaderboardRecordRepository.save(record);
+        if(players.size() == 0) { // very first record in the leaderboard
+            mLeaderboardRecordRepository.save(record);
+        } else {
+            for(int i = 0; i < players.size(); i++){
+                if(!record.getPlayer().getId().equals(players.get(i).getId())) {
+                    return mLeaderboardRecordRepository.save(record);
+                }
             }
         }
         return null;

@@ -29,7 +29,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     /**
      * Extracts the JWT token from the HTTP request, and performs filtering  and authentication operations.
      *
-      * @param request the HTTP request sent to any web controller (api).
+     * @param request the HTTP request sent to any web controller (api).
      * @param response the HTTP response that is used in the filter chain for it's internal operations.
      * @param filterChain the filtering mechanism that performs security actions and deals with authentication.
      * @throws ServletException may be thrown because of the filtering operations.
