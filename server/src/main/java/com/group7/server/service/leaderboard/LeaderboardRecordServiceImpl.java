@@ -3,6 +3,7 @@ package com.group7.server.service.leaderboard;
 import com.group7.server.model.Player;
 import com.group7.server.model.LeaderboardRecord;
 import com.group7.server.repository.LeaderboardRecordRepository;
+import com.group7.server.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,12 +35,12 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
      */
     @Override
     public LeaderboardRecord createRecord(LeaderboardRecord record) {
-        List<Player> players = mLeaderboardRecordRepository.getAllPlayers();
-        if(players.size() == 0) { // very first record in the leaderboard
-            mLeaderboardRecordRepository.save(record);
+        List<LeaderboardRecord> records = mLeaderboardRecordRepository.findAll();
+        if(records.size() == 0) { // very first record in the leaderboard
+            return mLeaderboardRecordRepository.save(record);
         } else {
-            for(int i = 0; i < players.size(); i++){
-                if(!record.getPlayer().getId().equals(players.get(i).getId())) {
+            for(int i = 0; i < records.size(); i++){
+                if(!record.getPlayer().getId().equals(records.get(i).getPlayer().getId())) {
                     return mLeaderboardRecordRepository.save(record);
                 }
             }
@@ -96,7 +97,7 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
         try {
             List<LeaderboardRecord> records;
             Date now = new java.util.Date();
-            Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:");
+            Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             String nowDate = formatter.format(now);
             if (period.equals("weekly")) {
                 Date sevenDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(7)));

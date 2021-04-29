@@ -16,8 +16,7 @@ import java.util.Optional;
 public interface LeaderboardRecordRepository
         extends JpaRepository<LeaderboardRecord, Long>
 {
-    @Query("select p from Player p")
-    List<Player> getAllPlayers();
+    List<LeaderboardRecord> findAll();
 
     @Query(value = "from LeaderboardRecord t where t.endDate between :startDate and :endDate order by t.score desc")
     List<LeaderboardRecord> findByEndDateBetween(

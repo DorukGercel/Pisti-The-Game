@@ -7,22 +7,40 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class LeaderboardRecordRepositoryTestStub implements LeaderboardRecordRepository {
 
-
-    @Override
-    public List<Player> getAllPlayers() {
-        return null;
-    }
+    static List<LeaderboardRecord> recordList = new ArrayList<>();
 
     @Override
     public List<LeaderboardRecord> findByEndDateBetween(Date startDate, Date endDate) {
-        return null;
+        List<LeaderboardRecord> tmpList = new ArrayList<>();
+        for(LeaderboardRecord record : recordList) {
+            if (record.getEndDate().after(endDate) && record.getEndDate().before(startDate)) {
+                tmpList.add(record);
+            }
+        }
+        Collections.sort(tmpList, new Comparator<>() {
+            @Override
+            public int compare(LeaderboardRecord o1, LeaderboardRecord o2) {
+                if (o1.getScore() == o2.getScore())
+                    return 0;
+                else if (o1.getScore() > o2.getScore())
+                    return -1;
+                else
+                    return 1;
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                return false;
+            }
+        });
+
+        return tmpList;
     }
+
 
     @Override
     public Optional<LeaderboardRecord> findByPlayer(Player player) {
@@ -31,7 +49,23 @@ public class LeaderboardRecordRepositoryTestStub implements LeaderboardRecordRep
 
     @Override
     public List<LeaderboardRecord> findAll() {
-        return null;
+        Collections.sort(recordList, new Comparator<>() {
+            @Override
+            public int compare(LeaderboardRecord o1, LeaderboardRecord o2) {
+                if (o1.getScore() == o2.getScore())
+                    return 0;
+                else if (o1.getScore() > o2.getScore())
+                    return -1;
+                else
+                    return 1;
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                return false;
+            }
+        });
+        return recordList;
     }
 
     @Override
@@ -56,7 +90,7 @@ public class LeaderboardRecordRepositoryTestStub implements LeaderboardRecordRep
 
     @Override
     public void deleteById(Long aLong) {
-
+        recordList.remove(0);
     }
 
     @Override
@@ -71,12 +105,13 @@ public class LeaderboardRecordRepositoryTestStub implements LeaderboardRecordRep
 
     @Override
     public void deleteAll() {
-
+        recordList.clear();
     }
 
     @Override
     public <S extends LeaderboardRecord> S save(S s) {
-        return null;
+        recordList.add(s);
+        return s;
     }
 
     @Override
@@ -86,7 +121,10 @@ public class LeaderboardRecordRepositoryTestStub implements LeaderboardRecordRep
 
     @Override
     public Optional<LeaderboardRecord> findById(Long aLong) {
-        return Optional.empty();
+        if (recordList.isEmpty()){
+            return Optional.ofNullable(null);
+        }
+        return Optional.ofNullable(recordList.get(0));
     }
 
     @Override
