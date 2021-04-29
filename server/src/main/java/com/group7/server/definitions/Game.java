@@ -147,7 +147,7 @@ public class Game {
     private GameEnvironment createPcEnvironment(boolean isPisti) {
         Short noHandCards = (short) getDeck(Side.PC).size();
         List<Short> middleCards = new ArrayList<>(getMiddleDeck());
-        List<Short> scores = new ArrayList<>(getScores(Side.PLAYER));
+        List<Short> scores = new ArrayList<>(getScores(Side.PC));
 
         return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti);
     }

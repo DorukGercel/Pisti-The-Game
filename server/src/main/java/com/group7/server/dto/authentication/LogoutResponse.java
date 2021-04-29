@@ -1,5 +1,7 @@
 package com.group7.server.dto.authentication;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group7.server.definitions.StatusCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,7 +12,9 @@ import lombok.EqualsAndHashCode;
 public class LogoutResponse extends AuthResponse{
 
     /** All args constructor*/
-    public LogoutResponse(StatusCode statusCode, String errorMessage){
+    @JsonCreator
+    public LogoutResponse(@JsonProperty("statusCode") StatusCode statusCode,
+                          @JsonProperty("errorMessage") String errorMessage){
         super(statusCode, errorMessage);
     }
 }

@@ -1,5 +1,7 @@
 package com.group7.server.dto.game;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group7.server.definitions.StatusCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +17,10 @@ public class InitGameResponse extends GameResponse {
     private Long gameId;
 
     /** All args constructor*/
-    public InitGameResponse(StatusCode statusCode, String errorMessage, Long gameId){
+    @JsonCreator
+    public InitGameResponse(@JsonProperty("statusCode") StatusCode statusCode,
+                            @JsonProperty("errorMessage") String errorMessage,
+                            @JsonProperty("gameId") Long gameId){
         super(statusCode, errorMessage);
         this.gameId = gameId;
     }

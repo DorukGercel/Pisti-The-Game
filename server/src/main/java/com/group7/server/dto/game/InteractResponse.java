@@ -1,5 +1,7 @@
 package com.group7.server.dto.game;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group7.server.definitions.GameEnvironment;
 import com.group7.server.definitions.StatusCode;
 import lombok.Data;
@@ -17,7 +19,11 @@ public class InteractResponse extends GameResponse {
     @NotEmpty
     private GameEnvironment pcEnvironment;
 
-    public InteractResponse(StatusCode statusCode, String errorMessage, GameEnvironment playerEnvironment, GameEnvironment pcEnvironment) {
+    @JsonCreator
+    public InteractResponse(@JsonProperty("statusCode") StatusCode statusCode,
+                            @JsonProperty("errorMessage") String errorMessage,
+                            @JsonProperty("playerEnvironment") GameEnvironment playerEnvironment,
+                            @JsonProperty("pcEnvironment") GameEnvironment pcEnvironment) {
         super(statusCode, errorMessage);
         this.playerEnvironment = playerEnvironment;
         this.pcEnvironment = pcEnvironment;

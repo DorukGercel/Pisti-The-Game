@@ -1,5 +1,6 @@
 package com.group7.server.api;
 
+import com.group7.server.definitions.Game;
 import com.group7.server.definitions.GameEnvironment;
 import com.group7.server.definitions.StatusCode;
 import com.group7.server.dto.game.*;
@@ -49,11 +50,25 @@ public class GameController {
         StatusCode statusCode = mGameService.interactGame(interactRequest.getSessionId(),
                 interactRequest.getGameId(),
                 interactRequest.getCardNo(),
-                interactRequest.getMoveType(),
+                decodeMoveType(interactRequest.getMoveType()),
                 gameEnvironmentList);
         if(statusCode.equals(StatusCode.SUCCESS)){
             return new InteractResponse(statusCode, null, gameEnvironmentList.get(0), gameEnvironmentList.get(1));
         }
         return new GameResponse(statusCode, "Interaction with the game failed!");
+    }
+
+    /** Helper function to decode string to enum*/
+    private Game.MoveType decodeMoveType(String moveTypeStr){
+        if(moveTypeStr.equals("INITIAL")){
+            return Game.MoveType.INITIAL;
+        }
+        else if(moveTypeStr.equals("CARD")){
+            return Game.MoveType.CARD;
+        }
+        else if(moveTypeStr.equals("REDEAL")){
+            return Game.MoveType.REDEAL;
+        }
+        return null;
     }
 }

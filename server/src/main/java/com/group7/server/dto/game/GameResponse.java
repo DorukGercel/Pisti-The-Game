@@ -1,5 +1,7 @@
 package com.group7.server.dto.game;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group7.server.definitions.StatusCode;
 import com.group7.server.dto.common.CommonResponse;
 import lombok.Data;
@@ -11,8 +13,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class GameResponse extends CommonResponse {
+
     /** All args constructor*/
-    public GameResponse(StatusCode statusCode, String errorMessage){
+    @JsonCreator
+    public GameResponse(@JsonProperty("statusCode") StatusCode statusCode,
+                        @JsonProperty("statusCode") String errorMessage){
         super(statusCode, errorMessage);
     }
 }

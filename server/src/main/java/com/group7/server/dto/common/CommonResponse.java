@@ -1,5 +1,7 @@
 package com.group7.server.dto.common;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group7.server.definitions.StatusCode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +12,6 @@ import javax.validation.constraints.NotEmpty;
 
 /** DTO used as a super class for all responses*/
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class CommonResponse {
     /** Indicates the success of the requested operation*/
@@ -20,4 +21,11 @@ public class CommonResponse {
     /** Indicates the error that occurred, null if operation was successful.*/
     @Nullable
     private String errorMessage;
+
+    @JsonCreator
+    public CommonResponse(@JsonProperty("statusCode") StatusCode statusCode,
+                          @JsonProperty("errorMessage") String errorMessage){
+        this.statusCode = statusCode;
+        this.errorMessage = errorMessage;
+    }
 }
