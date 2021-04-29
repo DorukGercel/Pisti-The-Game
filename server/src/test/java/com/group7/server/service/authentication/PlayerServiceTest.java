@@ -1,7 +1,9 @@
 package com.group7.server.service.authentication;
 
 import com.group7.server.definitions.StatusCode;
+import com.group7.server.model.ActivePlayer;
 import com.group7.server.model.Player;
+import com.group7.server.repository.ActivePlayerRepository;
 import com.group7.server.repository.ActivePlayerRepositoryTestStub;
 import com.group7.server.repository.PlayerRepositoryTestStub;
 import com.group7.server.security.UserDetailsManagerImpl;
@@ -29,14 +31,15 @@ import static org.junit.Assert.assertEquals;
         PlayerRepositoryTestStub.class,
         ActivePlayerRepositoryTestStub.class})
 @WebAppConfiguration
-
 public class PlayerServiceTest {
 
     private PlayerService mPlayerService;
+    private ActivePlayerRepository mActivePlayerRepository;
 
     @Autowired
-    void setPlayerService(PlayerService playerService) {
+    void setPlayerService(PlayerService playerService, ActivePlayerRepository activePlayerRepository) {
         this.mPlayerService = playerService;
+        this.mActivePlayerRepository = activePlayerRepository;
     }
 
     @Test
@@ -69,9 +72,13 @@ public class PlayerServiceTest {
     @Test
     public void testLogout() {
         // Can't logout as no login performed
-        StatusCode statusCode = mPlayerService.logout(1L);
+        StatusCode statusCode = mPlayerService.logout(-1L);
         assertEquals(statusCode, StatusCode.FAIL);
 
+        // Can't logout as no login performed
+        mActivePlayerRepository.save(new ActivePlayer());
+        statusCode = mPlayerService.logout(1L);
+        assertEquals(statusCode, StatusCode.SUCCESS);
     }
 }
 

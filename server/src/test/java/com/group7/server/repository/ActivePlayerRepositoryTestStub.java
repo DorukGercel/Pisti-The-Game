@@ -12,8 +12,8 @@ import java.util.Optional;
 
 public class ActivePlayerRepositoryTestStub implements ActivePlayerRepository{
 
-    public final Long NEW_TO_GAME_PLAYER_ID = 1L;
-    public final Long GAME_ASSIGNED_PLAYER_ID = 100L;
+    public final Long NEW_TO_GAME_PLAYER_ID = 100L;
+    public final Long GAME_ASSIGNED_PLAYER_ID = 1L;
 
     @Override
     public void deleteById(long sessionId) {
@@ -81,9 +81,9 @@ public class ActivePlayerRepositoryTestStub implements ActivePlayerRepository{
             // Return active player if id is valid
             ActivePlayer activePlayer = new ActivePlayer(new Player());
             activePlayer.setId(aLong);
-            if (aLong.equals(GAME_ASSIGNED_PLAYER_ID)){
+            if (aLong < NEW_TO_GAME_PLAYER_ID){
                 // Game assigned condition
-                activePlayer.setGameId(0);
+                activePlayer.setGameId(aLong);
             }
             return Optional.of(activePlayer);
         }
