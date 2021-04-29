@@ -1,5 +1,6 @@
 package com.group7.server.service.game;
 
+import com.group7.server.definitions.Game;
 import com.group7.server.definitions.GameEnvironment;
 import com.group7.server.definitions.StatusCode;
 
@@ -11,5 +12,6 @@ import java.util.List;
  */
 public interface GameService {
     StatusCode initGame(Long sessionId, Object[] gameId);
-    StatusCode interactGame(Long sessionId, Long gameId, Short cardNo, List<GameEnvironment> gameEnvironmentList);
+    StatusCode interactGame(Long sessionId, Long gameId, Short cardNo, Game.MoveType moveType, List<GameEnvironment> gameEnvironmentList);
+    StatusCode removeGame(Long sessionId, Long gameId);
 }

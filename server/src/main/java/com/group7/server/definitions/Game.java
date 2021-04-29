@@ -62,22 +62,37 @@ public class Game {
 
     public List<GameEnvironment> interactSinglePlayer(MoveType moveType, Short cardNo){
         if (moveType.equals(MoveType.INITIAL)){
-            return createEnvironment(createPlayerEnvironment(false), createPcEnvironment(false));
+            return createEnvironment(createPlayerEnvironment(false),
+                    createPcEnvironment(false)
+            );
+        } else if (moveType.equals(MoveType.CARD)){
+            return simulateGame(cardNo);
         } else {
-            simulateGame(cardNo);
-            return null;
+            dealCards();
+            return createEnvironment(createPlayerEnvironment(false),
+                    createPcEnvironment(false)
+            );
         }
     }
 
-    // TODO: Decide package structure to send to client
-    private void simulateGame(Short cardNo) {
+    private List<GameEnvironment> simulateGame(Short cardNo) {
+        List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
         if (mMode.equals(Mode.SINGLE)) {
-            simulateMovement(cardNo, mTurn);
+            // Simulate player movement and create game environment
+            gameEnvironmentList.add(
+                    createPlayerEnvironment(simulateMovement(cardNo, mTurn))
+            );
+            // Simulate pc movement and create game environment
+            gameEnvironmentList.add(
+                    createPcEnvironment(simulateMovement(pcDecideCard(), mTurn))
+            );
         }
+        return gameEnvironmentList;
     }
 
     /** The method that evaluates the moves of the player or the pc*/
-    private void simulateMovement(Short cardNo, Side side) {
+    private boolean simulateMovement(Short cardNo, Side side) {
+        boolean isPisti = false;
         List<Short> middleDeck = getMiddleDeck();
         // Player's or PC' deck
         List<Short> currentPlayerDeck = getDeck(side);
@@ -88,7 +103,7 @@ public class Game {
             Card currentPlayerCard = mCardTable.getCard(cardNo);
             if (isMatchedCard(currentPlayerCard)){
                 // Increment score of player and set last win
-                incrementScore(currentPlayerCard, side);
+                isPisti = incrementScore(currentPlayerCard, side);
                 setMLastWin(side);
             } else {
                 // Add player card to top of middle
@@ -100,10 +115,17 @@ public class Game {
         }
         // Change turn
         invertTurn();
+        return isPisti;
     }
 
-    private void pcDecideCard() {
-
+    private Short pcDecideCard() {
+        List<Short> pcDeck = getDeck(Side.PC);
+        for (Short cardNo : pcDeck) {
+            if(isMatchedCard(mCardTable.getCard(cardNo))) {
+                   return cardNo;
+            }
+        }
+        return getTopCardNo(pcDeck);
     }
 
     private List<GameEnvironment> createEnvironment(GameEnvironment playerEnv, GameEnvironment pcEnv) {
@@ -217,8 +239,11 @@ public class Game {
 
     /** Helper function to decide if there is a takeover.*/
     private boolean isMatchedCard(Card playerCard) {
-        //Extract the face up card
+        //Extract the face up card if middle is not empty
         List<Short> middleDeck = getMiddleDeck();
+        if(middleDeck.isEmpty()){
+            return false;
+        }
         Card faceUpCard = getTopCard(middleDeck);
 
         // True if the player card is jack or the ranks of the cards match
@@ -227,7 +252,8 @@ public class Game {
 
     /** Helper function to increment the score of the side who achieved takeover.*/
     // TODO: Q: When pisti achieved does user count the values of the cards? No in this implementation.
-    private void incrementScore(Card playerCard, Side side) {
+    private boolean incrementScore(Card playerCard, Side side) {
+        boolean isPisti = false;
         short pointsReceived = 0;
         short cardsReceived = 0;
 
@@ -243,6 +269,7 @@ public class Game {
             removeTopCard(middleDeck);
             pointsReceived = (short) (pointsReceived + takeoverPoint);
             cardsReceived = (short) (cardsReceived + 2);
+            isPisti = true;
         } else {
             // Take special points of the player card and top middle cards
             short playerCardPoint = SpecialPoint.takeCardPoint(playerCard);
@@ -266,6 +293,8 @@ public class Game {
         List<Short> scores = getScores(side);
         scores.set(0, (short) (scores.get(0) + pointsReceived));
         scores.set(1, (short) (scores.get(1) + cardsReceived));
+
+        return isPisti;
     }
 
     /** Helper function to change turns.*/
@@ -333,7 +362,8 @@ public class Game {
     /** Used in game related operations to separate first move and regular card move.*/
     public enum MoveType {
         INITIAL,
-        CARD
+        CARD,
+        REDEAL
     }
 
     /** Type definition of game mode; either vs PC or another player*/

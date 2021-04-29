@@ -2,7 +2,9 @@ package com.group7.server.definitions;
 
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +25,15 @@ public class CardTable {
     /** Return the card itself with that card number*/
     public Card getCard(short cardNo){
         return mCardMap.get(cardNo);
+    }
+
+    /** Return the list of cards with that card number*/
+    public List<Card> getAllCards(List<Short> cardList) {
+        List<Card> cards = new ArrayList<>();
+        for(Short cardNo : cardList) {
+            cards.add(getCard(cardNo));
+        }
+        return cards;
     }
 
     /** Forms the map, helper function of the constructor*/

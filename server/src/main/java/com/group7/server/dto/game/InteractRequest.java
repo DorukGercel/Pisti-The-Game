@@ -1,5 +1,6 @@
 package com.group7.server.dto.game;
 
+import com.group7.server.definitions.Game;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,10 +21,11 @@ public class InteractRequest {
     @NotEmpty
     private Long gameId;
 
-    /**
-     * No of the card to be played;
-     * Attention: if < 0 then it is initial request
-     **/
+    /** No of the card to be played*/
     @NotEmpty
     private Short cardNo;
+
+    /** Type of the move to be simulated*/
+    @NotEmpty
+    private Game.MoveType moveType;
 }

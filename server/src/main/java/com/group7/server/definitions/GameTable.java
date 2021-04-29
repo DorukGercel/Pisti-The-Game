@@ -25,7 +25,7 @@ public class GameTable  {
     public GameTable(ApplicationContext applicationContext){
         this.mApplicationContext = applicationContext;
         this.mGameMap = new HashMap<>();
-        this.mGameId = 0L;
+        this.mGameId = 1L;
     }
 
     /** Adds a new game entry to the table*/
@@ -41,4 +41,10 @@ public class GameTable  {
     public Game getGame(Long gameId){
         return mGameMap.get(gameId);
     }
+
+    /** Delete the game entry*/
+    public boolean deleteGame(Long gameId){
+        return mGameMap.remove(gameId) != null;
+    }
+
 }

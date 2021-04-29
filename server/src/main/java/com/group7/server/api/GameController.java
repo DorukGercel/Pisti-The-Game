@@ -46,7 +46,11 @@ public class GameController {
     @PutMapping("/interactGame")
     public GameResponse interactGame(@RequestBody InteractRequest interactRequest){
         List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
-        StatusCode statusCode = mGameService.interactGame(interactRequest.getSessionId(), interactRequest.getGameId(), interactRequest.getCardNo(), gameEnvironmentList);
+        StatusCode statusCode = mGameService.interactGame(interactRequest.getSessionId(),
+                interactRequest.getGameId(),
+                interactRequest.getCardNo(),
+                interactRequest.getMoveType(),
+                gameEnvironmentList);
         if(statusCode.equals(StatusCode.SUCCESS)){
             return new InteractResponse(statusCode, null, gameEnvironmentList.get(0), gameEnvironmentList.get(1));
         }
