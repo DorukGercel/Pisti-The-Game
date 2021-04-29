@@ -80,7 +80,7 @@ public class PlayerRepositoryTest {
         assertTrue(dbPlayer1.isPresent());
         assertTrue(dbPlayer2.isPresent());
 
-        // Delete  by id
+        // Delete by id
         mPlayerRepository.deleteById(dbPlayer1.get().getId());
         Optional<Player> deletedPlayer1 = mPlayerRepository.findById(savedPlayer1.getId());
         // Delete by username
