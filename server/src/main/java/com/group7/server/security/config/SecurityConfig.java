@@ -32,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      *This method determines the authentication requirements to URLs of the api.
      *They can either be public or private (require JWT token).
      * */
+    // TODO: Rearrange url's authentication settings
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http
