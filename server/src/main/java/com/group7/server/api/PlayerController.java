@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RequiredArgsConstructor
 @RequestMapping("/api/player")
-@Api(value = "User Api documentation")
+@Api(value = "Player API", tags = {"Player API"})
 @RestController
 public class PlayerController {
 
@@ -34,7 +34,7 @@ public class PlayerController {
      *
      */
     @PostMapping("/register")
-    @ApiOperation(value = "New User adding method")
+    @ApiOperation(value = "Handles player's register request.")
     public AuthResponse register(@RequestBody AuthRequest authRequest){
         StatusCode statusCode = mPlayerService.register(
                 new Player(
@@ -60,7 +60,7 @@ public class PlayerController {
      *                    If operation is not successful; returns fail status code and the error message.
      */
     @PostMapping("/login")
-    @ApiOperation(value = "User list method")
+    @ApiOperation(value = "Handles player's login request. Register required.")
     public AuthResponse login(@RequestBody AuthRequest authRequest){
         Object[] credentials = new Object[2];
         StatusCode statusCode = mPlayerService.login(
@@ -90,6 +90,7 @@ public class PlayerController {
      *                    If operation is not successful; returns fail status code and the error message.
      */
     @DeleteMapping("/logout")
+    @ApiOperation(value = "Handles player's logout request. Login required.")
     public AuthResponse logout(@RequestBody LogoutRequest logoutRequest){
         StatusCode statusCode = mPlayerService.logout(logoutRequest.getSessionId());
 

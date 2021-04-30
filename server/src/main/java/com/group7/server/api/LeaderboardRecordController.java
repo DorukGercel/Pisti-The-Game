@@ -3,6 +3,8 @@ package com.group7.server.api;
 
 import com.group7.server.model.LeaderboardRecord;
 import com.group7.server.service.leaderboard.LeaderboardRecordService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @RequestMapping("/api/leaderboard")
+@Api(value = "Leaderboard Record API", tags = {"Leaderboard Record API"})
 @RestController
 public class LeaderboardRecordController {
 
@@ -33,6 +36,7 @@ public class LeaderboardRecordController {
      *
      */
     @PostMapping("/create")
+    @ApiOperation(value = "Creates a new record in the leaderboard. Login required.")
     public ResponseEntity<LeaderboardRecord> createRecord(@RequestBody LeaderboardRecord record) {
         return ResponseEntity.ok().body(mLeaderboardRecordService.createRecord(record));
     }
@@ -46,6 +50,7 @@ public class LeaderboardRecordController {
      *
      */
     @PostMapping("/update")
+    @ApiOperation(value = "Updates a record in the leaderboard. Login required.")
     public ResponseEntity<LeaderboardRecord> updateRecord(@RequestBody LeaderboardRecord record) {
         return ResponseEntity.ok().body(mLeaderboardRecordService.updateRecord(record));
     }
@@ -59,6 +64,7 @@ public class LeaderboardRecordController {
      *
      */
     @DeleteMapping("/delete")
+    @ApiOperation(value = "Deletes a record from the leaderboard. Login required.")
     public ResponseEntity<Void> deleteRecord(@RequestBody LeaderboardRecord record) {
         mLeaderboardRecordService.deleteRecord(record);
         return ResponseEntity.noContent().build();
@@ -72,6 +78,7 @@ public class LeaderboardRecordController {
      *
      */
     @GetMapping("/allTimes")
+    @ApiOperation(value = "Lists all the records in the leaderboard. Login required.")
     public ResponseEntity<List<LeaderboardRecord>> getAllTimes(@RequestParam(value = "allTimes") String period) {
         return ResponseEntity.ok().body(mLeaderboardRecordService.getRecordsByDate("allTimes"));
     }
@@ -84,6 +91,7 @@ public class LeaderboardRecordController {
      *
      */
     @GetMapping("/weekly")
+    @ApiOperation(value = "Lists all the records in the leaderboard that are added this week. Login required.")
     public ResponseEntity<List<LeaderboardRecord>> getWeekly(@RequestParam(value = "weekly") String period) {
         return ResponseEntity.ok().body(mLeaderboardRecordService.getRecordsByDate("weekly"));
     }
@@ -96,6 +104,7 @@ public class LeaderboardRecordController {
      *
      */
     @GetMapping("/monthly")
+    @ApiOperation(value = "Lists all the records in the leaderboard that are added this month. Login required.")
     public ResponseEntity<List<LeaderboardRecord>> getMonthly(@RequestParam(value = "monthly") String period) {
         return ResponseEntity.ok().body(mLeaderboardRecordService.getRecordsByDate("monthly"));
     }

@@ -5,6 +5,8 @@ import com.group7.server.definitions.game.GameEnvironment;
 import com.group7.server.definitions.common.StatusCode;
 import com.group7.server.dto.game.*;
 import com.group7.server.service.game.GameService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @RequestMapping("/api/game")
+@Api(value = "Game API", tags = {"Game API"})
 @RestController
 public class GameController {
 
@@ -35,6 +38,7 @@ public class GameController {
      *                      If operation is not successful; returns fail status code and the error message.
      */
     @PutMapping("/startGame")
+    @ApiOperation(value = "Creates a new game and connects the player to the game. Login required.")
     public GameResponse startGame(@RequestBody InitGameRequest initGameRequest){
         Long[] gameId = new Long[1];
         StatusCode statusCode = mGameService.initGame(initGameRequest.getSessionId(),gameId);
@@ -45,6 +49,7 @@ public class GameController {
     }
 
     @PutMapping("/interactGame")
+    @ApiOperation(value = "Player interacts with the game. The player can perform initial, card or redeal movements. Login required.")
     public GameResponse interactGame(@RequestBody InteractRequest interactRequest){
         List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
         StatusCode statusCode = mGameService.interactGame(interactRequest.getSessionId(),
