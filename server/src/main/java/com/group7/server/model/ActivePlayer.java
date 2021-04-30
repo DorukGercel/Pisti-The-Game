@@ -27,7 +27,6 @@ public class ActivePlayer extends BaseModel {
     @Column(name = "SCORE")
     private int score;
 
-    //TODO: Add to schema
     /** Currently attached game*/
     @NotNull
     @Column(name = "GAME_ID")
