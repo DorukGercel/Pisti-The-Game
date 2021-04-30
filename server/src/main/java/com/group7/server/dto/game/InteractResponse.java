@@ -12,7 +12,6 @@ import javax.validation.constraints.NotEmpty;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class InteractResponse extends GameResponse {
-
     @NotEmpty
     private GameEnvironment playerEnvironment;
 

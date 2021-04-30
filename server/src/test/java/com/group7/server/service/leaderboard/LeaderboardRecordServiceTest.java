@@ -14,10 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -132,16 +129,19 @@ public class LeaderboardRecordServiceTest {
         LeaderboardRecord record4 = new LeaderboardRecord(testPlayer4, date4, 500);
         mLeaderboardRecordRepository.save(record4);
         // Check if only record1 and record2 are retrieved
-        List<LeaderboardRecord> weeklyRecords = mLeaderboardRecordService.getRecordsByDate("weekly");
+        List<LeaderboardRecord> weeklyRecords = new ArrayList<>();
+        mLeaderboardRecordService.getRecordsByDate(LeaderboardRecordService.Period.WEEKLY, weeklyRecords);
         assertEquals(testPlayer2, weeklyRecords.get(0).getPlayer());
         assertEquals(testPlayer1, weeklyRecords.get(1).getPlayer());
         // Check if only record1, record2 and record3 are retrieved
-        List<LeaderboardRecord> monthlyRecords = mLeaderboardRecordService.getRecordsByDate("monthly");
+        List<LeaderboardRecord> monthlyRecords = new ArrayList<>();
+        mLeaderboardRecordService.getRecordsByDate(LeaderboardRecordService.Period.MONTHLY, monthlyRecords);
         assertEquals(testPlayer3, monthlyRecords.get(0).getPlayer());
         assertEquals(testPlayer2, monthlyRecords.get(1).getPlayer());
         assertEquals(testPlayer1, monthlyRecords.get(2).getPlayer());
         // Check if all four records are retrieved
-        List<LeaderboardRecord> allTimesRecords = mLeaderboardRecordService.getRecordsByDate("allTimes");
+        List<LeaderboardRecord> allTimesRecords = new ArrayList<>();
+        mLeaderboardRecordService.getRecordsByDate(LeaderboardRecordService.Period.ALL_TIMES, allTimesRecords);
         assertEquals(testPlayer4, allTimesRecords.get(0).getPlayer());
         assertEquals(testPlayer3, allTimesRecords.get(1).getPlayer());
         assertEquals(testPlayer2, allTimesRecords.get(2).getPlayer());

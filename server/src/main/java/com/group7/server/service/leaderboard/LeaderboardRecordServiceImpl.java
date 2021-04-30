@@ -1,5 +1,6 @@
 package com.group7.server.service.leaderboard;
 
+import com.group7.server.definitions.common.StatusCode;
 import com.group7.server.model.Player;
 import com.group7.server.model.LeaderboardRecord;
 import com.group7.server.repository.LeaderboardRecordRepository;
@@ -74,13 +75,15 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
      * Deletes a record in the leaderboard record table.
      *
      * @param record the record to be deleted.
+     * return the status code of the operation
      */
     @Override
-    public void deleteRecord(LeaderboardRecord record) {
+    public StatusCode deleteRecord(LeaderboardRecord record) {
         try {
             mLeaderboardRecordRepository.deleteById(record.getId());
+            return StatusCode.SUCCESS;
         } catch(Exception e) {
-            return;
+            return StatusCode.FAIL;
         }
     }
 
@@ -88,38 +91,46 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
      * Retrieve all records according to given period from the leaderboard record table.
      *
      * @param period it can be "weekly", "monthly" or "allTimes"
-     * @return List of leaderboard records
+     * @param leaderboardRecordList List of leaderboard records
      *              If exception does not occur, returns List of LeaderboardRecord objects.
      *              If exception does not occurs, returns null.
+     *
+     * return the status code of the operation
      */
     @Override
-    public List<LeaderboardRecord> getRecordsByDate(String period) {
+    public StatusCode getRecordsByDate(Period period, List<LeaderboardRecord> leaderboardRecordList) {
         try {
-            List<LeaderboardRecord> records;
+            if (leaderboardRecordList == null || period == null){
+                return StatusCode.FAIL;
+            }
             Date now = new java.util.Date();
             Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             String nowDate = formatter.format(now);
-            if (period.equals("weekly")) {
+            if (period.equals(Period.WEEKLY)) {
                 Date sevenDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(7)));
                 String sevenDaysAgoDate = formatter.format(sevenDaysAgo);
-                records = mLeaderboardRecordRepository.findByEndDateBetween(
-                        new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
-                        new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(sevenDaysAgoDate));
-            } else if (period.equals("monthly")) {
+                leaderboardRecordList.addAll(mLeaderboardRecordRepository
+                        .findByEndDateBetween(
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(sevenDaysAgoDate))
+                );
+            } else if (period.equals(Period.MONTHLY)) {
                 Date thirtyDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(30)));
                 String thirtyDaysAgoDate = formatter.format(thirtyDaysAgo);
-                records = mLeaderboardRecordRepository.findByEndDateBetween(
-                        new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
-                        new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(thirtyDaysAgoDate));
+                leaderboardRecordList.addAll(mLeaderboardRecordRepository
+                        .findByEndDateBetween(
+                            new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
+                            new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(thirtyDaysAgoDate))
+                );
             } else {
                 /* period == "allTimes" */
-                records = mLeaderboardRecordRepository.findAll();
+                leaderboardRecordList.addAll(mLeaderboardRecordRepository.findAll());
             }
-            return records;
+            return StatusCode.SUCCESS;
         } catch (Exception e) {
             System.out.println("Exception occurred during Date parsing");
             e.printStackTrace();
-            return null;
+            return StatusCode.FAIL;
         }
     }
 

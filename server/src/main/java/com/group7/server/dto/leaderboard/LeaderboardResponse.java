@@ -1,4 +1,4 @@
-package com.group7.server.dto.game;
+package com.group7.server.dto.leaderboard;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,15 +8,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/** DTO used as a super class for game related responses*/
+/** DTO used as a super class for leaderboard record related responses*/
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class GameResponse extends CommonResponse {
+public class LeaderboardResponse extends CommonResponse {
     /** All args constructor*/
     @JsonCreator
-    public GameResponse(@JsonProperty("statusCode") StatusCode statusCode,
-                        @JsonProperty("statusCode") String errorMessage){
+    public LeaderboardResponse(@JsonProperty("statusCode") StatusCode statusCode,
+                               @JsonProperty("statusCode") String errorMessage) {
         super(statusCode, errorMessage);
     }
 }
