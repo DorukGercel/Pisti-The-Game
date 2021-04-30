@@ -11,8 +11,8 @@ import java.util.List;
  *
  */
 public interface LeaderboardRecordService {
-    LeaderboardRecord createRecord(LeaderboardRecord record);
-    LeaderboardRecord updateRecord(LeaderboardRecord record);
+    StatusCode createRecord(LeaderboardRecord record);
+    StatusCode updateRecord(LeaderboardRecord record);
     StatusCode deleteRecord(LeaderboardRecord record);
     StatusCode getRecordsByDate(Period period, List<LeaderboardRecord> leaderboardRecordList);
 

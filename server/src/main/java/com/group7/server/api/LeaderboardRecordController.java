@@ -38,35 +38,50 @@ public class LeaderboardRecordController {
      * Utilizes LeaderboardRecordService's method to deal with the request.
      *
      * @param recordRequest contains the record which belongs to a player who just finished his/her first game.
-     * @return ResponseEntity with created LeaderboardRecord and HTTP 200 response code.
-     *
+     * @return the leaderboard record response according to the success of the operation.
+     *                      If operation is successful; returns success status code.
+     *                                                ; error message is null.
+     *                      If operation is not successful; returns fail status code and the error message.
      */
     @PostMapping("/create")
     @ApiOperation(value = "Creates a new record in the leaderboard. Login required.")
-    public ResponseEntity<LeaderboardRecord> createRecord(@RequestBody LeaderboardRequest recordRequest) {
-        return ResponseEntity.ok().body(mLeaderboardRecordService.createRecord(recordRequest.getLeaderboardRecord()));
+    public LeaderboardResponse createRecord(@RequestBody LeaderboardRequest recordRequest) {
+        StatusCode statusCode = mLeaderboardRecordService.createRecord(recordRequest.getLeaderboardRecord());
+        if(statusCode.equals(StatusCode.SUCCESS)) {
+            return new LeaderboardResponse(statusCode, null);
+        }
+        return new LeaderboardResponse(statusCode, "Create record operation failed!");
     }
 
     /**
      * Handles update of an existing record in the leaderboard.
      * Utilizes LeaderboardRecordService's method to deal with the request.
      *
-     * @param recordRequest contains the record which belongs to a player who just finished his/her first game.
-     * @return ResponseEntity with updated LeaderboardRecord and HTTP 200 OK response code.
-     *
+     * @param recordRequest contains the record to be updated.
+     * @return the leaderboard record response according to the success of the operation.
+     *                      If operation is successful; returns success status code.
+     *                                                ; error message is null.
+     *                    If operation is not successful; returns fail status code and the error message.
      */
     @PostMapping("/update")
     @ApiOperation(value = "Updates a record in the leaderboard. Login required.")
-    public ResponseEntity<LeaderboardRecord> updateRecord(@RequestBody LeaderboardRequest recordRequest) {
-        return ResponseEntity.ok().body(mLeaderboardRecordService.updateRecord(recordRequest.getLeaderboardRecord()));
+    public LeaderboardResponse updateRecord(@RequestBody LeaderboardRequest recordRequest) {
+        StatusCode statusCode = mLeaderboardRecordService.updateRecord(recordRequest.getLeaderboardRecord());
+        if(statusCode.equals(StatusCode.SUCCESS)) {
+            return new LeaderboardResponse(statusCode, null);
+        }
+        return new LeaderboardResponse(statusCode, "Update record operation failed!");
     }
 
     /**
      * Handles deletion of an existing record in the leaderboard.
      * Utilizes LeaderboardRecordService's method to deal with the request.
      *
-     * @param recordRequest contains the record which belongs to a player who just finished his/her first game.
-     * @return ResponseEntity with HTTP 204 no content response code.
+     * @param recordRequest contains the record to be deleted.
+     * @return the leaderboard record response according to the success of the operation.
+     *                      If operation is successful; returns success status code.
+     *                                                ; error message is null.
+     *                      If operation is not successful; returns fail status code and the error message.
      *
      */
     @DeleteMapping("/delete")
@@ -83,13 +98,14 @@ public class LeaderboardRecordController {
      * Handles getting of all types of records in the leaderboard: all times, weekly, monthly.
      * Utilizes LeaderboardRecordService's method to deal with the request.
      *
+     * @param period to be used in filtering leaderboard records.
      * @return  the leaderboard record response according to the success of the operation.
-     *                      If operation is successful; returns success status code and game id
+     *                      If operation is successful; returns success status code and list of records
      *                                                ; error message is null.
      *                      If operation is not successful; returns fail status code and the error message.
      */
     @GetMapping("/get/{period}")
-    @ApiOperation(value = "Lists all the records in the leaderboard. Login required.")
+    @ApiOperation(value = "Lists the records in the leaderboard by period. Login required.")
     public LeaderboardResponse getRecords(@PathVariable String period) {
         List<LeaderboardRecord> leaderboardRecordList = new ArrayList<>();
         StatusCode statusCode = mLeaderboardRecordService.getRecordsByDate(decodePeriodType(period), leaderboardRecordList);
@@ -101,14 +117,14 @@ public class LeaderboardRecordController {
 
 
     /** Helper function to decode string to enum*/
-    private LeaderboardRecordService.Period decodePeriodType(String moveTypeStr){
-        if(moveTypeStr.equals("ALL TIMES")){
+    private LeaderboardRecordService.Period decodePeriodType(String periodTypeStr){
+        if(periodTypeStr.equals("allTimes")){
             return LeaderboardRecordService.Period.ALL_TIMES;
         }
-        else if(moveTypeStr.equals("WEEKLY")){
+        else if(periodTypeStr.equals("weekly")){
             return LeaderboardRecordService.Period.WEEKLY;
         }
-        else if(moveTypeStr.equals("MONTHLY")){
+        else if(periodTypeStr.equals("monthly")){
             return LeaderboardRecordService.Period.MONTHLY;
         }
         return null;

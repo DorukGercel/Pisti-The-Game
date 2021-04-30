@@ -31,43 +31,51 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
      * Creates a record in the leaderboard record table.
      *
      * @param record the record which needs to be added to the leaderboard record table.
-     * @return created Leaderboard Record object.
-     *              If the player of given record is already in the leaderboard; returns null.
+     * @return return the status code of the operation
      */
     @Override
-    public LeaderboardRecord createRecord(LeaderboardRecord record) {
-        List<LeaderboardRecord> records = mLeaderboardRecordRepository.findAll();
-        if(records.size() == 0) { // very first record in the leaderboard
-            return mLeaderboardRecordRepository.save(record);
-        } else {
-            for(int i = 0; i < records.size(); i++){
-                if(!record.getPlayer().getId().equals(records.get(i).getPlayer().getId())) {
-                    return mLeaderboardRecordRepository.save(record);
+    public StatusCode createRecord(LeaderboardRecord record) {
+        try {
+            List<LeaderboardRecord> records = mLeaderboardRecordRepository.findAll();
+            if(records.size() == 0) { // very first record in the leaderboard
+                mLeaderboardRecordRepository.save(record);
+                return StatusCode.SUCCESS;
+            } else {
+                for(int i = 0; i < records.size(); i++){
+                    if(!record.getPlayer().getId().equals(records.get(i).getPlayer().getId())) {
+                        // If the player is not already in the leaderboard, save it.
+                        mLeaderboardRecordRepository.save(record);
+                        return StatusCode.SUCCESS;
+                    } else {
+                        // The player is already in the leaderboard!
+                        return StatusCode.FAIL;
+                    }
                 }
             }
+            return StatusCode.SUCCESS;
+        } catch (Exception e) {
+            return StatusCode.FAIL;
         }
-        return null;
     }
 
     /**
      * Updates a record in the leaderboard record table.
      *
      * @param record the record which needs to be updated.
-     * @return LeaderboardRecord object.
-     *              If the record exists, returns updated LeaderboardRecord object.
-     *               If the record does not exist, returns null.
+     * @return return the status code of the operation.
      */
 
     @Override
-    public LeaderboardRecord updateRecord(LeaderboardRecord record) {
+    public StatusCode updateRecord(LeaderboardRecord record) {
         try {
             Optional<LeaderboardRecord> dbRecord = mLeaderboardRecordRepository.findById(record.getId());
             LeaderboardRecord dbRecordObj = dbRecord.get();
             dbRecordObj.setScore(record.getScore());
             dbRecordObj.setEndDate(record.getEndDate());
-            return mLeaderboardRecordRepository.save(dbRecordObj);
+            mLeaderboardRecordRepository.save(dbRecordObj);
+            return StatusCode.SUCCESS;
         } catch(java.util.NoSuchElementException e) {
-            return null;
+            return StatusCode.FAIL;
         }
     }
 
@@ -75,7 +83,7 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
      * Deletes a record in the leaderboard record table.
      *
      * @param record the record to be deleted.
-     * return the status code of the operation
+     * @return the status code of the operation
      */
     @Override
     public StatusCode deleteRecord(LeaderboardRecord record) {
@@ -92,8 +100,6 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
      *
      * @param period it can be "weekly", "monthly" or "allTimes"
      * @param leaderboardRecordList List of leaderboard records
-     *              If exception does not occur, returns List of LeaderboardRecord objects.
-     *              If exception does not occurs, returns null.
      *
      * return the status code of the operation
      */

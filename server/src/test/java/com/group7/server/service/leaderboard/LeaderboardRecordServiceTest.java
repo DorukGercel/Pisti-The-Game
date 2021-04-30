@@ -1,5 +1,6 @@
 package com.group7.server.service.leaderboard;
 
+import com.group7.server.definitions.common.StatusCode;
 import com.group7.server.model.LeaderboardRecord;
 import com.group7.server.model.Player;
 import com.group7.server.repository.LeaderboardRecordRepository;
@@ -48,11 +49,11 @@ public class LeaderboardRecordServiceTest {
         testPlayer.setId(1L);
         Date testDate = new Date();
         LeaderboardRecord testRecord = new LeaderboardRecord(testPlayer, testDate, 500);
-        LeaderboardRecord createdTestRecord = mLeaderboardRecordService.createRecord(testRecord);
-        assertNotNull(createdTestRecord);
+        StatusCode statusCode = mLeaderboardRecordService.createRecord(testRecord);
+        assertEquals(statusCode, StatusCode.SUCCESS);
         // Create a leaderboard record with user who has already been in the leaderboard
-        createdTestRecord = mLeaderboardRecordService.createRecord(testRecord);
-        assertNull(createdTestRecord);
+        statusCode = mLeaderboardRecordService.createRecord(testRecord);
+        assertEquals(statusCode, StatusCode.FAIL);
     }
 
     @Test
@@ -62,28 +63,30 @@ public class LeaderboardRecordServiceTest {
          testPlayer.setId(1L);
          Date testDate = new Date();
          LeaderboardRecord testRecord = new LeaderboardRecord(testPlayer, testDate, 500);
-         LeaderboardRecord createdTestRecord = mLeaderboardRecordService.createRecord(testRecord);
-         assertNotNull(createdTestRecord);
+         StatusCode statusCode = mLeaderboardRecordService.createRecord(testRecord);
+         assertEquals(statusCode, StatusCode.SUCCESS);
          // Create a record to be used in updating
          Date updateDate = new Date();
          LeaderboardRecord updateWithRecord = new LeaderboardRecord(testPlayer, updateDate, 600);
-         LeaderboardRecord updatedRecord = mLeaderboardRecordService.updateRecord(updateWithRecord);
-         // Check if record correctly updated
-         assertNotNull(updatedRecord);
-         assertEquals(updatedRecord.getEndDate(), updateDate);
-         assertEquals(updatedRecord.getScore(), 600);
+         statusCode = mLeaderboardRecordService.updateRecord(updateWithRecord);
+         assertEquals(statusCode, StatusCode.SUCCESS);
     }
 
     @Test
-    public void testDeleteRecord(){
+    public void testDeleteRecord() {
         // Create a leaderboard record
         Player testPlayer = new Player("Rabia", "lolFriends", "r@g.com");
         testPlayer.setId(1L);
         Date testDate = new Date();
         LeaderboardRecord testRecord = new LeaderboardRecord(testPlayer, testDate, 500);
-        LeaderboardRecord createdTestRecord = mLeaderboardRecordService.createRecord(testRecord);
-        assertNotNull(createdTestRecord);
-        mLeaderboardRecordService.deleteRecord(createdTestRecord);
+        StatusCode statusCode = mLeaderboardRecordService.createRecord(testRecord);
+        assertEquals(statusCode, StatusCode.SUCCESS);
+        // Delete an existing record
+        statusCode = mLeaderboardRecordService.deleteRecord(testRecord);
+        assertEquals(statusCode, StatusCode.SUCCESS);
+        // Can't delete already deleted record
+        statusCode = mLeaderboardRecordService.deleteRecord(testRecord);
+        assertEquals(statusCode, StatusCode.FAIL);
     }
 
     @Test
