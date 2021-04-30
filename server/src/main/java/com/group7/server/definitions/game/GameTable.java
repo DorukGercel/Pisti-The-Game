@@ -1,5 +1,6 @@
-package com.group7.server.definitions;
+package com.group7.server.definitions.game;
 
+import com.group7.server.definitions.game.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,10 @@
 package com.group7.server.service.game;
 
-import com.group7.server.definitions.*;
+import com.group7.server.definitions.common.StatusCode;
+import com.group7.server.definitions.game.Game;
+import com.group7.server.definitions.game.GameConfig;
+import com.group7.server.definitions.game.GameEnvironment;
+import com.group7.server.definitions.game.GameTable;
 import com.group7.server.repository.ActivePlayerRepositoryTestStub;
 import org.junit.After;
 import org.junit.Before;
@@ -22,17 +26,17 @@ import static org.junit.Assert.assertTrue;
         GameTable.class,
         ActivePlayerRepositoryTestStub.class,
         GameConfig.class,
-        CardTable.class})
+        GameConfig.CardTable.class})
 public class GameServiceInteractionTest {
 
     private GameService mGameService;
     private ActivePlayerRepositoryTestStub mActivePlayerRepository;
-    private CardTable mCardTable;
+    private GameConfig.CardTable mCardTable;
     private static Object[] mGameId;
     private static Long mSessionId;
 
     @Autowired
-    public void setGameService(GameService gameService, ActivePlayerRepositoryTestStub activePlayerRepository, CardTable cardTable) {
+    public void setGameService(GameService gameService, ActivePlayerRepositoryTestStub activePlayerRepository, GameConfig.CardTable cardTable) {
         this.mGameService = gameService;
         this.mActivePlayerRepository = activePlayerRepository;
         this.mCardTable = cardTable;
@@ -158,11 +162,11 @@ public class GameServiceInteractionTest {
         return handDeck.get(handDeck.size()-1);
     }
 
-    private boolean isMatchedCard(Card playerCard, List<Short> middleDeck) {
+    private boolean isMatchedCard(GameConfig.Card playerCard, List<Short> middleDeck) {
         //Extract the face up card
-        Card faceUpCard = mCardTable.getCard(middleDeck.get(middleDeck.size() - 1));
+        GameConfig.Card faceUpCard = mCardTable.getCard(middleDeck.get(middleDeck.size() - 1));
 
         // True if the player card is jack or the ranks of the cards match
-        return (playerCard.getMRank().equals(Card.Rank.JACK) || playerCard.getMRank().equals(faceUpCard.getMRank()));
+        return (playerCard.getMRank().equals(GameConfig.Card.Rank.JACK) || playerCard.getMRank().equals(faceUpCard.getMRank()));
     }
 }

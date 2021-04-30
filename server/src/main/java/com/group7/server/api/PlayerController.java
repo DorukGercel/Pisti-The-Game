@@ -1,6 +1,6 @@
 package com.group7.server.api;
 
-import com.group7.server.definitions.StatusCode;
+import com.group7.server.definitions.common.StatusCode;
 import com.group7.server.dto.authentication.*;
 import com.group7.server.model.Player;
 import com.group7.server.service.authentication.PlayerService;

@@ -1,6 +1,8 @@
 package com.group7.server.service.game;
 
-import com.group7.server.definitions.*;
+import com.group7.server.definitions.common.StatusCode;
+import com.group7.server.definitions.game.GameConfig;
+import com.group7.server.definitions.game.GameTable;
 import com.group7.server.repository.ActivePlayerRepositoryTestStub;
 import org.junit.After;
 import org.junit.Before;
@@ -18,7 +20,7 @@ import static org.junit.Assert.assertTrue;
         GameTable.class,
         ActivePlayerRepositoryTestStub.class,
         GameConfig.class,
-        CardTable.class})
+        GameConfig.CardTable.class})
 public class GameServiceInitGameTest {
 
     private GameService mGameService;
@@ -26,7 +28,7 @@ public class GameServiceInitGameTest {
     private Object[] mGameId;
 
     @Autowired
-    public void setGameService(GameService gameService, ActivePlayerRepositoryTestStub activePlayerRepository, CardTable cardTable) {
+    public void setGameService(GameService gameService, ActivePlayerRepositoryTestStub activePlayerRepository, GameConfig.CardTable cardTable) {
         this.mGameService = gameService;
         this.mActivePlayerRepository = activePlayerRepository;
     }

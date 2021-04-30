@@ -2,7 +2,7 @@ package com.group7.server.dto.authentication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.group7.server.definitions.StatusCode;
+import com.group7.server.definitions.common.StatusCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

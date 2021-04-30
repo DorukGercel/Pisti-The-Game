@@ -2,8 +2,7 @@ package com.group7.server.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.group7.server.definitions.StatusCode;
-import lombok.AllArgsConstructor;
+import com.group7.server.definitions.common.StatusCode;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;

@@ -1,4 +1,4 @@
-package com.group7.server.definitions;
+package com.group7.server.definitions.game;
 
 import lombok.Data;
 

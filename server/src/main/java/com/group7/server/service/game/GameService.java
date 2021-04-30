@@ -1,8 +1,8 @@
 package com.group7.server.service.game;
 
-import com.group7.server.definitions.Game;
-import com.group7.server.definitions.GameEnvironment;
-import com.group7.server.definitions.StatusCode;
+import com.group7.server.definitions.game.Game;
+import com.group7.server.definitions.game.GameEnvironment;
+import com.group7.server.definitions.common.StatusCode;
 
 import java.util.List;
 

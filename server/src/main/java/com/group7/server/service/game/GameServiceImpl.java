@@ -1,9 +1,9 @@
 package com.group7.server.service.game;
 
-import com.group7.server.definitions.Game;
-import com.group7.server.definitions.GameEnvironment;
-import com.group7.server.definitions.GameTable;
-import com.group7.server.definitions.StatusCode;
+import com.group7.server.definitions.game.Game;
+import com.group7.server.definitions.game.GameEnvironment;
+import com.group7.server.definitions.game.GameTable;
+import com.group7.server.definitions.common.StatusCode;
 import com.group7.server.model.ActivePlayer;
 import com.group7.server.repository.ActivePlayerRepository;
 import lombok.RequiredArgsConstructor;

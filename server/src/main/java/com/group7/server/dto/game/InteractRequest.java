@@ -2,8 +2,7 @@ package com.group7.server.dto.game;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.group7.server.definitions.Game;
-import lombok.AllArgsConstructor;
+import com.group7.server.definitions.game.Game;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

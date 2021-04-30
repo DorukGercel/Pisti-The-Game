@@ -2,8 +2,8 @@ package com.group7.server.dto.game;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.group7.server.definitions.GameEnvironment;
-import com.group7.server.definitions.StatusCode;
+import com.group7.server.definitions.game.GameEnvironment;
+import com.group7.server.definitions.common.StatusCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

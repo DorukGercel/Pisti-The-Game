@@ -1,4 +1,4 @@
-package com.group7.server.definitions;
+package com.group7.server.definitions.game;
 
 import lombok.Data;
 
@@ -30,7 +30,7 @@ public class Game {
      * Player 1 Cards, Player 2 Cards ....*/
     private final List<List<Short>>   mCards;
     /** Reference to the card table with card numbers and cards*/
-    private final CardTable           mCardTable;
+    private final GameConfig.CardTable mCardTable;
     /** Scores of each player*/
     private       List<List<Short>>   mScores;
     /** Current game level of the active game*/
@@ -43,7 +43,7 @@ public class Game {
     private       Side                mLastWin;
 
     /** Constructor; called when a new game is created*/
-    public Game(CardTable cardTable){
+    public Game(GameConfig.CardTable cardTable){
         this.mCardTable = cardTable;
         this.mLevel = 1;
         this.mMode = Mode.SINGLE;
@@ -100,7 +100,7 @@ public class Game {
         currentPlayerDeck.remove(cardNo);
         // Check if middle is empty or not
         if(middleDeck.size() > 0) {
-            Card currentPlayerCard = mCardTable.getCard(cardNo);
+            GameConfig.Card currentPlayerCard = mCardTable.getCard(cardNo);
             if (isMatchedCard(currentPlayerCard)){
                 // Increment score of player and set last win
                 isPisti = incrementScore(currentPlayerCard, side);
@@ -214,10 +214,10 @@ public class Game {
         while (true) {
             // Find top card and card no
             faceUpCardNo = getTopCardNo(mainDeck);
-            Card faceUpCard = getTopCard(mainDeck);
+            GameConfig.Card faceUpCard = getTopCard(mainDeck);
             // Remove the top card in main deck
             removeTopCard(mainDeck);
-            if (!faceUpCard.getMRank().equals(Card.Rank.JACK)) {
+            if (!faceUpCard.getMRank().equals(GameConfig.Card.Rank.JACK)) {
                 // Found non-Jack card break
                 // TODO: Remove print statement
                 System.out.println(faceUpCard.getMRank());
@@ -238,27 +238,27 @@ public class Game {
     }
 
     /** Helper function to decide if there is a takeover.*/
-    private boolean isMatchedCard(Card playerCard) {
+    private boolean isMatchedCard(GameConfig.Card playerCard) {
         //Extract the face up card if middle is not empty
         List<Short> middleDeck = getMiddleDeck();
         if(middleDeck.isEmpty()){
             return false;
         }
-        Card faceUpCard = getTopCard(middleDeck);
+        GameConfig.Card faceUpCard = getTopCard(middleDeck);
 
         // True if the player card is jack or the ranks of the cards match
-        return (playerCard.getMRank().equals(Card.Rank.JACK) || playerCard.getMRank().equals(faceUpCard.getMRank()));
+        return (playerCard.getMRank().equals(GameConfig.Card.Rank.JACK) || playerCard.getMRank().equals(faceUpCard.getMRank()));
     }
 
     /** Helper function to increment the score of the side who achieved takeover.*/
     // TODO: Q: When pisti achieved does user count the values of the cards? No in this implementation.
-    private boolean incrementScore(Card playerCard, Side side) {
+    private boolean incrementScore(GameConfig.Card playerCard, Side side) {
         boolean isPisti = false;
         short pointsReceived = 0;
         short cardsReceived = 0;
 
         List<Short> middleDeck = getMiddleDeck();
-        Card faceUpCard = getTopCard(middleDeck);
+        GameConfig.Card faceUpCard = getTopCard(middleDeck);
 
         // Decide the takeover type
         TakeoverType takeoverType = TakeoverType.getTakeoverType(faceUpCard, middleDeck.size());
@@ -281,7 +281,7 @@ public class Game {
 
         // Count the points of the cards received
         for(Short cardNo : middleDeck) {
-            Card middleCard = mCardTable.getCard(cardNo);
+            GameConfig.Card middleCard = mCardTable.getCard(cardNo);
             short middleCardPoint = SpecialPoint.takeCardPoint(middleCard);
             pointsReceived = (short) (pointsReceived + middleCardPoint);
             cardsReceived = (short) (cardsReceived + 1);
@@ -307,10 +307,10 @@ public class Game {
     }
 
     /** Helper function to take the top card of given deck.*/
-    private Card getTopCard(List<Short> deck) {
+    private GameConfig.Card getTopCard(List<Short> deck) {
         if (deck.size() > 0) {
             Short topCardNo = getTopCardNo(deck);
-            Card topCard = mCardTable.getCard(topCardNo);
+            GameConfig.Card topCard = mCardTable.getCard(topCardNo);
             return topCard;
         }
         return null;
@@ -385,8 +385,8 @@ public class Game {
         PISTI,
         REGULAR;
 
-        public static TakeoverType getTakeoverType(Card faceUpCard, int noMiddleCards) {
-            if (noMiddleCards == 1 && faceUpCard.getMRank().equals(Card.Rank.JACK)) {
+        public static TakeoverType getTakeoverType(GameConfig.Card faceUpCard, int noMiddleCards) {
+            if (noMiddleCards == 1 && faceUpCard.getMRank().equals(GameConfig.Card.Rank.JACK)) {
                 return DOUBLE_PISTI;
             } else if (noMiddleCards == 1) {
                 return PISTI;
@@ -420,14 +420,14 @@ public class Game {
             return 0;
         }
 
-        public static Short takeCardPoint(Card card){
-            if (card.getMRank().equals(Card.Rank.ACE)) {
+        public static Short takeCardPoint(GameConfig.Card card){
+            if (card.getMRank().equals(GameConfig.Card.Rank.ACE)) {
                 return ACE.getPoint();
-            } else if (card.getMRank().equals(Card.Rank.JACK)) {
+            } else if (card.getMRank().equals(GameConfig.Card.Rank.JACK)) {
                 return JACK.getPoint();
-            } else if (card.getMSuit().equals(Card.Suit.CLUBS) && card.getMRank().equals(Card.Rank.TWO)) {
+            } else if (card.getMSuit().equals(GameConfig.Card.Suit.CLUBS) && card.getMRank().equals(GameConfig.Card.Rank.TWO)) {
                 return CLUB_TWO.getPoint();
-            } else if (card.getMSuit().equals(Card.Suit.DIAMONDS) && card.getMRank().equals(Card.Rank.TEN)) {
+            } else if (card.getMSuit().equals(GameConfig.Card.Suit.DIAMONDS) && card.getMRank().equals(GameConfig.Card.Rank.TEN)) {
                 return DIAMOND_TEN.getPoint();
             }
             return 0;
