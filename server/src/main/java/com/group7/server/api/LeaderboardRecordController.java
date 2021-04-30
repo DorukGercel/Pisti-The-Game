@@ -3,6 +3,7 @@ package com.group7.server.api;
 
 import com.group7.server.definitions.common.StatusCode;
 import com.group7.server.definitions.game.Game;
+import com.group7.server.dto.leaderboard.LeaderboardRequest;
 import com.group7.server.dto.leaderboard.LeaderboardResponse;
 import com.group7.server.dto.leaderboard.ListRecordsResponse;
 import com.group7.server.model.LeaderboardRecord;
@@ -36,42 +37,42 @@ public class LeaderboardRecordController {
      * Handles creation of a new record in the leaderboard.
      * Utilizes LeaderboardRecordService's method to deal with the request.
      *
-     * @param record the record which belongs to a player who just finished his/her first game.
+     * @param recordRequest contains the record which belongs to a player who just finished his/her first game.
      * @return ResponseEntity with created LeaderboardRecord and HTTP 200 response code.
      *
      */
     @PostMapping("/create")
     @ApiOperation(value = "Creates a new record in the leaderboard. Login required.")
-    public ResponseEntity<LeaderboardRecord> createRecord(@RequestBody LeaderboardRecord record) {
-        return ResponseEntity.ok().body(mLeaderboardRecordService.createRecord(record));
+    public ResponseEntity<LeaderboardRecord> createRecord(@RequestBody LeaderboardRequest recordRequest) {
+        return ResponseEntity.ok().body(mLeaderboardRecordService.createRecord(recordRequest.getLeaderboardRecord()));
     }
 
     /**
      * Handles update of an existing record in the leaderboard.
      * Utilizes LeaderboardRecordService's method to deal with the request.
      *
-     * @param record the record which belongs to a player who just finished his/her first game.
+     * @param recordRequest contains the record which belongs to a player who just finished his/her first game.
      * @return ResponseEntity with updated LeaderboardRecord and HTTP 200 OK response code.
      *
      */
     @PostMapping("/update")
     @ApiOperation(value = "Updates a record in the leaderboard. Login required.")
-    public ResponseEntity<LeaderboardRecord> updateRecord(@RequestBody LeaderboardRecord record) {
-        return ResponseEntity.ok().body(mLeaderboardRecordService.updateRecord(record));
+    public ResponseEntity<LeaderboardRecord> updateRecord(@RequestBody LeaderboardRequest recordRequest) {
+        return ResponseEntity.ok().body(mLeaderboardRecordService.updateRecord(recordRequest.getLeaderboardRecord()));
     }
 
     /**
      * Handles deletion of an existing record in the leaderboard.
      * Utilizes LeaderboardRecordService's method to deal with the request.
      *
-     * @param record the record which belongs to a player who just finished his/her first game.
+     * @param recordRequest contains the record which belongs to a player who just finished his/her first game.
      * @return ResponseEntity with HTTP 204 no content response code.
      *
      */
     @DeleteMapping("/delete")
     @ApiOperation(value = "Deletes a record from the leaderboard. Login required.")
-    public LeaderboardResponse deleteRecord(@RequestBody LeaderboardRecord record) {
-        StatusCode statusCode = mLeaderboardRecordService.deleteRecord(record);
+    public LeaderboardResponse deleteRecord(@RequestBody LeaderboardRequest recordRequest) {
+        StatusCode statusCode = mLeaderboardRecordService.deleteRecord(recordRequest.getLeaderboardRecord());
         if (statusCode.equals(StatusCode.SUCCESS)) {
             return new LeaderboardResponse(statusCode, null);
         }
