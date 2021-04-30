@@ -4,6 +4,8 @@ import com.group7.server.definitions.common.StatusCode;
 import com.group7.server.dto.authentication.*;
 import com.group7.server.model.Player;
 import com.group7.server.service.authentication.PlayerService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RequiredArgsConstructor
 @RequestMapping("/api/player")
+@Api(value = "User Api documentation")
 @RestController
 public class PlayerController {
 
@@ -31,6 +34,7 @@ public class PlayerController {
      *
      */
     @PostMapping("/register")
+    @ApiOperation(value = "New User adding method")
     public AuthResponse register(@RequestBody AuthRequest authRequest){
         StatusCode statusCode = mPlayerService.register(
                 new Player(
@@ -56,6 +60,7 @@ public class PlayerController {
      *                    If operation is not successful; returns fail status code and the error message.
      */
     @PostMapping("/login")
+    @ApiOperation(value = "User list method")
     public AuthResponse login(@RequestBody AuthRequest authRequest){
         Object[] credentials = new Object[2];
         StatusCode statusCode = mPlayerService.login(
