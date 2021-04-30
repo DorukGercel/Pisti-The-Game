@@ -46,6 +46,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/leaderboard/allTimes").permitAll()
                 .antMatchers("/api/leaderboard/weekly").permitAll()
                 .antMatchers("/api/leaderboard/monthly").permitAll()
+                .antMatchers("/swagger-ui/").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
