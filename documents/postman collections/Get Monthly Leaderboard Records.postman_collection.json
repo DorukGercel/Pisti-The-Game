@@ -1,0 +1,59 @@
+{
+	"info": {
+		"_postman_id": "18015e17-3beb-48fe-839d-b80e90ed261e",
+		"name": "Get Monthly Leaderboard Records",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Doruk Gerçel",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "{{get}}/monthly",
+					"host": [
+						"{{get}}"
+					],
+					"path": [
+						"monthly"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "getMonthlyUrl",
+			"value": "localhost:8080/api/leaderboard/get/monthly\n"
+		}
+	]
+}

@@ -1,0 +1,70 @@
+{
+	"info": {
+		"_postman_id": "37413554-d68f-4c32-9211-fa3cf55d242a",
+		"name": "Get All Times Leaderboard Records",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Doruk Gerçel",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb3J1ayIsImF1dGhvcml0aWVzIjpbXSwiaWF0IjoxNjE5ODE4OTI2LCJleHAiOjE2MjExMTI0MDB9.ESw_6VtBkYUDzHtIbJ-xozAmSl0JmWDPcibnKrSAiHOmTw2SKrpjjE7K-c1CreRPIeWWYMpUC2IdU9ITWLzNXA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "{{get}}/allTimes",
+					"host": [
+						"{{get}}"
+					],
+					"path": [
+						"allTimes"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "\n",
+			"value": "localhost:8080/api/leaderboard/get/allTimes\n",
+			"disabled": true
+		}
+	]
+}

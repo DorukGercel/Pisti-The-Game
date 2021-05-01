@@ -1,0 +1,48 @@
+{
+	"info": {
+		"_postman_id": "3e311c27-c45c-4077-8ae5-e0546ebb0608",
+		"name": "Logout",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Doruk Gercel",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb3J1ayIsImF1dGhvcml0aWVzIjpbXSwiaWF0IjoxNjE5NzE4MzU2LCJleHAiOjE2MjA5Mzk2MDB9.8vah1EGAv_xRq-b8MzmlaD9ReqdznNQ_i6PFsDalrtiZmYn28n_ExvSB04-68xW8TOz48akp7Bb7Dp9yXx_hWw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"sessionId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{logoutUrl}}",
+					"host": [
+						"{{logoutUrl}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "logoutUrl",
+			"value": "localhost:8080/api/player/logout"
+		}
+	]
+}

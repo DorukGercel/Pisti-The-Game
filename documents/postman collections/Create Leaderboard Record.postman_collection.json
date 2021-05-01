@@ -1,0 +1,68 @@
+{
+	"info": {
+		"_postman_id": "233cb421-94d1-4e99-bd9e-30da70a45ae9",
+		"name": "Create Leaderboard Record",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Doruk Gerçel",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb3J1ayIsImF1dGhvcml0aWVzIjpbXSwiaWF0IjoxNjE5ODMxMDcwLCJleHAiOjE2MjExMTI0MDB9.78Br9FRpFMsHNWn2gL_N5-5Ticg-IhIT7eDxXEABXY981Wkm3B3W8ALiKnaS-ThHPQINCu6Ua-6Y2PnRQmx6Uw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"playerId\": 1,\r\n  \"date\": \"2021-05-01T00:23:32.520Z\",\r\n  \"id\": 1,\r\n  \"score\": 100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{createLBRurl}}",
+					"host": [
+						"{{createLBRurl}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "createLBRurl",
+			"value": "http://localhost:8080/api/leaderboard/create"
+		}
+	]
+}

@@ -1,0 +1,53 @@
+{
+	"info": {
+		"_postman_id": "609801cb-2fa3-45bb-b92f-f031a3dd0687",
+		"name": "Delete Leaderboard Record",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Doruk Gerçel",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"playerId\": 1,\r\n  \"date\": \"2021-05-01T00:23:32.520Z\",\r\n  \"id\": 1,\r\n  \"score\": 100\r\n}"
+				},
+				"url": {
+					"raw": "{{deleteLBRurl}}",
+					"host": [
+						"{{deleteLBRurl}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "deleteLBRurl",
+			"value": "localhost:8080/api/leaderboard/delete\n"
+		}
+	]
+}

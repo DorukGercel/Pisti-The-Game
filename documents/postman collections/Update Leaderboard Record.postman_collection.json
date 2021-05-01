@@ -1,0 +1,53 @@
+{
+	"info": {
+		"_postman_id": "a6d1c036-9925-402b-bcd6-4269956539f7",
+		"name": "Update Leaderboard Record",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Doruk Gerçel",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"playerId\": 1,\r\n  \"date\": \"2021-05-01T00:23:32.520Z\",\r\n  \"id\": 1,\r\n  \"score\": 700\r\n}"
+				},
+				"url": {
+					"raw": "{{updateLBRurl}}",
+					"host": [
+						"{{updateLBRurl}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "updateLBRurl",
+			"value": "http://localhost:8080/api/leaderboard/update"
+		}
+	]
+}

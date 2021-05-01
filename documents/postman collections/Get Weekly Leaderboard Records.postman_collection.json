@@ -1,0 +1,59 @@
+{
+	"info": {
+		"_postman_id": "931f8ab8-7d36-4bb1-9d44-79466135efa8",
+		"name": "Get Weekly Leaderboard Records",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Doruk Gerçel",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "{{get}}/monthly",
+					"host": [
+						"{{get}}"
+					],
+					"path": [
+						"monthly"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "getWeeklyUrl\n",
+			"value": "localhost:8080/api/leaderboard/get/weekly\n"
+		}
+	]
+}

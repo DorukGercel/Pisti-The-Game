@@ -1,0 +1,48 @@
+{
+	"info": {
+		"_postman_id": "1bf3d1eb-c043-4c4b-9abd-20a01cb1edfa",
+		"name": "Start New Game",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Doruk Gercel",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb3J1ayIsImF1dGhvcml0aWVzIjpbXSwiaWF0IjoxNjE5ODMxMDcwLCJleHAiOjE2MjExMTI0MDB9.78Br9FRpFMsHNWn2gL_N5-5Ticg-IhIT7eDxXEABXY981Wkm3B3W8ALiKnaS-ThHPQINCu6Ua-6Y2PnRQmx6Uw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"sessionId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{startGame}}",
+					"host": [
+						"{{startGame}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "startGame",
+			"value": "localhost:8080/api/game/startGame"
+		}
+	]
+}

@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "7dc8295e-43e2-494f-8b7b-48f943a4ef72",
+		"name": "Login",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Doruk Gercel",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"doruk\",\n    \"password\": \"ı<3ozge\",\n    \"email\": \"d@hot.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{loginUrl}}",
+					"host": [
+						"{{loginUrl}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "loginUrl",
+			"value": "localhost:8080/api/player/login"
+		}
+	]
+}

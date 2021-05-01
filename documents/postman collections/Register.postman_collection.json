@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "1b749b58-49c0-4e8d-bff9-13dcef94bde6",
+		"name": "Register",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Doruk Gercel",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"doruk\",\n    \"password\": \"ı<3ozge\",\n    \"email\": \"d@hot.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{registerUrl}}",
+					"host": [
+						"{{registerUrl}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "registerUrl",
+			"value": "localhost:8080/api/player/register"
+		}
+	]
+}
