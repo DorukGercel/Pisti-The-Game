@@ -94,9 +94,6 @@ public class GameConfig {
                     mCardMap.put(cardNo++, new Card(suit, rank));
                 }
             }
-            // TODO: Remove print
-            System.out.println(cardNo);
-            System.out.println(mCardMap);
         }
     }
 }

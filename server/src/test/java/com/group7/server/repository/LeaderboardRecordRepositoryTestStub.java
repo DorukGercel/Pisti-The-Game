@@ -69,6 +69,14 @@ public class LeaderboardRecordRepositoryTestStub implements LeaderboardRecordRep
     }
 
     @Override
+    public Optional<LeaderboardRecord> findByPlayerAndEndDate(Player player, Date date) {
+        Player testPlayer = new Player("Rabia", "lolFriends", "r@g.com");
+        testPlayer.setId(1L);
+        Date testDate = new Date();
+        return Optional.of(new LeaderboardRecord(testPlayer, testDate, 500));
+    }
+
+    @Override
     public List<LeaderboardRecord> findAll(Sort sort) {
         return null;
     }

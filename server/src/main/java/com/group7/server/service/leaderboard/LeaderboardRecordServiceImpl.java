@@ -26,16 +26,24 @@ import java.text.SimpleDateFormat;
 public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
 
     private final LeaderboardRecordRepository mLeaderboardRecordRepository;
+    private final PlayerRepository            mPlayerRepository;
 
     /**
      * Creates a record in the leaderboard record table.
      *
-     * @param record the record which needs to be added to the leaderboard record table.
+     * @param playerId the player id of the record.
+     * @param date the date record belongs to.
+     * @param score to be set.
      * @return return the status code of the operation
      */
     @Override
-    public StatusCode createRecord(LeaderboardRecord record) {
+    public StatusCode createRecord(Long playerId, Date date, Integer score) {
         try {
+            Optional<Player> dbPlayer = mPlayerRepository.findById(playerId);
+            if(dbPlayer.isEmpty()) {
+                return StatusCode.FAIL;
+            }
+            LeaderboardRecord record = new LeaderboardRecord(dbPlayer.get(), date, score);
             List<LeaderboardRecord> records = mLeaderboardRecordRepository.findAll();
             if(records.size() == 0) { // very first record in the leaderboard
                 mLeaderboardRecordRepository.save(record);
@@ -61,20 +69,29 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
     /**
      * Updates a record in the leaderboard record table.
      *
-     * @param record the record which needs to be updated.
+     * @param playerId the player id of the record.
+     * @param date the date record belongs to.
+     * @param score to be set.
      * @return return the status code of the operation.
      */
 
     @Override
-    public StatusCode updateRecord(LeaderboardRecord record) {
+    public StatusCode updateRecord(Long recordId, Long playerId, Date date, Integer score) {
         try {
-            Optional<LeaderboardRecord> dbRecord = mLeaderboardRecordRepository.findById(record.getId());
-            LeaderboardRecord dbRecordObj = dbRecord.get();
-            dbRecordObj.setScore(record.getScore());
-            dbRecordObj.setEndDate(record.getEndDate());
-            mLeaderboardRecordRepository.save(dbRecordObj);
+            LeaderboardRecord record = findRecord(recordId);
+            if (record == null) {
+                return StatusCode.FAIL;
+            }
+            if (mPlayerRepository.findById(playerId).isEmpty()){
+                return StatusCode.FAIL;
+            }
+            record.setPlayer(mPlayerRepository.findById(playerId).get());
+            record.setScore(score);
+            record.setEndDate(date);
+            mLeaderboardRecordRepository.save(record);
             return StatusCode.SUCCESS;
         } catch(java.util.NoSuchElementException e) {
+            e.printStackTrace();
             return StatusCode.FAIL;
         }
     }
@@ -82,12 +99,17 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
     /**
      * Deletes a record in the leaderboard record table.
      *
-     * @param record the record to be deleted.
+     * @param recordId the id of the record.
+     *
      * @return the status code of the operation
      */
     @Override
-    public StatusCode deleteRecord(LeaderboardRecord record) {
+    public StatusCode deleteRecord(Long recordId) {
         try {
+            LeaderboardRecord record = findRecord(recordId);
+            if (record == null) {
+                return StatusCode.FAIL;
+            }
             mLeaderboardRecordRepository.deleteById(record.getId());
             return StatusCode.SUCCESS;
         } catch(Exception e) {
@@ -140,5 +162,13 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
         }
     }
 
+    /** Helper function to find record*/
+    private LeaderboardRecord findRecord(Long recordId) {
+        Optional<LeaderboardRecord> dbRecord = mLeaderboardRecordRepository.findById(recordId);
+        if(dbRecord.isEmpty()) {
+            return null;
+        }
+        return dbRecord.get();
+    }
 
 }

@@ -88,8 +88,6 @@ public class PlayerServiceImpl implements PlayerService {
     public StatusCode logout(Long sessionId) {
         try {
             Optional<ActivePlayer> dbActivePlayer = mActivePlayerRepository.findById(sessionId);
-            // TODO: Remove print
-            System.out.println(dbActivePlayer.get());
             mActivePlayerRepository.deleteById(sessionId);
             return StatusCode.SUCCESS;
         } catch (Exception e) {
@@ -109,8 +107,6 @@ public class PlayerServiceImpl implements PlayerService {
         Optional<Player> dbPlayer = mPlayerRepository.findByUsername(player.getUsername());
         if (dbPlayer.isPresent()) {
             /* Given player was registered; then add to the active player's table.*/
-            // TODO: Remove print
-            System.out.println(dbPlayer.get());
             ActivePlayer activePlayer = mActivePlayerRepository.save(new ActivePlayer(dbPlayer.get()));
             return activePlayer.getId();
         }

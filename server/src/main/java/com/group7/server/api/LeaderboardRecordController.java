@@ -46,7 +46,7 @@ public class LeaderboardRecordController {
     @PostMapping("/create")
     @ApiOperation(value = "Creates a new record in the leaderboard. Login required.")
     public LeaderboardResponse createRecord(@RequestBody LeaderboardRequest recordRequest) {
-        StatusCode statusCode = mLeaderboardRecordService.createRecord(recordRequest.getLeaderboardRecord());
+        StatusCode statusCode = mLeaderboardRecordService.createRecord(recordRequest.getPlayerId(), recordRequest.getDate(), recordRequest.getScore());
         if(statusCode.equals(StatusCode.SUCCESS)) {
             return new LeaderboardResponse(statusCode, null);
         }
@@ -66,7 +66,7 @@ public class LeaderboardRecordController {
     @PostMapping("/update")
     @ApiOperation(value = "Updates a record in the leaderboard. Login required.")
     public LeaderboardResponse updateRecord(@RequestBody LeaderboardRequest recordRequest) {
-        StatusCode statusCode = mLeaderboardRecordService.updateRecord(recordRequest.getLeaderboardRecord());
+        StatusCode statusCode = mLeaderboardRecordService.updateRecord(recordRequest.getRecordId() ,recordRequest.getPlayerId(), recordRequest.getDate(), recordRequest.getScore());
         if(statusCode.equals(StatusCode.SUCCESS)) {
             return new LeaderboardResponse(statusCode, null);
         }
@@ -87,7 +87,7 @@ public class LeaderboardRecordController {
     @DeleteMapping("/delete")
     @ApiOperation(value = "Deletes a record from the leaderboard. Login required.")
     public LeaderboardResponse deleteRecord(@RequestBody LeaderboardRequest recordRequest) {
-        StatusCode statusCode = mLeaderboardRecordService.deleteRecord(recordRequest.getLeaderboardRecord());
+        StatusCode statusCode = mLeaderboardRecordService.deleteRecord(recordRequest.getRecordId());
         if (statusCode.equals(StatusCode.SUCCESS)) {
             return new LeaderboardResponse(statusCode, null);
         }

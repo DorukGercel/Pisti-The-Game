@@ -161,24 +161,15 @@ public class Game {
         List<Short> mainDeck = getMainDeck();
         for (short cardNo = 0; cardNo < NO_CARDS; cardNo++) {
             mainDeck.add(cardNo);
-            // TODO: Remove print
-            if (cardNo == 51) {
-                System.out.println(cardNo);
-            }
+
         }
-        // TODO: remove print statement
-        System.out.println(this);
 
         // Shuffle the deck
         Collections.shuffle(mainDeck);
 
-        // TODO: remove print statement
-        System.out.println(this);
 
         dealCards();
         openCards();
-        // TODO: remove print statement
-        System.out.println(this);
     }
 
     /** Helper function to deal the cards to the each player.*/
@@ -219,8 +210,6 @@ public class Game {
             removeTopCard(mainDeck);
             if (!faceUpCard.getMRank().equals(GameConfig.Card.Rank.JACK)) {
                 // Found non-Jack card break
-                // TODO: Remove print statement
-                System.out.println(faceUpCard.getMRank());
                 break;
             }
             // If card is Jack place at the bottom

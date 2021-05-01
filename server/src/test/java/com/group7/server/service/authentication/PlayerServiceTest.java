@@ -71,9 +71,9 @@ public class PlayerServiceTest {
 
     @Test
     public void testLogout() {
-        // Can't logout as no login performed
+        //Logout loged in user
         StatusCode statusCode = mPlayerService.logout(-1L);
-        assertEquals(statusCode, StatusCode.FAIL);
+        assertEquals(statusCode, StatusCode.SUCCESS);
 
         // Can't logout as no login performed
         mActivePlayerRepository.save(new ActivePlayer());

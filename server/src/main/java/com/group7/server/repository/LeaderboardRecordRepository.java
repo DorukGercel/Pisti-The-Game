@@ -18,6 +18,8 @@ public interface LeaderboardRecordRepository
 {
     List<LeaderboardRecord> findAll();
 
+    Optional<LeaderboardRecord> findByPlayerAndEndDate(Player player, Date date);
+
     @Query(value = "from LeaderboardRecord t where t.endDate between :startDate and :endDate order by t.score desc")
     List<LeaderboardRecord> findByEndDateBetween(
             @Param("startDate") Date startDate, @Param("endDate") Date endDate);

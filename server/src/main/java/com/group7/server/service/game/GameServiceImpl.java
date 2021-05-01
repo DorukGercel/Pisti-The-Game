@@ -46,8 +46,6 @@ public class GameServiceImpl implements GameService{
             // Check if the player logged in and is not attached to another game
             if(dbActivePlayer.isPresent() && !isAttachedToGame(dbActivePlayer.get())){
                 gameId[0] = mGameTable.addNewGame();
-                // TODO: Remove print
-                System.out.println(mGameTable.getGame((Long) gameId[0]));
                 // Set the active player's level and attach to the newly created game
                 return updateActivePlayer(UpdateOperationCode.INITIALIZE, dbActivePlayer.get(), gameId[0]);
             }

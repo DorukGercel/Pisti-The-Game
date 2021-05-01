@@ -3,6 +3,7 @@ package com.group7.server.service.leaderboard;
 import com.group7.server.definitions.common.StatusCode;
 import com.group7.server.model.LeaderboardRecord;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,9 +12,9 @@ import java.util.List;
  *
  */
 public interface LeaderboardRecordService {
-    StatusCode createRecord(LeaderboardRecord record);
-    StatusCode updateRecord(LeaderboardRecord record);
-    StatusCode deleteRecord(LeaderboardRecord record);
+    StatusCode createRecord(Long playerId, Date date, Integer score);
+    StatusCode updateRecord(Long recordId, Long playerId, Date date, Integer score);
+    StatusCode deleteRecord(Long recordId);
     StatusCode getRecordsByDate(Period period, List<LeaderboardRecord> leaderboardRecordList);
 
      enum Period {

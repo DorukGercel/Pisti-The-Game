@@ -13,7 +13,9 @@ public class PlayerRepositoryTestStub implements PlayerRepository {
 
     @Override
     public Optional<Player> findById(long id) {
-        return Optional.empty();
+        Player testPlayer = new Player("Rabia", "lolFriends", "r@g.com");
+        testPlayer.setId(1L);
+        return Optional.of(testPlayer);
     }
 
     @Override
@@ -93,7 +95,9 @@ public class PlayerRepositoryTestStub implements PlayerRepository {
 
     @Override
     public Optional<Player> findById(Long aLong) {
-        return Optional.empty();
+        Player testPlayer = new Player("Rabia", "lolFriends", "r@g.com");
+        testPlayer.setId(1L);
+        return Optional.of(testPlayer);
     }
 
     @Override
