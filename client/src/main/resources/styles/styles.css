@@ -1,0 +1,82 @@
+/* Common styling of the components*/
+
+#common {
+    -fx-background-image: url("../image/poker_table.jpg");
+    -fx-background-size: cover;
+    -fx-pref-height: 400px;
+    -fx-pref-width: 600px;
+    -fx-alignment: center;
+}
+
+#main_menu {
+    -fx-alignment: center;
+}
+
+.main_button {
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+}
+
+.main_button:hover {
+    -fx-background-color: white;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-cursor: hand;
+}
+
+.main_button:pressed {
+    -fx-background-color: black;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-cursor: hand;
+}
+
+#forgot_text {
+    -fx-text-fill: #00f3f3;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-underline: true;
+    -fx-border-width: 0;
+}
+
+#forgot_text:hover {
+    -fx-text-fill: white;
+}
+
+#forgot_text:pressed {
+    -fx-text-fill: black;
+}
+
+.form_label {
+    -fx-text-fill: white;
+}
+
+#login_form_container {
+    -fx-alignment: center;
+}
+
+#login_form {
+    -fx-alignment: center;
+    -fx-background-radius: 10;
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+}
+
+#login_form_return_button {
+    -fx-alignment: center;
+    -fx-background-radius: 5;
+}
+
+#register_form_container {
+    -fx-alignment: center;
+}
+
+#register_form {
+    -fx-alignment: center;
+    -fx-background-radius: 10;
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+}
+
+#register_form_return_button {
+    -fx-alignment: center;
+    -fx-background-radius: 5;
+}
