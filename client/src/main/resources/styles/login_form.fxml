@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.group7.client.controller.LoginController">
+   <VBox fx:id="login_form_container">
+      <Group>
+         <Label fx:id="informationLabel" alignment="TOP_CENTER" contentDisplay="TOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" textAlignment="CENTER">
+            <font>
+               <Font size="16.0" />
+            </font>
+         </Label>
+         <GridPane fx:id="login_form">
+            <Label styleClass="form_label" text="Username:">
+               <GridPane.margin>
+                  <Insets bottom="10.0" left="5.0" right="5.0" top="10.0"/>
+               </GridPane.margin>
+               <font>
+                  <Font name="DejaVu Serif Bold" size="14.0"/>
+               </font>
+            </Label>
+            <Label styleClass="form_label" text="Email:" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets bottom="10.0" left="5.0" right="5.0" top="10.0"/>
+               </GridPane.margin>
+               <font>
+                  <Font name="DejaVu Serif Bold" size="14.0"/>
+               </font>
+            </Label>
+            <Label styleClass="form_label" text="Password:" GridPane.rowIndex="4">
+               <GridPane.margin>
+                  <Insets left="5.0"/>
+               </GridPane.margin>
+               <font>
+                  <Font name="DejaVu Serif Bold" size="14.0"/>
+               </font>
+            </Label>
+            <TextField fx:id="username_field" prefWidth="180.0" GridPane.columnIndex="2">
+               <GridPane.margin>
+                  <Insets bottom="10.0" left="5.0" right="5.0" top="10.0"/>
+               </GridPane.margin>
+            </TextField>
+            <TextField fx:id="email_field" GridPane.columnIndex="2" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets bottom="10.0" left="5.0" right="5.0" top="10.0"/>
+               </GridPane.margin>
+            </TextField>
+            <PasswordField fx:id="password_field" GridPane.columnIndex="2" GridPane.rowIndex="4">
+               <GridPane.margin>
+                  <Insets bottom="10.0" left="5.0" right="5.0" top="15.0"/>
+               </GridPane.margin>
+            </PasswordField>
+            <Button mnemonicParsing="false" text="Login" GridPane.columnIndex="2" GridPane.rowIndex="6"
+                    onAction="#clickLoginButton">
+               <GridPane.margin>
+                  <Insets bottom="10.0" top="10.0"/>
+               </GridPane.margin>
+               <font>
+                  <Font name="DejaVu Serif Bold" size="14.0"/>
+               </font>
+            </Button>
+            <Separator GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            <Separator GridPane.rowIndex="1"/>
+            <Separator GridPane.columnIndex="2" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets bottom="5.0" top="5.0"/>
+               </GridPane.margin>
+            </Separator>
+            <Separator GridPane.rowIndex="3"/>
+            <Separator GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+            <Separator GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            <Separator GridPane.rowIndex="5"/>
+            <Separator GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+            <Separator GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+            <columnConstraints>
+               <ColumnConstraints/>
+               <ColumnConstraints maxWidth="13.0" minWidth="6.0" prefWidth="9.0"/>
+               <ColumnConstraints maxWidth="165.0" minWidth="158.0" prefWidth="162.0"/>
+            </columnConstraints>
+            <rowConstraints>
+               <RowConstraints/>
+               <RowConstraints maxHeight="5.0" minHeight="5.0" prefHeight="5.0"/>
+               <RowConstraints/>
+               <RowConstraints/>
+               <RowConstraints/>
+               <RowConstraints/>
+               <RowConstraints/>
+            </rowConstraints>
+
+         </GridPane>
+      </Group>
+      <Button fx:id="login_form_return_button" styleClass="main_button" text="Return to Main Menu"
+              onAction="#clickReturnButton">
+         <font>
+            <Font name="DejaVu Serif Bold" size="14.0"/>
+         </font>
+         <VBox.margin>
+            <Insets top="50.0"/>
+         </VBox.margin>
+      </Button>
+   </VBox>
+</StackPane>
