@@ -80,3 +80,9 @@
     -fx-alignment: center;
     -fx-background-radius: 5;
 }
+
+#leaderboard_table {
+    -fx-alignment: center;
+    -fx-background-radius: 10;
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+}

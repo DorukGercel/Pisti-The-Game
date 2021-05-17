@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="800.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group7.client.controller.LeaderboardController">
+    <Label fx:id="informationLabel" alignment="TOP_CENTER" contentDisplay="TOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" textAlignment="CENTER">
+        <font>
+            <Font size="16.0" />
+        </font>
+    </Label>
+    <TableView fx:id="leaderboard_table" layoutX="100.0" layoutY="200.0" prefHeight="400.0" prefWidth="400.0">
+        <columns>
+            <TableColumn fx:id="rank_column" prefWidth="50.0" text="Rank" />
+            <TableColumn fx:id="username_column" prefWidth="220.0" text="Username" />
+            <TableColumn fx:id="score_column" prefWidth="130.0" text="Score" />
+        </columns>
+    </TableView>
+    <ComboBox fx:id="time_selection_combobox" layoutX="100.0" layoutY="620.0" onAction="#selectFromComboBox" prefWidth="150.0" promptText="Select Time" />
+</AnchorPane>
