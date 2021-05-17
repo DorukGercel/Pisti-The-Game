@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Responsible for dealing with Scene and Scene Graph
  * */
-@Service
+@Component
 public class ScreenManager {
     /** Holds the panes of the application*/
     private final Map<String, Pane> mPaneMap;

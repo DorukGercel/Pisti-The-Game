@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox fx:id="user_menu" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group7.client.controller.UserMenuController">
+    <Button fx:id="start_game_button" styleClass="user_button" text="Start New Game" onAction="#clickStartGameButton">
+        <font>
+            <Font name="DejaVu Serif Bold" size="24.0" />
+        </font>
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </Button>
+    <Button fx:id="leaderboard_button" styleClass="user_button" text="Leaderboard" onAction="#clickLeaderboardButton">
+        <font>
+            <Font name="DejaVu Serif Bold" size="24.0" />
+        </font>
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </Button>
+    <Button fx:id="logout_button" styleClass="user_button" text="Logout" onAction="#clickLogoutButton">
+        <font>
+            <Font name="DejaVu Serif Bold" size="24.0" />
+        </font>
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </VBox.margin>
+    </Button>
+</VBox>

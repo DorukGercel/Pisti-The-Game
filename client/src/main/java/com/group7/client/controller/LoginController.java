@@ -75,7 +75,7 @@ public class LoginController implements Initializable {
         if(isNetworkOperationSuccess(commonResponse[0], networkStatusCode)) {
             LoginResponse loginResponse = (LoginResponse) commonResponse[0];
             if (isOperationSuccess(loginResponse)) {
-                mScreenManager.activatePane("main_menu");
+                mScreenManager.activatePane("user_menu");
             } else {
                 displayAlert(Objects.requireNonNull(loginResponse).getErrorMessage());
             }

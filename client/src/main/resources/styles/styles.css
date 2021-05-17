@@ -86,3 +86,26 @@
     -fx-background-radius: 10;
     -fx-background-color: linear-gradient(#ff5400, #be1d00);
 }
+
+#user_menu {
+    -fx-alignment: center;
+}
+
+.user_button {
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+}
+
+.user_button:hover {
+    -fx-background-color: white;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-cursor: hand;
+}
+
+.user_button:pressed {
+    -fx-background-color: black;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-cursor: hand;
+}
