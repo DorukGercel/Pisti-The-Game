@@ -2,7 +2,7 @@ package com.group7.server.dto.leaderboard;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group7.server.definitions.common.StatusCode;
-import com.group7.server.model.LeaderboardRecord;
+import com.group7.server.definitions.leaderboard.RecordEntry;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,14 +13,14 @@ import java.util.List;
 @Data
 public class ListRecordsResponse extends LeaderboardResponse {
     /** List of records according to query*/
-    private List<LeaderboardRecord> mLeaderboardRecordList;
+    private List<RecordEntry> mLeaderboardRecordEntryList;
 
     /** All args constructor*/
     public ListRecordsResponse(@JsonProperty("statusCode") StatusCode statusCode,
                                @JsonProperty("errorMessage") String errorMessage,
-                               @JsonProperty("recordList") List<LeaderboardRecord> leaderboardRecordList) {
+                               @JsonProperty("recordEntryList") List<RecordEntry> recordEntryList) {
         super(statusCode, errorMessage);
-        mLeaderboardRecordList = new ArrayList<>();
-        mLeaderboardRecordList.addAll(leaderboardRecordList);
+        mLeaderboardRecordEntryList = new ArrayList<>();
+        mLeaderboardRecordEntryList.addAll(recordEntryList);
     }
 }

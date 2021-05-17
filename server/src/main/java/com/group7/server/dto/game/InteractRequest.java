@@ -3,15 +3,18 @@ package com.group7.server.dto.game;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group7.server.definitions.game.Game;
+import com.group7.server.dto.common.CommonRequest;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 
 /** DTO used for interacting with the game*/
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class InteractRequest {
+public class InteractRequest extends CommonRequest {
 
     /** Session id of the active player who requests*/
     @NotEmpty

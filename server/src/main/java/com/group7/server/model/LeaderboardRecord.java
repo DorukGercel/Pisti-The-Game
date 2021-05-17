@@ -5,9 +5,8 @@ import javax.persistence.*;
 import java.util.Date;
 
 /** Model of the leaderboard record created upon finish of a game*/
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @SequenceGenerator(name = "idgen", sequenceName = "LEADERBOARD_RECORD_SEQ")
 @Entity

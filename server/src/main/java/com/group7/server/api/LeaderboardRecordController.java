@@ -2,21 +2,17 @@ package com.group7.server.api;
 
 
 import com.group7.server.definitions.common.StatusCode;
-import com.group7.server.definitions.game.Game;
+import com.group7.server.definitions.leaderboard.RecordEntry;
 import com.group7.server.dto.leaderboard.LeaderboardRequest;
 import com.group7.server.dto.leaderboard.LeaderboardResponse;
 import com.group7.server.dto.leaderboard.ListRecordsResponse;
-import com.group7.server.model.LeaderboardRecord;
 import com.group7.server.service.leaderboard.LeaderboardRecordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -27,7 +23,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @RequestMapping("/api/leaderboard")
-@Api(value = "Leaderboard Record API", tags = {"Leaderboard Record API"})
+@Api(value = "Leaderboard RecordEntry API", tags = {"Leaderboard RecordEntry API"})
 @RestController
 public class LeaderboardRecordController {
 
@@ -107,10 +103,12 @@ public class LeaderboardRecordController {
     @GetMapping("/get/{period}")
     @ApiOperation(value = "Lists the records in the leaderboard by period. Login required.")
     public LeaderboardResponse getRecords(@PathVariable String period) {
-        List<LeaderboardRecord> leaderboardRecordList = new ArrayList<>();
-        StatusCode statusCode = mLeaderboardRecordService.getRecordsByDate(decodePeriodType(period), leaderboardRecordList);
+        List<RecordEntry> recordEntryList = new ArrayList<>();
+        StatusCode statusCode = mLeaderboardRecordService.getRecordsByDate(decodePeriodType(period), recordEntryList);
         if(statusCode.equals(StatusCode.SUCCESS)) {
-            return new ListRecordsResponse(StatusCode.SUCCESS, null, leaderboardRecordList);
+            // TODO: Remove print
+            System.out.println(recordEntryList);
+            return new ListRecordsResponse(StatusCode.SUCCESS, null, recordEntryList);
         }
         return new LeaderboardResponse(statusCode, "Get records operation failed!");
     }

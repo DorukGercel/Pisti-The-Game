@@ -1,6 +1,7 @@
 package com.group7.server.service.leaderboard;
 
 import com.group7.server.definitions.common.StatusCode;
+import com.group7.server.definitions.leaderboard.RecordEntry;
 import com.group7.server.model.Player;
 import com.group7.server.model.LeaderboardRecord;
 import com.group7.server.repository.LeaderboardRecordRepository;
@@ -8,10 +9,7 @@ import com.group7.server.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.text.Format;
@@ -121,14 +119,14 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
      * Retrieve all records according to given period from the leaderboard record table.
      *
      * @param period it can be "weekly", "monthly" or "allTimes"
-     * @param leaderboardRecordList List of leaderboard records
+     * @param recordEntryList List of leaderboard records
      *
      * return the status code of the operation
      */
     @Override
-    public StatusCode getRecordsByDate(Period period, List<LeaderboardRecord> leaderboardRecordList) {
+    public StatusCode getRecordsByDate(Period period, List<RecordEntry> recordEntryList) {
         try {
-            if (leaderboardRecordList == null || period == null){
+            if (recordEntryList == null || period == null){
                 return StatusCode.FAIL;
             }
             Date now = new java.util.Date();
@@ -137,22 +135,38 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
             if (period.equals(Period.WEEKLY)) {
                 Date sevenDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(7)));
                 String sevenDaysAgoDate = formatter.format(sevenDaysAgo);
-                leaderboardRecordList.addAll(mLeaderboardRecordRepository
+                List<LeaderboardRecord> dbLeaderboardRecords = mLeaderboardRecordRepository
                         .findByEndDateBetween(
-                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
-                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(sevenDaysAgoDate))
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(sevenDaysAgoDate),
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate));
+                // TODO: Remove print
+                System.out.println(nowDate);
+                recordEntryList.addAll(
+                    convertToRecordList(dbLeaderboardRecords)
                 );
+                // TODO: Remove print
+                System.out.println(recordEntryList);
+                System.out.println(dbLeaderboardRecords);
             } else if (period.equals(Period.MONTHLY)) {
                 Date thirtyDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(30)));
                 String thirtyDaysAgoDate = formatter.format(thirtyDaysAgo);
-                leaderboardRecordList.addAll(mLeaderboardRecordRepository
+                List<LeaderboardRecord> dbLeaderboardRecords = mLeaderboardRecordRepository
                         .findByEndDateBetween(
-                            new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate),
-                            new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(thirtyDaysAgoDate))
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(thirtyDaysAgoDate),
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate));
+                recordEntryList.addAll(
+                        convertToRecordList(dbLeaderboardRecords)
                 );
+                // TODO: Remove print
+                System.out.println(recordEntryList);
+                System.out.println(dbLeaderboardRecords);
             } else {
                 /* period == "allTimes" */
-                leaderboardRecordList.addAll(mLeaderboardRecordRepository.findAll());
+                List<LeaderboardRecord> dbLeaderboardRecords = mLeaderboardRecordRepository.findAll();
+                recordEntryList.addAll(convertToRecordList(dbLeaderboardRecords));
+                // TODO: Remove print
+                System.out.println(recordEntryList);
+                System.out.println(dbLeaderboardRecords);
             }
             return StatusCode.SUCCESS;
         } catch (Exception e) {
@@ -169,6 +183,19 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
             return null;
         }
         return dbRecord.get();
+    }
+
+    /** Helper function to convert from leaderboard record to record list*/
+    private List<RecordEntry> convertToRecordList(List<LeaderboardRecord> leaderboardRecordList) {
+        List<RecordEntry> recordEntryList = new ArrayList<>();
+        for(LeaderboardRecord leaderboardRecord : leaderboardRecordList) {
+            recordEntryList.add(new RecordEntry(leaderboardRecord.getPlayer().getUsername(),
+                                      leaderboardRecord.getScore(),
+                                      leaderboardRecord.getEndDate()
+                    )
+            );
+        }
+        return recordEntryList;
     }
 
 }
