@@ -8,12 +8,18 @@
 
 <StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group7.client.controller.LoginController">
    <VBox fx:id="login_form_container">
+      <Label fx:id="login_text" alignment="CENTER" contentDisplay="CENTER" text="Login Menu" textAlignment="CENTER">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <VBox.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </VBox.margin>
+         <font>
+            <Font name="DejaVu Serif Bold" size="18.0" />
+         </font>
+      </Label>
       <Group>
-         <Label fx:id="informationLabel" alignment="TOP_CENTER" contentDisplay="TOP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" textAlignment="CENTER">
-            <font>
-               <Font size="16.0" />
-            </font>
-         </Label>
          <GridPane fx:id="login_form">
             <Label styleClass="form_label" text="Username:">
                <GridPane.margin>

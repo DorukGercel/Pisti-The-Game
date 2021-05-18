@@ -1,7 +1,7 @@
 /* Common styling of the components*/
 
 #common {
-    -fx-background-image: url("../image/poker_table.jpg");
+    -fx-background-image: url("../images/poker_table.jpg");
     -fx-background-size: cover;
     -fx-pref-height: 400px;
     -fx-pref-width: 600px;
@@ -55,6 +55,13 @@
     -fx-alignment: center;
 }
 
+#login_text {
+    -fx-alignment: center;
+    -fx-background-radius: 10;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-background-color: black;
+}
+
 #login_form {
     -fx-alignment: center;
     -fx-background-radius: 10;
@@ -68,6 +75,13 @@
 
 #register_form_container {
     -fx-alignment: center;
+}
+
+#register_text {
+    -fx-alignment: center;
+    -fx-background-radius: 10;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-background-color: black;
 }
 
 #register_form {
