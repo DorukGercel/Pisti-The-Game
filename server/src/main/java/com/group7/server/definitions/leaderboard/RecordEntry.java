@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.Date;
 
+/** Used in leaderboard dto to indicate records.*/
 @Data
 @AllArgsConstructor
 public class RecordEntry {
