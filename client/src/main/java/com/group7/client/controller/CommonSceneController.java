@@ -1,13 +1,8 @@
 package com.group7.client.controller;
 
-import javafx.fxml.Initializable;
+import com.group7.client.controller.common.BaseController;
 
-import java.net.URL;
-import java.util.ResourceBundle;
+/** Controller for the main background*/
+public class CommonSceneController extends BaseController {
 
-public class CommonSceneController implements Initializable {
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-
-    }
 }

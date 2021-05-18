@@ -3,6 +3,9 @@ package com.group7.client;
 import javafx.application.Application;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * Main Spring application which is responsible for launching UI App
+ */
 @SpringBootApplication
 public class ClientApplication {
 

@@ -7,26 +7,34 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 
+/**
+ * Main FX application which is responsible for starting UI App
+ */
 public class UiApplication extends Application {
 
+    /** Context of the running application*/
     private ConfigurableApplicationContext applicationContext;
 
+    /** Initializes the application*/
     @Override
     public void init() {
         applicationContext = new SpringApplicationBuilder(ClientApplication.class).run();
     }
 
+    /** Creates an event to create stage*/
     @Override
     public void start(Stage stage) {
         applicationContext.publishEvent(new StageReadyEvent(stage));
     }
 
+    /** Closes application context in exit*/
     @Override
     public void stop() {
         applicationContext.close();
         Platform.exit();
     }
 
+    /** Event which indicates the app is ready to create stage*/
     static class StageReadyEvent extends ApplicationEvent {
         public StageReadyEvent(Stage stage) {
             super(stage);

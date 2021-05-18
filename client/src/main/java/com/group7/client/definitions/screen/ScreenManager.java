@@ -1,4 +1,4 @@
-package com.group7.client;
+package com.group7.client.definitions.screen;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -28,6 +28,7 @@ public class ScreenManager {
     /** Application context created via Spring*/
     private final ApplicationContext applicationContext;
 
+    /** Required args constructor*/
     public ScreenManager(ApplicationContext applicationContext,
                          @Value("${spring.application.screen.common.url}") String commonUrl,
                          @Value("${spring.application.screen.panes.name}") String[] panesName,
@@ -38,15 +39,22 @@ public class ScreenManager {
         initScene(commonUrl);
     }
 
+    /** Get the current scene*/
     public Scene getCurrentScene() {
         return currentScene;
     }
 
+    /**
+     * Change the root of scene graph to switch screen.
+     *
+     * @param name of the scene to switch to.
+     */
     public void activatePane(String name){
         Pane root = (Pane) currentScene.getRoot();
         root.getChildren().setAll(mPaneMap.get(name));
     }
 
+    /** Create the first scene of the application*/
     private void initScene(String commonUrl) {
         try {
             ResourceLoader resourceLoader = new DefaultResourceLoader();
@@ -63,6 +71,7 @@ public class ScreenManager {
         }
     }
 
+    /** Loads all the panes that are used in the app*/
     private void initPaneMap(String[] panesUrl, String[] panesName) {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
         Resource resource;
@@ -73,6 +82,7 @@ public class ScreenManager {
         }
     }
 
+    /** Adds a pane to the pane map*/
     private void addPane(String paneName, Resource resource){
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(resource.getURL());
@@ -85,6 +95,7 @@ public class ScreenManager {
         }
     }
 
+    /** Removes the pane from the pane map*/
     private void removePane(String paneName){
         mPaneMap.remove(paneName);
     }

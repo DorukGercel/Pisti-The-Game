@@ -1,6 +1,6 @@
 package com.group7.client.controller;
 
-import com.group7.client.ScreenManager;
+import com.group7.client.definitions.screen.ScreenManager;
 import com.group7.client.definitions.common.StatusCode;
 import com.group7.client.definitions.network.NetworkManager;
 import com.group7.client.dto.common.CommonRequest;

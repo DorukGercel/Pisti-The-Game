@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import java.util.ArrayList;
 import java.util.List;
 
+/** DTO used as response for getting list of records*/
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ListRecordsResponse extends LeaderboardResponse {
