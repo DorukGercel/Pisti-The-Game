@@ -1,5 +1,6 @@
 package com.group7.client.definitions.screen;
 
+import com.group7.client.definitions.game.GameConfig;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -28,13 +29,18 @@ public class ScreenManager {
     /** Application context created via Spring*/
     private final ApplicationContext applicationContext;
 
+    // TODO: Delete this component
+    private final GameConfig.CardTable mCardTable;
+
     /** Required args constructor*/
     public ScreenManager(ApplicationContext applicationContext,
+                         GameConfig.CardTable cardTable,
                          @Value("${spring.application.screen.common.url}") String commonUrl,
                          @Value("${spring.application.screen.panes.name}") String[] panesName,
                          @Value("${spring.application.screen.panes.url}") String[] panesUrl) {
-        mPaneMap = new HashMap<>();
+        this.mPaneMap = new HashMap<>();
         this.applicationContext = applicationContext;
+        this.mCardTable = cardTable;
         initPaneMap(panesUrl, panesName);
         initScene(commonUrl);
     }
@@ -63,6 +69,8 @@ public class ScreenManager {
             fxmlLoader.setControllerFactory(applicationContext::getBean);
             Pane pane = fxmlLoader.load();
             pane.getChildren().add(mPaneMap.get("main_menu"));
+            // TODO: Remove print
+            //pane.getChildren().add(mCardTable.getCard((short) 35).getCard());
             currentScene = new Scene(pane);
             System.out.println("common");
         }
