@@ -1,5 +1,6 @@
 package com.group7.client.controller;
 
+import com.group7.client.definitions.player.PlayerManager;
 import com.group7.client.definitions.screen.ScreenManager;
 import com.group7.client.controller.common.BaseNetworkController;
 import com.group7.client.definitions.common.StatusCode;
@@ -20,11 +21,6 @@ import java.util.Objects;
 /** Controller for the login form*/
 @Component
 public class LoginController extends BaseNetworkController {
-
-    /** Reference to common screen manager*/
-    private ScreenManager mScreenManager;
-    /** Reference to common network manager*/
-    private NetworkManager mNetworkManager;
     /** Common api address of the back-end for controller requests*/
     @Value("${spring.application.apiAddress.player}") private String apiAddress;
 
@@ -35,15 +31,16 @@ public class LoginController extends BaseNetworkController {
 
     /** Setter injection method*/
     @Autowired
-    public void setManagers(@Lazy ScreenManager screenManager, NetworkManager networkManager) {
+    public void setManagers(@Lazy ScreenManager screenManager, NetworkManager networkManager, @Lazy PlayerManager playerManager) {
         this.mScreenManager = screenManager;
         this.mNetworkManager = networkManager;
+        this.mPlayerManager = playerManager;
     }
 
     /** Returns to the main screen*/
     @FXML
     public void clickReturnButton() {
-        mScreenManager.activatePane("main_menu");
+        mScreenManager.activatePane("main_menu", null);
     }
 
     /** Sends the fields as a login request*/
@@ -57,9 +54,7 @@ public class LoginController extends BaseNetworkController {
 
         // Check validity of fields
         if(!areFieldsValid(username, email, password)) {
-            displayAlert(Alert.AlertType.ERROR,
-                    "Error",
-                    "Login Player",
+            displayError("Login Player",
                     "Some fields are missing.");
             return;
         }
@@ -75,23 +70,12 @@ public class LoginController extends BaseNetworkController {
                 commonResponse,
                 LoginResponse.class);
 
-        // Check if network operation is successful
-        if(isNetworkOperationSuccess(commonResponse[0], networkStatusCode)) {
+        // Check if operation is successful
+        if(isOperationSuccess(commonResponse[0], networkStatusCode, LoginResponse.class, "Login  Player")) {
             LoginResponse loginResponse = (LoginResponse) commonResponse[0];
-            // Check if operation is successful
-            if (isOperationSuccess(loginResponse)) {
-                mScreenManager.activatePane("user_menu");
-            } else {
-                displayAlert(Alert.AlertType.ERROR,
-                        "Error",
-                        "Login Player",
-                        Objects.requireNonNull(loginResponse).getErrorMessage());
-            }
-        } else {
-            displayAlert(Alert.AlertType.ERROR,
-                    "Error",
-                    "Login Player",
-                    "Network connection error occurred!");
+            mPlayerManager.setUsername(username);
+            mPlayerManager.setSessionId(loginResponse.getSessionId());
+            mScreenManager.activatePane("user_menu", null);
         }
         clearFields();
     }

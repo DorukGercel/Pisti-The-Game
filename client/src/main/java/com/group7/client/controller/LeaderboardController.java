@@ -75,7 +75,7 @@ public class LeaderboardController implements Initializable {
             LeaderboardResponse leaderboardResponse = (LeaderboardResponse) commonResponse[0];
             if(isOperationSuccess(leaderboardResponse)) {
                 putLeaderboardRecords(leaderboardResponse);
-                mScreenManager.activatePane("leaderboard_table");
+                mScreenManager.activatePane("leaderboard_table", null);
             } else {
                 displayAlert(Objects.requireNonNull(leaderboardResponse.getErrorMessage()));
             }

@@ -10,10 +10,6 @@ import org.springframework.stereotype.Component;
 /** Controller for the main menu*/
 @Component
 public class MainMenuController extends BaseController {
-
-    /** Reference to common screen manager*/
-    private ScreenManager mScreenManager;
-
     /** Setter injection method*/
     @Autowired
     public void setManagers(@Lazy ScreenManager screenManager) {
@@ -23,12 +19,12 @@ public class MainMenuController extends BaseController {
     /** Switches to the login form*/
     @FXML
     public void clickLoginButton() {
-        mScreenManager.activatePane("login_form");
+        mScreenManager.activatePane("login_form", null);
     }
 
     /** Switches to the register form*/
     @FXML
     public void clickRegisterButton() {
-        mScreenManager.activatePane("register_form");
+        mScreenManager.activatePane("register_form", null);
     }
 }

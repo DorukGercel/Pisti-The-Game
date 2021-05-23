@@ -20,11 +20,6 @@ import java.util.Objects;
 /** Controller for the register form*/
 @Component
 public class RegisterController extends BaseNetworkController {
-
-    /** Reference to common screen manager*/
-    private ScreenManager mScreenManager;
-    /** Reference to common network manager*/
-    private NetworkManager mNetworkManager;
     /** Common api address of the back-end for controller requests*/
     @Value("${spring.application.apiAddress.player}") private String apiAddress;
 
@@ -43,7 +38,7 @@ public class RegisterController extends BaseNetworkController {
     /** Returns to the main screen*/
     @FXML
     public void clickReturnButton() {
-        mScreenManager.activatePane("main_menu");
+        mScreenManager.activatePane("main_menu", null);
     }
 
     /** Sends the fields as a register request*/
@@ -55,9 +50,7 @@ public class RegisterController extends BaseNetworkController {
 
         // Check validity of fields
         if(!areFieldsValid(username, email, password)) {
-            displayAlert(Alert.AlertType.ERROR,
-                    "Error",
-                    "Register Player",
+            displayError("Register Player",
                     "Some fields are missing!");
             return;
         }
@@ -73,23 +66,9 @@ public class RegisterController extends BaseNetworkController {
                 commonResponse,
                 AuthResponse.class);
 
-        // Check if network operation is successful
-        if (isNetworkOperationSuccess(commonResponse[0], networkStatusCode)) {
-            AuthResponse authResponse = (AuthResponse) commonResponse[0];
-            // Check if operation is successful
-            if (isOperationSuccess(authResponse)) {
-                mScreenManager.activatePane("main_menu");
-            } else {
-                displayAlert(Alert.AlertType.ERROR,
-                        "Error",
-                        "Register Player",
-                        Objects.requireNonNull( authResponse.getErrorMessage()));
-            }
-        } else {
-            displayAlert(Alert.AlertType.ERROR,
-                    "Error",
-                    "Register Player",
-                    "Network connection error occurred!");
+        // Check if operation is successful
+        if (isOperationSuccess(commonResponse[0], networkStatusCode, AuthResponse.class, "Register Player")) {
+            mScreenManager.activatePane("main_menu", null);
         }
         clearFields();
     }

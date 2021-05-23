@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-
-<StackPane fx:id="common" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"/>
+<BorderPane fx:id="common" pickOnBounds="false" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group7.client.controller.CommonSceneController">
+   <top>
+       <Button fx:id="back_button" styleClass="main_button" text="Back" textAlignment="CENTER" onAction="#clickBackButton">
+           <font>
+               <Font name="DejaVu Serif Bold" size="10.0" />
+           </font>
+         <BorderPane.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </BorderPane.margin>
+       </Button>
+   </top>
+</BorderPane>
