@@ -11,4 +11,8 @@ import org.springframework.stereotype.Component;
 public class PlayerManager {
     /** Session id of the active player*/
     private Long sessionId;
+    /** Game id that active player is assigned*/
+    private Long gameId;
+    /** Name of the player*/
+    private String username;
 }

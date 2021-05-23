@@ -22,20 +22,12 @@ public class NetworkManager {
     private final RestTemplate mRestTemplate;
     /** Request header*/
     private final HttpHeaders mHttpHeaders;
-    /** Holds active player information*/
-    private       PlayerManager mPlayerManager;
 
     /** No args constructor*/
     public NetworkManager() {
         mRestTemplate = new RestTemplate();
         mHttpHeaders = new HttpHeaders();
         mHttpHeaders.setContentType(MediaType.APPLICATION_JSON);
-    }
-
-    /** Setter injection method*/
-    @Autowired
-    private void setManagers(@Lazy PlayerManager playerManager) {
-        this.mPlayerManager = playerManager;
     }
 
     /***
@@ -89,7 +81,6 @@ public class NetworkManager {
         if (loginResponse.getStatusCode().equals(StatusCode.SUCCESS)) {
             String token = loginResponse.getToken();
             mHttpHeaders.setBearerAuth(token);
-            mPlayerManager.setSessionId(loginResponse.getSessionId());
         }
     }
 
@@ -97,7 +88,6 @@ public class NetworkManager {
     private void removeToken(LogoutResponse logoutResponse) {
         if (logoutResponse.getStatusCode().equals(StatusCode.SUCCESS)) {
             mHttpHeaders.setBearerAuth("");
-            mPlayerManager.setSessionId(-1L);
         }
     }
 }

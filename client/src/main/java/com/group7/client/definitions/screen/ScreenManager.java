@@ -1,17 +1,18 @@
 package com.group7.client.definitions.screen;
 
-import com.group7.client.definitions.game.GameConfig;
+import com.group7.client.definitions.game.CardTable;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.PropertySources;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,35 +20,39 @@ import java.util.Map;
 
 /**
  * Responsible for dealing with Scene and Scene Graph
+ * Also event publishing for scenes occur here
  * */
 @Component
 public class ScreenManager {
-    /** Holds the panes of the application*/
-    private final Map<String, Pane> mPaneMap;
+    /** Holds the panes and the name of the parents of the application*/
+    private final Map<String, Pair<Pane,String>> mPaneMap;
     /** Holds the scene of the application*/
-    private Scene currentScene;
+    private Scene mCurrentScene;
+    /** Holds the name of the parent of the current scene*/
+    private String mParentSceneName;
     /** Application context created via Spring*/
-    private final ApplicationContext applicationContext;
+    private final ApplicationContext mApplicationContext;
 
     // TODO: Delete this component
-    private final GameConfig.CardTable mCardTable;
+    private final CardTable mCardTable;
 
     /** Required args constructor*/
     public ScreenManager(ApplicationContext applicationContext,
-                         GameConfig.CardTable cardTable,
+                         CardTable cardTable,
                          @Value("${spring.application.screen.common.url}") String commonUrl,
-                         @Value("${spring.application.screen.panes.name}") String[] panesName,
-                         @Value("${spring.application.screen.panes.url}") String[] panesUrl) {
+                         @Value("${spring.application.screen.panes.name}") String[] panesNames,
+                         @Value("${spring.application.screen.panes.url}") String[] panesUrls,
+                         @Value("${spring.application.screen.panes.parent}") String[] parentNames) {
         this.mPaneMap = new HashMap<>();
-        this.applicationContext = applicationContext;
+        this.mApplicationContext = applicationContext;
         this.mCardTable = cardTable;
-        initPaneMap(panesUrl, panesName);
+        initPaneMap(panesUrls, panesNames, parentNames);
         initScene(commonUrl);
     }
 
     /** Get the current scene*/
     public Scene getCurrentScene() {
-        return currentScene;
+        return mCurrentScene;
     }
 
     /**
@@ -55,9 +60,28 @@ public class ScreenManager {
      *
      * @param name of the scene to switch to.
      */
-    public void activatePane(String name){
-        Pane root = (Pane) currentScene.getRoot();
-        root.getChildren().setAll(mPaneMap.get(name));
+    public void activatePane(String name, ApplicationEvent event){
+        if(event != null) {
+            mApplicationContext.publishEvent(event);
+        }
+        // Main root pane is border pane
+        BorderPane root = (BorderPane) mCurrentScene.getRoot();
+        // Always change the center of the border
+        root.setCenter(mPaneMap.get(name).getKey());
+
+        if (hasParent(name)) {
+            mApplicationContext.publishEvent(new BackButtonEvent(true));
+        } else {
+            mApplicationContext.publishEvent(new BackButtonEvent(false));
+        }
+    }
+
+    /**
+     * Change the current scene to the parent of this scene
+     */
+    public void returnParentScene() {
+        // Event is null, no event in return back
+        activatePane(mParentSceneName ,null);
     }
 
     /** Create the first scene of the application*/
@@ -66,13 +90,14 @@ public class ScreenManager {
             ResourceLoader resourceLoader = new DefaultResourceLoader();
             Resource resource = resourceLoader.getResource(commonUrl);
             FXMLLoader fxmlLoader = new FXMLLoader(resource.getURL());
-            fxmlLoader.setControllerFactory(applicationContext::getBean);
-            Pane pane = fxmlLoader.load();
-            pane.getChildren().add(mPaneMap.get("main_menu"));
+            fxmlLoader.setControllerFactory(mApplicationContext::getBean);
+            // Main root pane is border pane
+            BorderPane root = fxmlLoader.load();
+            root.setCenter(mPaneMap.get("main_menu").getKey());
+            mCurrentScene = new Scene(root);
             // TODO: Remove print
-            //pane.getChildren().add(mCardTable.getCard((short) 35).getCard());
-            currentScene = new Scene(pane);
             System.out.println("common");
+
         }
         catch (IOException e) {
             throw new RuntimeException();
@@ -80,23 +105,25 @@ public class ScreenManager {
     }
 
     /** Loads all the panes that are used in the app*/
-    private void initPaneMap(String[] panesUrl, String[] panesName) {
+    private void initPaneMap(String[] panesUrls, String[] panesNames, String[] parentsNames) {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
         Resource resource;
-        for (int i = 0; i < panesUrl.length; i++) {
-            resource = resourceLoader.getResource(panesUrl[i]);
-            addPane(panesName[i], resource);
-            System.out.println(panesName[i]);
+        for (int i = 0; i < panesUrls.length; i++) {
+            resource = resourceLoader.getResource(panesUrls[i]);
+            addPane(panesNames[i], resource, parentsNames[i]);
+            // TODO: Remove print
+            System.out.println(panesNames[i]);
+            System.out.println(parentsNames[i] + "\n");
         }
     }
 
     /** Adds a pane to the pane map*/
-    private void addPane(String paneName, Resource resource){
+    private void addPane(String paneName, Resource resource, String parentName){
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(resource.getURL());
-            fxmlLoader.setControllerFactory(applicationContext::getBean);
+            fxmlLoader.setControllerFactory(mApplicationContext::getBean);
             Pane pane = fxmlLoader.load();
-            mPaneMap.put(paneName, pane);
+            mPaneMap.put(paneName, new Pair<>(pane, parentName));
         }
         catch (IOException e) {
             throw new RuntimeException();
@@ -108,4 +135,16 @@ public class ScreenManager {
         mPaneMap.remove(paneName);
     }
 
+    /** Helper function which checks if pane has parent and sets parent scene name*/
+    private boolean hasParent(String paneName) {
+        mParentSceneName = mPaneMap.get(paneName).getValue();
+        return !paneName.equals(mParentSceneName);
+    }
+
+    /** Event which indicates the game is started*/
+    public static class BackButtonEvent extends ApplicationEvent {
+        public BackButtonEvent(boolean code) {
+            super(code);
+        }
+    }
 }
