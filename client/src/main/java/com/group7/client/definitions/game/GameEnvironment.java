@@ -1,10 +1,12 @@
 package com.group7.client.definitions.game;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 public class GameEnvironment {
     private List<Short> mHandCards;
     private Short       mNoHandCards;

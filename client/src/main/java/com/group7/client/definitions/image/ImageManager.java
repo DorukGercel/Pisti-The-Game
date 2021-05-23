@@ -1,6 +1,6 @@
 package com.group7.client.definitions.image;
 
-import com.group7.client.definitions.game.GameConfig;
+import com.group7.client.definitions.game.Card;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
@@ -40,8 +40,8 @@ public class ImageManager {
     private void initCardImages(int width, int height) {
         //Reading the color of the image
         int x_cord = 0, y_cord = 0;
-        for(int y = 0; y < GameConfig.Card.Suit.values().length; y++) {
-            for(int x = 0; x < GameConfig.Card.Rank.values().length; x++) {
+        for(int y = 0; y < Card.Suit.values().length; y++) {
+            for(int x = 0; x < Card.Rank.values().length; x++) {
                 Image cardImage = initSingleCardImage(x_cord, y_cord, width, height);
                 x_cord += width + x%2;
                 mCardImageList.add(cardImage);

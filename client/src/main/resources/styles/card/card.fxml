@@ -3,4 +3,4 @@
 <?import javafx.scene.shape.*?>
 
 
-<Rectangle fx:id="card" fill="WHITE" arcHeight="10" arcWidth="10" height="120" width="80.0" stroke="BLACK" strokeLineCap="ROUND" strokeType="INSIDE" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" />
+<Rectangle fx:id="card" fill="WHITE" arcHeight="10" arcWidth="10" height="120" width="80.0" stroke="BLACK" strokeLineCap="ROUND" strokeType="INSIDE" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"/>

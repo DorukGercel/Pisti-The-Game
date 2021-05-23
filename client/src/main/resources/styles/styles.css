@@ -8,6 +8,10 @@
     -fx-alignment: center;
 }
 
+#back_button {
+    -fx-background-radius: 5;
+}
+
 #main_menu {
     -fx-alignment: center;
 }
@@ -123,3 +127,31 @@
     -fx-text-fill: linear-gradient(#ff5400, #be1d00);
     -fx-cursor: hand;
 }
+
+#game_table {
+    -fx-background-size: cover;
+    -fx-pref-height: 100%;
+    -fx-pref-width: 100%;
+}
+
+#scoreboard {
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+}
+
+.player_label {
+    -fx-background-color: black;
+    -fx-background-radius: 10;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-alignment: center;
+}
+
+.score_label {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-alignment: center;
+}
+
+
