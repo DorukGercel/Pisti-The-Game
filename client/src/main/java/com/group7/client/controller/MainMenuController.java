@@ -18,13 +18,13 @@ public class MainMenuController extends BaseController {
 
     /** Switches to the login form*/
     @FXML
-    public void clickLoginButton() {
+    private void clickLoginButton() {
         mScreenManager.activatePane("login_form", null);
     }
 
     /** Switches to the register form*/
     @FXML
-    public void clickRegisterButton() {
+    private void clickRegisterButton() {
         mScreenManager.activatePane("register_form", null);
     }
 }

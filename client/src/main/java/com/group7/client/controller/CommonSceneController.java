@@ -51,7 +51,7 @@ public class CommonSceneController extends BaseController
 
     /** Return to the previous scene method*/
     @FXML
-    public void clickBackButton() {
+    private void clickBackButton() {
         mScreenManager.returnParentScene();
     }
 }

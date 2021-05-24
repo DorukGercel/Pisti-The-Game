@@ -15,13 +15,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 /** Controller for the register form*/
 @Component
 public class RegisterController extends BaseNetworkController {
     /** Common api address of the back-end for controller requests*/
-    @Value("${spring.application.apiAddress.player}") private String apiAddress;
+    @Value("${spring.application.apiAddress.player}") private String mApiAddress;
 
     /** FXML fields*/
     @FXML private TextField username_field;
@@ -37,13 +35,13 @@ public class RegisterController extends BaseNetworkController {
 
     /** Returns to the main screen*/
     @FXML
-    public void clickReturnButton() {
+    private void clickReturnButton() {
         mScreenManager.activatePane("main_menu", null);
     }
 
     /** Sends the fields as a register request*/
     @FXML
-    public void clickRegisterButton() {
+    private void clickRegisterButton() {
         String username = username_field.getText();
         String email = email_field.getText();
         String password = password_field.getText();
@@ -60,7 +58,7 @@ public class RegisterController extends BaseNetworkController {
         CommonResponse[] commonResponse = new AuthResponse[1];
 
         StatusCode networkStatusCode = mNetworkManager.exchange(
-                apiAddress + "/register",
+                mApiAddress + "/register",
                 HttpMethod.POST,
                 authRequest,
                 commonResponse,

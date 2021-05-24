@@ -16,13 +16,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 /** Controller for the login form*/
 @Component
 public class LoginController extends BaseNetworkController {
     /** Common api address of the back-end for controller requests*/
-    @Value("${spring.application.apiAddress.player}") private String apiAddress;
+    @Value("${spring.application.apiAddress.player}") private String mApiAddress;
 
     /** FXML fields*/
     @FXML private TextField username_field;
@@ -39,13 +37,13 @@ public class LoginController extends BaseNetworkController {
 
     /** Returns to the main screen*/
     @FXML
-    public void clickReturnButton() {
+    private void clickReturnButton() {
         mScreenManager.activatePane("main_menu", null);
     }
 
     /** Sends the fields as a login request*/
     @FXML
-    public void clickLoginButton() {
+    private void clickLoginButton() {
         String username = username_field.getText();
         String email = email_field.getText();
         String password = password_field.getText();
@@ -64,7 +62,7 @@ public class LoginController extends BaseNetworkController {
         CommonResponse[] commonResponse = new LoginResponse[1];
 
         StatusCode networkStatusCode = mNetworkManager.exchange(
-                apiAddress + "/login",
+                mApiAddress + "/login",
                 HttpMethod.POST,
                 authRequest,
                 commonResponse,

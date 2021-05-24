@@ -38,8 +38,6 @@ public class StageInitializer implements ApplicationListener<UiApplication.Stage
         stage.setTitle(applicationTitle);
         stage.setMinWidth(windowWidth);
         stage.setMinHeight(windowHeight);
-        stage.setMaxWidth(windowWidth);
-        stage.setMaxHeight(windowHeight);
         stage.show();
     }
 }

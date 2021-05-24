@@ -6,8 +6,6 @@ import com.group7.client.dto.authentication.LoginResponse;
 import com.group7.client.dto.authentication.LogoutResponse;
 import com.group7.client.dto.common.CommonRequest;
 import com.group7.client.dto.common.CommonResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
@@ -46,29 +44,32 @@ public class NetworkManager {
                                CommonRequest request,
                                CommonResponse[] response,
                                Class<? extends CommonResponse> responseType) {
+        try {
+            // Entity sent as request
+            var httpEntity = new HttpEntity<>(request, mHttpHeaders);
+            // Perform rest exchange
+            ResponseEntity<? extends CommonResponse> responseEntity = mRestTemplate.exchange(
+                    apiAddress,
+                    httpMethod,
+                    httpEntity,
+                    responseType);
 
-        // Entity sent as request
-        var httpEntity = new HttpEntity<>(request, mHttpHeaders);
-        // Perform rest exchange
-        ResponseEntity<? extends CommonResponse> responseEntity = mRestTemplate.exchange(
-                apiAddress,
-                httpMethod,
-                httpEntity,
-                responseType);
-
-        // Check if response body is present; if present status success
-        if(isNetworkOperationSuccess(responseEntity)) {
-            response[0] = responseEntity.getBody();
-            if (responseType.equals(LoginResponse.class) && response[0] != null) {
-                // In login operation set token
-                setToken((LoginResponse) response[0]);
-            } else if (responseType.equals(LogoutResponse.class) && response[0] != null) {
-                // In logout operation remove token
-                removeToken((LogoutResponse) response[0]);
+            // Check if response body is present; if present status success
+            if(isNetworkOperationSuccess(responseEntity)) {
+                response[0] = responseEntity.getBody();
+                if (responseType.equals(LoginResponse.class) && response[0] != null) {
+                    // In login operation set token
+                    setToken((LoginResponse) response[0]);
+                } else if (responseType.equals(LogoutResponse.class) && response[0] != null) {
+                    // In logout operation remove token
+                    removeToken((LogoutResponse) response[0]);
+                }
+                return StatusCode.SUCCESS;
             }
-            return StatusCode.SUCCESS;
+            return StatusCode.FAIL;
+        } catch (Exception e) {
+            return StatusCode.FAIL;
         }
-        return StatusCode.FAIL;
     }
 
     /** Check whether response entity is present*/

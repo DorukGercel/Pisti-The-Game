@@ -5,16 +5,12 @@ import com.group7.client.definitions.screen.ScreenManager;
 import com.group7.client.definitions.common.StatusCode;
 import com.group7.client.definitions.network.NetworkManager;
 import com.group7.client.definitions.player.PlayerManager;
-import com.group7.client.dto.authentication.AuthRequest;
 import com.group7.client.dto.authentication.AuthResponse;
-import com.group7.client.dto.authentication.LoginResponse;
 import com.group7.client.dto.authentication.LogoutRequest;
 import com.group7.client.dto.common.CommonResponse;
 import com.group7.client.dto.game.InitGameRequest;
 import com.group7.client.dto.game.InitGameResponse;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEvent;
@@ -22,14 +18,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 /** Controller for the user menu*/
 @Component
 public class UserMenuController extends BaseNetworkController {
     /** Common api addresses of the back-end for controller requests*/
-    @Value("${spring.application.apiAddress.player}") private String playerApiAddress;
-    @Value("${spring.application.apiAddress.game}") private String gameApiAddress;
+    @Value("${spring.application.apiAddress.player}") private String mPlayerApiAddress;
+    @Value("${spring.application.apiAddress.game}") private String mGameApiAddress;
 
     /** Setter injection method*/
     @Autowired
@@ -39,14 +33,15 @@ public class UserMenuController extends BaseNetworkController {
         this.mPlayerManager = playerManager;
     }
 
+    /** Creates a new game and switches to the game table*/
     @FXML
-    public void clickStartGameButton() {
+    private void clickStartGameButton() {
         // Exchange request and response
         InitGameRequest initGameRequest = new InitGameRequest(mPlayerManager.getSessionId());
         CommonResponse[] commonResponse = new InitGameResponse[1];
 
         StatusCode networkStatusCode = mNetworkManager.exchange(
-                gameApiAddress + "/startGame",
+                mGameApiAddress + "/startGame",
                 HttpMethod.PUT,
                 initGameRequest,
                 commonResponse,
@@ -60,20 +55,21 @@ public class UserMenuController extends BaseNetworkController {
         }
     }
 
+    /** Switches to leaderboard screen*/
     @FXML
-    public void clickLeaderboardButton() {
+    private void clickLeaderboardButton() {
         mScreenManager.activatePane("leaderboard", null);
     }
 
     /** Performs logout action*/
     @FXML
-    public void clickLogoutButton() {
+    private void clickLogoutButton() {
         // Exchange request and response
         LogoutRequest logoutRequest = new LogoutRequest(mPlayerManager.getSessionId());
         CommonResponse[] commonResponse = new AuthResponse[1];
 
         StatusCode networkStatusCode = mNetworkManager.exchange(
-                playerApiAddress + "/logout",
+                mPlayerApiAddress + "/logout",
                 HttpMethod.DELETE,
                 logoutRequest,
                 commonResponse,
