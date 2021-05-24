@@ -16,22 +16,22 @@ import java.io.IOException;
 @Data
 public class Card {
     private Short cardNo;
-    @FXML private Rectangle card;
+    @FXML private Rectangle cardGeometry;
 
     public Card(Short cardNo, String cardUrl, Image cardImage) {
         this.cardNo = cardNo;
-        setCard(cardUrl, cardImage);
+        setCardGeometry(cardUrl, cardImage);
     }
 
-    private void setCard(String cardUrl, Image cardImage) {
+    private void setCardGeometry(String cardUrl, Image cardImage) {
         try {
             // Load the card layout from fxml
             ResourceLoader resourceLoader = new DefaultResourceLoader();
             Resource resource = resourceLoader.getResource(cardUrl);
             FXMLLoader fxmlLoader = new FXMLLoader(resource.getURL());
-            card = fxmlLoader.load();
+            cardGeometry = fxmlLoader.load();
             // Fill the face of the card with image
-            card.setFill(new ImagePattern(cardImage));
+            cardGeometry.setFill(new ImagePattern(cardImage));
         }
         catch (IOException e) {
             throw new RuntimeException();
