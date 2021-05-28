@@ -1,5 +1,6 @@
 package com.group7.client.definitions.screen;
 
+import com.group7.client.controller.GameTableController;
 import com.group7.client.definitions.game.CardTable;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -62,7 +63,7 @@ public class ScreenManager {
      */
     public void activatePane(String name, ApplicationEvent event){
         if(event != null) {
-            mApplicationContext.publishEvent(event);
+            publishEvent(event);
         }
         // Main root pane is border pane
         BorderPane root = (BorderPane) mCurrentScene.getRoot();
@@ -70,9 +71,9 @@ public class ScreenManager {
         root.setCenter(mPaneMap.get(name).getKey());
 
         if (hasParent(name)) {
-            mApplicationContext.publishEvent(new BackButtonEvent(true));
+            publishEvent(new BackButtonEvent(true));
         } else {
-            mApplicationContext.publishEvent(new BackButtonEvent(false));
+            publishEvent(new BackButtonEvent(false));
         }
     }
 
@@ -82,6 +83,11 @@ public class ScreenManager {
     public void returnParentScene() {
         // Event is null, no event in return back
         activatePane(mParentSceneName ,null);
+    }
+
+    /** Publish the given event*/
+    public void publishEvent(ApplicationEvent event) {
+        mApplicationContext.publishEvent(event);
     }
 
     /** Create the first scene of the application*/

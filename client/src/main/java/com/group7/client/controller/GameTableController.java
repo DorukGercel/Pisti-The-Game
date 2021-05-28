@@ -2,18 +2,17 @@ package com.group7.client.controller;
 
 import com.group7.client.controller.common.BaseNetworkController;
 import com.group7.client.definitions.common.StatusCode;
-import com.group7.client.definitions.game.Card;
-import com.group7.client.definitions.game.GameManager;
-import com.group7.client.definitions.game.MoveType;
+import com.group7.client.definitions.game.*;
 import com.group7.client.definitions.network.NetworkManager;
 import com.group7.client.definitions.player.PlayerManager;
 import com.group7.client.definitions.screen.ScreenManager;
 import com.group7.client.dto.common.CommonResponse;
 import com.group7.client.dto.game.InteractRequest;
 import com.group7.client.dto.game.InteractResponse;
-import javafx.event.EventHandler;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
@@ -23,26 +22,31 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Component
-public class GameTableController extends BaseNetworkController
-        implements ApplicationListener<UserMenuController.StartGameEvent> {
-
+public class GameTableController extends BaseNetworkController {
     /** Reference to common game manager*/
     private GameManager mGameManager;
     /** Common api address of the back-end for controller requests*/
     @Value("${spring.application.apiAddress.game}") private String mApiAddress;
-
+    /** Sleep time between display of player and pc cards*/
+    @Value("${spring.application.sleep.long}")
+    private int mSleepTime;
+    /** Player cards*/
     private List<Card> mPlayerCards;
+    /** Card in the middle*/
     private Card       mMiddleCard;
+
     /** FXML fields*/
     @FXML private Label     active_player_label;
     @FXML private Label     active_player_score_label;
@@ -52,6 +56,7 @@ public class GameTableController extends BaseNetworkController
     @FXML private Circle    middle_area;
     @FXML private Rectangle middle_card;
     @FXML private Group     pc_area_container;
+    @FXML private Button    start_button;
 
     /** Perform initializations*/
     @Override
@@ -70,21 +75,39 @@ public class GameTableController extends BaseNetworkController
     }
 
     /** Start Game Event listener, sets username*/
-    @Override
-    public void onApplicationEvent(UserMenuController.StartGameEvent startGameEvent) {
+    @EventListener({UserMenuController.CreateGameEvent.class})
+    public void onCreateGameEvent(UserMenuController.CreateGameEvent createGameEvent) {
         active_player_label.setText(mPlayerManager.getUsername());
-        performInitialInteract();
-        // TODO: Delete this
-        active_player_score_label.setText(mPlayerManager.getGameId().toString());
+        Executors.newSingleThreadExecutor().execute(() -> mGameManager.run());
+        performInteract(MoveType.INITIAL, (short) -1);
+    }
+
+    /** Function which is invoked by game manager to simulate card move*/
+    public void simulateMove(MoveType moveType, short cardNo) {
+        performInteract(moveType, cardNo);
+    }
+
+    /** Function which turns off drag mode*/
+    public void turnOffDrag() {
+        for (Card card : mPlayerCards) {
+            card.getCardGeometry().setOnDragDetected(null);
+        }
+    }
+
+    /** Function which turns on drag mode*/
+    public void turnOnDrag() {
+        for (Card card : mPlayerCards) {
+            setCardDragAndDropListener(card);
+        }
     }
 
     /** Helper function send the initial interact request*/
-    private void performInitialInteract() {
+    private void performInteract(MoveType moveType ,short cardNo) {
         // Exchange request and response
         InteractRequest interactRequest = new InteractRequest(mPlayerManager.getSessionId(),
                 mPlayerManager.getGameId(),
-                (short)-1,  //Card no doesn't matter for initial move
-                MoveType.INITIAL);
+                cardNo,  //Card no doesn't matter for initial move
+                moveType);
         CommonResponse[] commonResponse = new InteractResponse[1];
 
         StatusCode networkStatusCode = mNetworkManager.exchange(
@@ -94,16 +117,49 @@ public class GameTableController extends BaseNetworkController
                 commonResponse,
                 InteractResponse.class);
 
-        if (isOperationSuccess(commonResponse[0], networkStatusCode, InteractResponse.class, "Interact Game - Initial")) {
+        if (isOperationSuccess(commonResponse[0], networkStatusCode, InteractResponse.class, "Interact Game")) {
             InteractResponse interactResponse = (InteractResponse) commonResponse[0];
             // TODO: Remove print
             System.out.println(interactResponse.getPlayerEnvironment());
             System.out.println(interactResponse.getPcEnvironment());
-
-            mPlayerCards = mGameManager.dealPlayerCards(interactResponse.getPlayerEnvironment());
-            mMiddleCard = mGameManager.getMiddleCard(interactResponse.getPlayerEnvironment());
-            placePlayerCards();
+            simulateTurn(moveType, interactResponse.getPlayerEnvironment(), interactResponse.getPcEnvironment());
         }
+    }
+
+    /** Helper function to place the cards according to move type*/
+    private void simulateTurn(MoveType moveType, GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
+        try {
+            if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.REDEAL)) {
+                simulateInitTurn(moveType, playerGameEnv);
+            } else {
+                Platform.runLater(() -> simulatePlayerTurn(moveType, MoveTurn.PLAYER, playerGameEnv));
+                // TODO: Remove print
+                System.out.println("a");
+                TimeUnit.SECONDS.sleep(mSleepTime);
+                // TODO: Remove print
+                System.out.println("b");
+                Platform.runLater(() -> simulatePlayerTurn(moveType, MoveTurn.PC, pcGameEnv));
+                // TODO: Remove print
+                System.out.println("c");
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /** Helper function to place middle card and set score*/
+    private void simulatePlayerTurn(MoveType moveType, MoveTurn moveTurn,GameEnvironment gameEnvironment) {
+        mMiddleCard = mGameManager.getMiddleCard(gameEnvironment);
+        placeMiddleCard(moveTurn, moveType);
+        setScore(moveTurn, gameEnvironment.getMScores().get(0));
+    }
+
+    /** Helper function to perform initial card placing*/
+    private void simulateInitTurn(MoveType moveType, GameEnvironment gameEnvironment) {
+        mPlayerCards = mGameManager.dealPlayerCards(gameEnvironment);
+        Platform.runLater(() -> placePlayerCards());
+        mMiddleCard = mGameManager.getMiddleCard(gameEnvironment);
+        Platform.runLater(() -> placeMiddleCard(MoveTurn.PLAYER, moveType));
     }
 
     /** Helper function to place player cards*/
@@ -113,6 +169,7 @@ public class GameTableController extends BaseNetworkController
         double hShift = 20;
         double vShift;
         int    counter = 0;
+        // Place all the cards as they were hold by hand
         for(Card card : mPlayerCards) {
             vShift = (counter == 1 || counter == 2) ? 0:10;
             Rectangle cardRec = card.getCardGeometry();
@@ -125,54 +182,55 @@ public class GameTableController extends BaseNetworkController
         }
     }
 
+    /** Helper function to place middle card*/
+    private void placeMiddleCard(MoveTurn moveTurn, MoveType moveType) {
+        if (mMiddleCard == null) {
+            middle_card.setFill(Color.BURLYWOOD);
+        } else if (moveType.equals(MoveType.INITIAL) || moveTurn.equals(MoveTurn.PC)) {
+            middle_card.setFill(mMiddleCard.getCardGeometry().getFill());
+        }
+    }
+
+    /** Helper function to set scores in the boards*/
+    private void setScore(MoveTurn moveTurn, Short score) {
+        if(moveTurn.equals(MoveTurn.PLAYER)) {
+            active_player_score_label.setText(score.toString());
+            return;
+        }
+        pc_score_label.setText(score.toString());
+    }
+
+    /** Helper function to attach drag and drop listener to middle area*/
     private void setMiddleAreaDragAndDropListener() {
         middle_card.setOnDragOver(event -> {
-            //TODO: Remove print
-            System.out.println("over");
-
-            if (event.getGestureSource() != middle_area &&
-                    event.getDragboard().hasImage()) {
+            if (event.getGestureSource() != middle_area) {
                 event.acceptTransferModes(TransferMode.MOVE);
             }
             event.consume();
         });
 
         middle_card.setOnDragEntered(event -> {
-            //TODO: Remove print
-            System.out.println("enter");
-
-            /* the drag-and-drop gesture entered the target */
-            /* show to the user that it is an actual gesture target */
             if (event.getGestureSource() != middle_area &&
-                    event.getDragboard().hasImage()) {
-                middle_area.setFill(Color.GREEN);
+                    event.getDragboard().hasImage() &&
+                    event.getDragboard().hasString()) {
+                middle_area.setFill(Color.CRIMSON);
             }
             event.consume();
         });
 
         middle_card.setOnDragExited(event -> {
-            //TODO: Remove print
-            System.out.println("exit");
-            /* mouse moved away, remove the graphical cues */
-            middle_area.setFill(Color.BLACK);
+            middle_area.setFill(Color.BURLYWOOD);
             event.consume();
         });
 
         middle_card.setOnDragDropped(event -> {
-            //TODO: Remove print
-            System.out.println("drop");
-
             Dragboard dragboard = event.getDragboard();
             boolean success = false;
             if (dragboard.hasImage()) {
-                //TODO: Remove print
-                System.out.println("drop success");
-
                 middle_card.setFill(new ImagePattern(dragboard.getImage()));
                 success = true;
             }
             event.setDropCompleted(success);
-
             event.consume();
         });
     }
@@ -183,32 +241,33 @@ public class GameTableController extends BaseNetworkController
         Rectangle cardGeo = card.getCardGeometry();
         // Set on drag listener to card geometry
         cardGeo.setOnDragDetected(event -> {
-            //TODO: Remove print
-            System.out.println("detect");
             // Only allow move transfer option
             Dragboard dragboard = cardGeo.startDragAndDrop(TransferMode.MOVE);
-            // Copy image to clipboard and dragboard
+            // Copy image to clipboard content and set dragboard
             ClipboardContent content = new ClipboardContent();
+            // Copy background image
             Image cardImage = ((ImagePattern) cardGeo.getFill()).getImage();
             content.putImage(cardImage);
+            // Copy card no as string
+            content.putString(card.getCardNo().toString());
             dragboard.setContent(content);
 
             event.consume();
         });
         // Set drag done listener to card geometry
         cardGeo.setOnDragDone(event -> {
-            //TODO: Remove print
-            System.out.println("done");
-            if (event.getTransferMode() == TransferMode.MOVE) {
-                //TODO: Remove print
-                System.out.println("done success");
-                // Turn off visibility after drag
-                cardGeo.setVisible(false);
+            synchronized (mGameManager.getMPlayerTurn()) {
+                if (event.getTransferMode() == TransferMode.MOVE) {
+                    // Turn off visibility after drag
+                    cardGeo.setVisible(false);
+                    mGameManager.setMMiddleCard(card.getCardNo());
+                    event.consume();
+                    mGameManager.notifyPlayerTurn();
+
+                } else {
+                    event.consume();
+                }
             }
-            event.consume();
         });
     }
-
-
-
 }

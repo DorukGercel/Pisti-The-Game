@@ -51,7 +51,7 @@ public class UserMenuController extends BaseNetworkController {
         if (isOperationSuccess(commonResponse[0], networkStatusCode, InitGameResponse.class, "Start Game")) {
             InitGameResponse initGameResponse = (InitGameResponse) commonResponse[0];
             mPlayerManager.setGameId(initGameResponse.getGameId());
-            mScreenManager.activatePane("game_table", new StartGameEvent());
+            mScreenManager.activatePane("game_table", new CreateGameEvent());
         }
     }
 
@@ -85,8 +85,8 @@ public class UserMenuController extends BaseNetworkController {
     }
 
     /** Event which indicates the game is started*/
-    static class StartGameEvent extends ApplicationEvent {
-        public StartGameEvent() {
+    public static class CreateGameEvent extends ApplicationEvent {
+        public CreateGameEvent() {
             super(UserMenuController.class);
         }
     }
