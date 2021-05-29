@@ -51,6 +51,10 @@ public class Game {
         this.mLastWin = Side.NONE;
 
         this.mCards = new ArrayList<>(NO_PLAYERS + NO_NON_PLAYER_DECKS);
+        for(int deckNo = 0; deckNo < NO_PLAYERS + 2; deckNo++) {
+            List<Short> tmpDeck = new ArrayList<>();
+            mCards.add(tmpDeck);
+        }
         initCards();
 
         this.mScores = new ArrayList<>(NO_PLAYERS);
@@ -62,15 +66,28 @@ public class Game {
 
     public List<GameEnvironment> interactSinglePlayer(MoveType moveType, Short cardNo){
         if (moveType.equals(MoveType.INITIAL)){
-            return createEnvironment(createPlayerEnvironment(false),
-                    createPcEnvironment(false)
+            return createEnvironment(createPlayerEnvironment(false, MoveType.INITIAL),
+                    createPcEnvironment(false, MoveType.INITIAL)
             );
         } else if (moveType.equals(MoveType.CARD)){
             return simulateGame(cardNo);
         } else {
-            dealCards();
-            return createEnvironment(createPlayerEnvironment(false),
-                    createPcEnvironment(false)
+            List<Short> mainDeck = getMainDeck();
+            MoveType sentMoveType;
+            if(mainDeck.size() > 0) {
+                // Redeal in a round
+                dealCards();
+                sentMoveType = MoveType.REDEAL;
+            } else {
+                // Restart with another level
+                //TODO: Remove print
+                System.out.println("Restart");
+                incrementScore(null, getMLastWin());
+                initCards();
+                sentMoveType = MoveType.RESTART;
+            }
+            return createEnvironment(createPlayerEnvironment(false, sentMoveType),
+                    createPcEnvironment(false, sentMoveType)
             );
         }
     }
@@ -80,11 +97,11 @@ public class Game {
         if (mMode.equals(Mode.SINGLE)) {
             // Simulate player movement and create game environment
             gameEnvironmentList.add(
-                    createPlayerEnvironment(simulateMovement(cardNo, mTurn))
+                    createPlayerEnvironment(simulateMovement(cardNo, mTurn), MoveType.CARD)
             );
             // Simulate pc movement and create game environment
             gameEnvironmentList.add(
-                    createPcEnvironment(simulateMovement(pcDecideCard(), mTurn))
+                    createPcEnvironment(simulateMovement(pcDecideCard(), mTurn), MoveType.CARD)
             );
         }
         return gameEnvironmentList;
@@ -136,38 +153,31 @@ public class Game {
         return environment;
     }
 
-    private GameEnvironment createPlayerEnvironment(boolean isPisti) {
+    private GameEnvironment createPlayerEnvironment(boolean isPisti, MoveType moveType) {
         List<Short> handCards = new ArrayList<>(getDeck(Side.PLAYER));
         List<Short> middleCards = new ArrayList<>(getMiddleDeck());
         List<Short> scores = new ArrayList<>(getScores(Side.PLAYER));
 
-        return GameEnvironment.buildPlayerEnvironment(handCards, middleCards, scores, isPisti);
+        return GameEnvironment.buildPlayerEnvironment(handCards, middleCards, scores, isPisti, isGameFinished(Side.PLAYER), moveType);
     }
 
-    private GameEnvironment createPcEnvironment(boolean isPisti) {
+    private GameEnvironment createPcEnvironment(boolean isPisti, MoveType moveType) {
         Short noHandCards = (short) getDeck(Side.PC).size();
         List<Short> middleCards = new ArrayList<>(getMiddleDeck());
         List<Short> scores = new ArrayList<>(getScores(Side.PC));
 
-        return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti);
+        return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti, isGameFinished(Side.PC), moveType);
     }
 
     /** Initializes all decks of cards in the game; helper of constructor*/
     private void initCards(){
-        for(int deckNo = 0; deckNo < NO_PLAYERS + 2; deckNo++) {
-            List<Short> tmpDeck = new ArrayList<>();
-            mCards.add(tmpDeck);
-        }
         List<Short> mainDeck = getMainDeck();
         for (short cardNo = 0; cardNo < NO_CARDS; cardNo++) {
             mainDeck.add(cardNo);
 
         }
-
         // Shuffle the deck
         Collections.shuffle(mainDeck);
-
-
         dealCards();
         openCards();
     }
@@ -252,20 +262,23 @@ public class Game {
         // Decide the takeover type
         TakeoverType takeoverType = TakeoverType.getTakeoverType(faceUpCard, middleDeck.size());
 
-        if(takeoverType.equals(TakeoverType.PISTI) || takeoverType.equals(TakeoverType.DOUBLE_PISTI)){
-            // Take takeover special points by player card and top middle cards
-            short takeoverPoint = SpecialPoint.takeTakeoverPoint(takeoverType);
-            removeTopCard(middleDeck);
-            pointsReceived = (short) (pointsReceived + takeoverPoint);
-            cardsReceived = (short) (cardsReceived + 2);
-            isPisti = true;
-        } else {
-            // Take special points of the player card and top middle cards
-            short playerCardPoint = SpecialPoint.takeCardPoint(playerCard);
-            short faceUpCardPoint = SpecialPoint.takeCardPoint(faceUpCard);
-            removeTopCard(middleDeck);
-            pointsReceived = (short) (pointsReceived + playerCardPoint + faceUpCardPoint);
-            cardsReceived = (short) (cardsReceived + 2);
+        if(playerCard != null) {
+            // May be last points so check nullity of player card
+            if (takeoverType.equals(TakeoverType.PISTI) || takeoverType.equals(TakeoverType.DOUBLE_PISTI)) {
+                // Take takeover special points by player card and top middle cards
+                short takeoverPoint = SpecialPoint.takeTakeoverPoint(takeoverType);
+                removeTopCard(middleDeck);
+                pointsReceived = (short) (pointsReceived + takeoverPoint);
+                cardsReceived = (short) (cardsReceived + 2);
+                isPisti = true;
+            } else {
+                // Take special points of the player card and top middle cards
+                short playerCardPoint = SpecialPoint.takeCardPoint(playerCard);
+                short faceUpCardPoint = SpecialPoint.takeCardPoint(faceUpCard);
+                removeTopCard(middleDeck);
+                pointsReceived = (short) (pointsReceived + playerCardPoint + faceUpCardPoint);
+                cardsReceived = (short) (cardsReceived + 2);
+            }
         }
 
         // Count the points of the cards received
@@ -348,11 +361,17 @@ public class Game {
         return mScores.get(1);
     }
 
+    /** Helper function to decide whether game is finished*/
+    private boolean isGameFinished(Side side) {
+        return getScores(side).get(0) >= (short) 151;
+    }
+
     /** Used in game related operations to separate first move and regular card move.*/
     public enum MoveType {
         INITIAL,
         CARD,
-        REDEAL
+        REDEAL,
+        RESTART
     }
 
     /** Type definition of game mode; either vs PC or another player*/
@@ -377,7 +396,7 @@ public class Game {
         public static TakeoverType getTakeoverType(GameConfig.Card faceUpCard, int noMiddleCards) {
             if (noMiddleCards == 1 && faceUpCard.getMRank().equals(GameConfig.Card.Rank.JACK)) {
                 return DOUBLE_PISTI;
-            } else if (noMiddleCards == 1) {
+            } else if (noMiddleCards == 1) { //TODO: If Jack is it still Pisti
                 return PISTI;
             } else {
                 return REGULAR;
