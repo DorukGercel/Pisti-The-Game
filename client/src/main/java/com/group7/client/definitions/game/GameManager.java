@@ -29,7 +29,7 @@ public class GameManager {
     private final GameTableController   mGameTableController;
     /** Player cards*/
     private final List<Short>           mPlayerCards;
-    /** Card in the middle*/
+    /** Card in the middle that is updated by player (after move)*/
     private       Short                 mMiddleCard;
     /** Variable to indicate if game is over*/
     private       Boolean               mGameOver;

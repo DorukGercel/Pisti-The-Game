@@ -87,17 +87,17 @@ public class GameTableController extends BaseNetworkController {
         performInteract(moveType, cardNo);
     }
 
-    /** Function which turns off drag mode*/
-    public void turnOffDrag() {
-        for (Card card : mPlayerCards) {
-            card.getCardGeometry().setOnDragDetected(null);
-        }
-    }
-
     /** Function which turns on drag mode*/
     public void turnOnDrag() {
         for (Card card : mPlayerCards) {
             setCardDragAndDropListener(card);
+        }
+    }
+
+    /** Function which turns off drag mode*/
+    public void turnOffDrag() {
+        for (Card card : mPlayerCards) {
+            card.getCardGeometry().setOnDragDetected(null);
         }
     }
 
@@ -122,7 +122,7 @@ public class GameTableController extends BaseNetworkController {
             // TODO: Remove print
             System.out.println(interactResponse.getPlayerEnvironment());
             System.out.println(interactResponse.getPcEnvironment());
-            simulateTurn(moveType, interactResponse.getPlayerEnvironment(), interactResponse.getPcEnvironment());
+            simulateTurn(MoveType.convertMoveType(interactResponse.getPlayerEnvironment().getMMoveType()), interactResponse.getPlayerEnvironment(), interactResponse.getPcEnvironment());
         }
     }
 
@@ -130,17 +130,33 @@ public class GameTableController extends BaseNetworkController {
     private void simulateTurn(MoveType moveType, GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
         try {
             if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.REDEAL)) {
-                simulateInitTurn(moveType, playerGameEnv);
+                Platform.runLater(()->simulateInitTurn(moveType, playerGameEnv));
+            } else if (moveType.equals(MoveType.RESTART)) {
+                Platform.runLater(()->simulateRestartTurn(moveType, playerGameEnv, pcGameEnv));
             } else {
                 Platform.runLater(() -> simulatePlayerTurn(moveType, MoveTurn.PLAYER, playerGameEnv));
                 // TODO: Remove print
                 System.out.println("a");
+
+                if(playerGameEnv.getMGameFinished()) {
+                    // Check if player won
+                    //TODO: Implement Game Over
+                    mGameManager.setMGameOver(true);
+                    return;
+                }
+
                 TimeUnit.SECONDS.sleep(mSleepTime);
                 // TODO: Remove print
                 System.out.println("b");
                 Platform.runLater(() -> simulatePlayerTurn(moveType, MoveTurn.PC, pcGameEnv));
                 // TODO: Remove print
                 System.out.println("c");
+
+                if(pcGameEnv.getMGameFinished()) {
+                    // Check if pc won
+                    //TODO: Implement Game Over
+                    mGameManager.setMGameOver(true);
+                }
             }
         } catch(Exception e){
             e.printStackTrace();
@@ -149,17 +165,38 @@ public class GameTableController extends BaseNetworkController {
 
     /** Helper function to place middle card and set score*/
     private void simulatePlayerTurn(MoveType moveType, MoveTurn moveTurn,GameEnvironment gameEnvironment) {
+        // Place the card in the middle
         mMiddleCard = mGameManager.getMiddleCard(gameEnvironment);
         placeMiddleCard(moveTurn, moveType);
+        // Set score
         setScore(moveTurn, gameEnvironment.getMScores().get(0));
     }
 
     /** Helper function to perform initial card placing*/
     private void simulateInitTurn(MoveType moveType, GameEnvironment gameEnvironment) {
         mPlayerCards = mGameManager.dealPlayerCards(gameEnvironment);
-        Platform.runLater(() -> placePlayerCards());
+        placePlayerCards();
         mMiddleCard = mGameManager.getMiddleCard(gameEnvironment);
-        Platform.runLater(() -> placeMiddleCard(MoveTurn.PLAYER, moveType));
+        placeMiddleCard(MoveTurn.PLAYER, moveType);
+    }
+
+    /** Helper function to perform restart card placing*/
+    private void simulateRestartTurn(MoveType moveType, GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
+        setBothScores(playerGameEnv, pcGameEnv);
+        if(playerGameEnv.getMGameFinished()) {
+            // Check if player won
+            //TODO: Implement Game Over
+            mGameManager.setMGameOver(true);
+            return;
+        }
+        if(pcGameEnv.getMGameFinished()) {
+            // Check if pc won
+            //TODO: Implement Game Over
+            mGameManager.setMGameOver(true);
+            return;
+        }
+        flushContainerAreas();
+        simulateInitTurn(moveType, playerGameEnv);
     }
 
     /** Helper function to place player cards*/
@@ -178,20 +215,32 @@ public class GameTableController extends BaseNetworkController {
             cardRec.setTranslateY(vShift);
             player_area_container.getChildren().add(cardRec);
             counter += 1;
+            // Place the listeners to the card
             setCardDragAndDropListener(card);
         }
+    }
+
+    /** Helper function empty player area and middle area*/
+    private void flushContainerAreas() {
+        player_area_container.getChildren().clear();
     }
 
     /** Helper function to place middle card*/
     private void placeMiddleCard(MoveTurn moveTurn, MoveType moveType) {
         if (mMiddleCard == null) {
             middle_card.setFill(Color.BURLYWOOD);
-        } else if (moveType.equals(MoveType.INITIAL) || moveTurn.equals(MoveTurn.PC)) {
+        } else if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.RESTART) || moveTurn.equals(MoveTurn.PC)) {
             middle_card.setFill(mMiddleCard.getCardGeometry().getFill());
         }
     }
 
-    /** Helper function to set scores in the boards*/
+    /** Helper function to set scores in the boards for both sides*/
+    private void setBothScores(GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
+        setScore(MoveTurn.PLAYER, playerGameEnv.getMScores().get(0));
+        setScore(MoveTurn.PC, pcGameEnv.getMScores().get(0));
+    }
+
+    /** Helper function to set score in the board for a side*/
     private void setScore(MoveTurn moveTurn, Short score) {
         if(moveTurn.equals(MoveTurn.PLAYER)) {
             active_player_score_label.setText(score.toString());
@@ -259,7 +308,7 @@ public class GameTableController extends BaseNetworkController {
             synchronized (mGameManager.getMPlayerTurn()) {
                 if (event.getTransferMode() == TransferMode.MOVE) {
                     // Turn off visibility after drag
-                    cardGeo.setVisible(false);
+                    player_area_container.getChildren().remove(cardGeo);
                     mGameManager.setMMiddleCard(card.getCardNo());
                     event.consume();
                     mGameManager.notifyPlayerTurn();
