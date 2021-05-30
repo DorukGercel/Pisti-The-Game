@@ -31,6 +31,8 @@ public class Game {
     private final List<List<Short>>   mCards;
     /** Reference to the card table with card numbers and cards*/
     private final GameConfig.CardTable mCardTable;
+    /** Reference to the current game strategy*/
+    private       GameStrategy         mGameStrategy;
     /** Scores of each player*/
     private       List<List<Short>>   mScores;
     /** Current game level of the active game*/
@@ -49,6 +51,7 @@ public class Game {
         this.mMode = Mode.SINGLE;
         this.mTurn = Side.PLAYER;
         this.mLastWin = Side.NONE;
+        registerStrategy();
 
         this.mCards = new ArrayList<>(NO_PLAYERS + NO_NON_PLAYER_DECKS);
         for(int deckNo = 0; deckNo < NO_PLAYERS + 2; deckNo++) {
@@ -64,88 +67,11 @@ public class Game {
         }
     }
 
-    public List<GameEnvironment> interactSinglePlayer(MoveType moveType, Short cardNo){
-        if (moveType.equals(MoveType.INITIAL)){
-            return createEnvironment(createPlayerEnvironment(false, MoveType.INITIAL),
-                    createPcEnvironment(false, MoveType.INITIAL)
-            );
-        } else if (moveType.equals(MoveType.CARD)){
-            return simulateGame(cardNo);
-        } else {
-            List<Short> mainDeck = getMainDeck();
-            MoveType sentMoveType;
-            if(mainDeck.size() > 0) {
-                // Redeal in a round
-                dealCards();
-                sentMoveType = MoveType.REDEAL;
-            } else {
-                // Restart with another level
-                //TODO: Remove print
-                System.out.println("Restart");
-                incrementScore(null, getMLastWin());
-                initCards();
-                sentMoveType = MoveType.RESTART;
-            }
-            return createEnvironment(createPlayerEnvironment(false, sentMoveType),
-                    createPcEnvironment(false, sentMoveType)
-            );
-        }
+    public List<GameEnvironment> interact(MoveType moveType, Short cardNo){
+        return mGameStrategy.interact(moveType, cardNo);
     }
 
-    private List<GameEnvironment> simulateGame(Short cardNo) {
-        List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
-        if (mMode.equals(Mode.SINGLE)) {
-            // Simulate player movement and create game environment
-            gameEnvironmentList.add(
-                    createPlayerEnvironment(simulateMovement(cardNo, mTurn), MoveType.CARD)
-            );
-            // Simulate pc movement and create game environment
-            gameEnvironmentList.add(
-                    createPcEnvironment(simulateMovement(pcDecideCard(), mTurn), MoveType.CARD)
-            );
-        }
-        return gameEnvironmentList;
-    }
-
-    /** The method that evaluates the moves of the player or the pc*/
-    private boolean simulateMovement(Short cardNo, Side side) {
-        boolean isPisti = false;
-        List<Short> middleDeck = getMiddleDeck();
-        // Player's or PC' deck
-        List<Short> currentPlayerDeck = getDeck(side);
-        // Remove the card from players deck
-        currentPlayerDeck.remove(cardNo);
-        // Check if middle is empty or not
-        if(middleDeck.size() > 0) {
-            GameConfig.Card currentPlayerCard = mCardTable.getCard(cardNo);
-            if (isMatchedCard(currentPlayerCard)){
-                // Increment score of player and set last win
-                isPisti = incrementScore(currentPlayerCard, side);
-                setMLastWin(side);
-            } else {
-                // Add player card to top of middle
-                middleDeck.add(cardNo);
-            }
-        } else {
-            // Add player card to top of middle
-            middleDeck.add(cardNo);
-        }
-        // Change turn
-        invertTurn();
-        return isPisti;
-    }
-
-    private Short pcDecideCard() {
-        List<Short> pcDeck = getDeck(Side.PC);
-        for (Short cardNo : pcDeck) {
-            if(isMatchedCard(mCardTable.getCard(cardNo))) {
-                   return cardNo;
-            }
-        }
-        return getTopCardNo(pcDeck);
-    }
-
-    private List<GameEnvironment> createEnvironment(GameEnvironment playerEnv, GameEnvironment pcEnv) {
+    public List<GameEnvironment> createEnvironment(GameEnvironment playerEnv, GameEnvironment pcEnv) {
         List<GameEnvironment> environment = new ArrayList<>();
         environment.add(playerEnv);
         environment.add(pcEnv);
@@ -153,26 +79,88 @@ public class Game {
         return environment;
     }
 
-    private GameEnvironment createPlayerEnvironment(boolean isPisti, MoveType moveType) {
-        List<Short> handCards = new ArrayList<>(getDeck(Side.PLAYER));
+    public GameEnvironment createPlayerEnvironment(boolean isPisti, boolean gameFinished, Game.MoveType moveType) {
+        List<Short> handCards = new ArrayList<>(getDeck(Game.Side.PLAYER));
         List<Short> middleCards = new ArrayList<>(getMiddleDeck());
-        List<Short> scores = new ArrayList<>(getScores(Side.PLAYER));
+        List<Short> scores = new ArrayList<>(getScores(Game.Side.PLAYER));
 
-        return GameEnvironment.buildPlayerEnvironment(handCards, middleCards, scores, isPisti, isGameFinished(Side.PLAYER), moveType);
+        return GameEnvironment.buildPlayerEnvironment(handCards, middleCards, scores, isPisti, gameFinished, moveType);
     }
 
-    private GameEnvironment createPcEnvironment(boolean isPisti, MoveType moveType) {
-        Short noHandCards = (short) getDeck(Side.PC).size();
+    public GameEnvironment createPcEnvironment(boolean isPisti, boolean gameFinished, Game.MoveType moveType) {
+        Short noHandCards = (short) getDeck(Game.Side.PC).size();
         List<Short> middleCards = new ArrayList<>(getMiddleDeck());
-        List<Short> scores = new ArrayList<>(getScores(Side.PC));
+        List<Short> scores = new ArrayList<>(getScores(Game.Side.PC));
 
-        return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti, isGameFinished(Side.PC), moveType);
+        return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti, gameFinished, moveType);
+    }
+
+    /** Helper function to change turns.*/
+    public void invertTurn() {
+        if (getMTurn().equals(Game.Side.PLAYER)) {
+            setMTurn(Game.Side.PC);
+        } else {
+            setMTurn(Game.Side.PLAYER);
+        }
+    }
+
+    /** Helper function to take the top card of given deck.*/
+    public GameConfig.Card getTopCard(List<Short> deck) {
+        if (deck.size() > 0) {
+            Short topCardNo = getTopCardNo(deck);
+            GameConfig.Card topCard = getMCardTable().getCard(topCardNo);
+            return topCard;
+        }
+        return null;
+    }
+
+    /** Helper function to take the top card no of given deck.*/
+    public Short getTopCardNo(List<Short> deck) {
+        if (deck.size() > 0) {
+            Short topCardNo = deck.get(deck.size() - 1);
+            return topCardNo;
+        }
+        return null;
+    }
+
+    /** Helper function to remove the top card of given deck.*/
+    public void removeTopCard(List<Short> deck) {
+        if (deck.size() <= 0) {
+            return;
+        }
+        deck.remove(deck.size() - 1);
+    }
+
+    /** Helper function to get main deck.*/
+    public List<Short> getMainDeck() {
+        return getMCards().get(0);
+    }
+
+    /** Helper function to get middle deck.*/
+    public List<Short> getMiddleDeck() {
+        return getMCards().get(1);
+    }
+
+    /** Helper function to get player deck with given side.*/
+    public List<Short> getDeck(Game.Side side) {
+        if(side.equals(Game.Side.PLAYER)){
+            return getMCards().get(getNO_NON_PLAYER_DECKS());
+        }
+        return getMCards().get(getNO_NON_PLAYER_DECKS() + 1);
+    }
+
+    /** Helper function to get scores of given side.*/
+    public List<Short> getScores(Game.Side side) {
+        if (side.equals(Game.Side.PLAYER)){
+            return getMScores().get(0);
+        }
+        return getMScores().get(1);
     }
 
     /** Initializes all decks of cards in the game; helper of constructor*/
-    private void initCards(){
+    public void initCards(){
         List<Short> mainDeck = getMainDeck();
-        for (short cardNo = 0; cardNo < NO_CARDS; cardNo++) {
+        for (short cardNo = 0; cardNo < getNO_CARDS(); cardNo++) {
             mainDeck.add(cardNo);
 
         }
@@ -183,26 +171,26 @@ public class Game {
     }
 
     /** Helper function to deal the cards to the each player.*/
-    private void dealCards() {
+    public void dealCards() {
         List<Short> mainDeck = getMainDeck();
         //If main deck is empty escape
         if(mainDeck.size() <= 0) {
             return;
         }
-        for (int i = 0; i < NO_PLAYERS; i++) {
-            for (int j = 0; j < NO_DEAL_CARDS; j++) {
+        for (int i = 0; i < getNO_PLAYERS(); i++) {
+            for (int j = 0; j < getNO_DEAL_CARDS(); j++) {
                 // Find the top card in the main deck
                 Short topCardNo = getTopCardNo(mainDeck);
                 // Remove the top card in the main deck
                 removeTopCard(mainDeck);
                 // Give the card to the player
-                mCards.get(NO_NON_PLAYER_DECKS + i).add(topCardNo);
+                getMCards().get(getNO_NON_PLAYER_DECKS() + i).add(topCardNo);
             }
         }
     }
 
     /** Helper function to open cards to the middle in the beginning.*/
-    private void openCards() {
+    public void openCards() {
         List<Short> mainDeck = getMainDeck();
         List<Short> middleDeck = getMiddleDeck();
         // If main deck is empty escape
@@ -227,7 +215,7 @@ public class Game {
         }
         // Place the other cards to the middle, note: these cards are not visible
         // NO_DEAL_CARD-1 because top card is already opened
-        for(int i = 0; i < NO_DEAL_CARDS - 1; i++) {
+        for(int i = 0; i < getNO_DEAL_CARDS() - 1; i++) {
             Short cardNo = getTopCardNo(mainDeck);
             removeTopCard(mainDeck);
             middleDeck.add(cardNo);
@@ -236,134 +224,24 @@ public class Game {
         middleDeck.add(faceUpCardNo);
     }
 
-    /** Helper function to decide if there is a takeover.*/
-    private boolean isMatchedCard(GameConfig.Card playerCard) {
-        //Extract the face up card if middle is not empty
-        List<Short> middleDeck = getMiddleDeck();
-        if(middleDeck.isEmpty()){
-            return false;
-        }
-        GameConfig.Card faceUpCard = getTopCard(middleDeck);
-
-        // True if the player card is jack or the ranks of the cards match
-        return (playerCard.getMRank().equals(GameConfig.Card.Rank.JACK) || playerCard.getMRank().equals(faceUpCard.getMRank()));
-    }
-
-    /** Helper function to increment the score of the side who achieved takeover.*/
-    // TODO: Q: When pisti achieved does user count the values of the cards? No in this implementation.
-    private boolean incrementScore(GameConfig.Card playerCard, Side side) {
-        boolean isPisti = false;
-        short pointsReceived = 0;
-        short cardsReceived = 0;
-
-        List<Short> middleDeck = getMiddleDeck();
-        GameConfig.Card faceUpCard = getTopCard(middleDeck);
-
-        // Decide the takeover type
-        TakeoverType takeoverType = TakeoverType.getTakeoverType(faceUpCard, middleDeck.size());
-
-        if(playerCard != null) {
-            // May be last points so check nullity of player card
-            if (takeoverType.equals(TakeoverType.PISTI) || takeoverType.equals(TakeoverType.DOUBLE_PISTI)) {
-                // Take takeover special points by player card and top middle cards
-                short takeoverPoint = SpecialPoint.takeTakeoverPoint(takeoverType);
-                removeTopCard(middleDeck);
-                pointsReceived = (short) (pointsReceived + takeoverPoint);
-                cardsReceived = (short) (cardsReceived + 2);
-                isPisti = true;
-            } else {
-                // Take special points of the player card and top middle cards
-                short playerCardPoint = SpecialPoint.takeCardPoint(playerCard);
-                short faceUpCardPoint = SpecialPoint.takeCardPoint(faceUpCard);
-                removeTopCard(middleDeck);
-                pointsReceived = (short) (pointsReceived + playerCardPoint + faceUpCardPoint);
-                cardsReceived = (short) (cardsReceived + 2);
+    /** Bind game with the appropriate level*/
+    private void registerStrategy() {
+        switch (getMLevel()) {
+            case 1 -> {
+                // TODO: Remove print
+                System.out.println("LEVEL 1");
+                mGameStrategy = new GameStrategyLevel1();
+                mGameStrategy.registerGame(this);
             }
         }
-
-        // Count the points of the cards received
-        for(Short cardNo : middleDeck) {
-            GameConfig.Card middleCard = mCardTable.getCard(cardNo);
-            short middleCardPoint = SpecialPoint.takeCardPoint(middleCard);
-            pointsReceived = (short) (pointsReceived + middleCardPoint);
-            cardsReceived = (short) (cardsReceived + 1);
-        }
-        // Flush the middle deck
-        middleDeck.clear();
-
-        // Set the scores (point, card received) of the player (decide as who made takeover)
-        List<Short> scores = getScores(side);
-        scores.set(0, (short) (scores.get(0) + pointsReceived));
-        scores.set(1, (short) (scores.get(1) + cardsReceived));
-
-        return isPisti;
     }
 
-    /** Helper function to change turns.*/
-    private void invertTurn() {
-        if (mTurn.equals(Side.PLAYER)) {
-            mTurn = Side.PC;
-        } else {
-            mTurn = Side.PLAYER;
-        }
-    }
 
-    /** Helper function to take the top card of given deck.*/
-    private GameConfig.Card getTopCard(List<Short> deck) {
-        if (deck.size() > 0) {
-            Short topCardNo = getTopCardNo(deck);
-            GameConfig.Card topCard = mCardTable.getCard(topCardNo);
-            return topCard;
-        }
-        return null;
-    }
-
-    /** Helper function to take the top card no of given deck.*/
-    private Short getTopCardNo(List<Short> deck) {
-        if (deck.size() > 0) {
-            Short topCardNo = deck.get(deck.size() - 1);
-            return topCardNo;
-        }
-        return null;
-    }
-
-    /** Helper function to remove the top card of given deck.*/
-    private void removeTopCard(List<Short> deck) {
-        if (deck.size() <= 0) {
-            return;
-        }
-        deck.remove(deck.size() - 1);
-    }
-
-    /** Helper function to get main deck.*/
-    private List<Short> getMainDeck() {
-        return mCards.get(0);
-    }
-
-    /** Helper function to get middle deck.*/
-    private List<Short> getMiddleDeck() {
-        return mCards.get(1);
-    }
-
-    /** Helper function to get player deck with given side.*/
-    private List<Short> getDeck(Side side) {
-        if(side.equals(Side.PLAYER)){
-            return mCards.get(NO_NON_PLAYER_DECKS);
-        }
-        return mCards.get(NO_NON_PLAYER_DECKS + 1);
-    }
-
-    /** Helper function to get scores of given side.*/
-    private List<Short> getScores(Side side) {
-        if (side.equals(Side.PLAYER)){
-            return mScores.get(0);
-        }
-        return mScores.get(1);
-    }
-
-    /** Helper function to decide whether game is finished*/
-    private boolean isGameFinished(Side side) {
-        return getScores(side).get(0) >= (short) 151;
+    /** Type definition to indicate player or PC*/
+    public enum Side {
+        PLAYER,
+        PC,
+        NONE
     }
 
     /** Used in game related operations to separate first move and regular card move.*/
@@ -380,69 +258,4 @@ public class Game {
         MULTI
     }
 
-    /** Type definition to indicate player or PC*/
-    private enum Side {
-        PLAYER,
-        PC,
-        NONE
-    }
-
-    /** Type definition of how player took the cards*/
-    private enum TakeoverType {
-        DOUBLE_PISTI,
-        PISTI,
-        REGULAR;
-
-        public static TakeoverType getTakeoverType(GameConfig.Card faceUpCard, int noMiddleCards) {
-            if (noMiddleCards == 1 && faceUpCard.getMRank().equals(GameConfig.Card.Rank.JACK)) {
-                return DOUBLE_PISTI;
-            } else if (noMiddleCards == 1) { //TODO: If Jack is it still Pisti
-                return PISTI;
-            } else {
-                return REGULAR;
-            }
-        }
-    }
-
-    /** Special points in the game*/
-    private enum SpecialPoint {
-        DOUBLE_PISTI((short) 20),
-        PISTI((short) 10),
-        DIAMOND_TEN((short) 3),
-        CLUB_TWO((short) 2),
-        ACE((short) 1),
-        JACK((short) 1);
-
-        private Short point;
-
-        public Short getPoint() {
-            return this.point;
-        }
-
-        public static Short takeTakeoverPoint(TakeoverType type) {
-            if (type.equals(TakeoverType.DOUBLE_PISTI)) {
-                return DOUBLE_PISTI.getPoint();
-            } else if (type.equals(TakeoverType.PISTI)) {
-                return PISTI.getPoint();
-            }
-            return 0;
-        }
-
-        public static Short takeCardPoint(GameConfig.Card card){
-            if (card.getMRank().equals(GameConfig.Card.Rank.ACE)) {
-                return ACE.getPoint();
-            } else if (card.getMRank().equals(GameConfig.Card.Rank.JACK)) {
-                return JACK.getPoint();
-            } else if (card.getMSuit().equals(GameConfig.Card.Suit.CLUBS) && card.getMRank().equals(GameConfig.Card.Rank.TWO)) {
-                return CLUB_TWO.getPoint();
-            } else if (card.getMSuit().equals(GameConfig.Card.Suit.DIAMONDS) && card.getMRank().equals(GameConfig.Card.Rank.TEN)) {
-                return DIAMOND_TEN.getPoint();
-            }
-            return 0;
-        }
-
-        SpecialPoint(Short point) {
-            this.point = point;
-        }
-    }
 }

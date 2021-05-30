@@ -22,7 +22,7 @@ public class GameConfig {
     public Game game(final CardTable cardTable){
         return new Game(cardTable);
     }
-
+    
     /** Definition of the card in the game*/
     @Data
     @RequiredArgsConstructor

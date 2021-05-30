@@ -104,7 +104,7 @@ public class GameServiceImpl implements GameService{
                     ((currentGame = mGameTable.getGame(gameId)) != null) &&
                     isValidMoveAndCard(cardNo, moveType) && (gameEnvironments != null)){
 
-                List<GameEnvironment> gameEnvironmentList = currentGame.interactSinglePlayer(moveType, cardNo);
+                List<GameEnvironment> gameEnvironmentList = currentGame.interact(moveType, cardNo);
                 gameEnvironments.addAll(gameEnvironmentList);
                 return StatusCode.SUCCESS;
             }
