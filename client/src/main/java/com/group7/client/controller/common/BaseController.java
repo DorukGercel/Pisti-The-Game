@@ -22,7 +22,9 @@ public abstract class BaseController implements Initializable {
     @FXML protected Label informationLabel;
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {}
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        informationLabel = new Label();
+    }
 
     /** Open error dialog*/
     protected void displayError(String headerText, String message) {

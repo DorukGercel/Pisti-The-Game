@@ -8,6 +8,7 @@ import com.group7.client.definitions.common.StatusCode;
 import com.group7.client.definitions.network.NetworkManager;
 import com.group7.client.dto.common.CommonRequest;
 import com.group7.client.dto.common.CommonResponse;
+import com.group7.client.dto.game.InitGameResponse;
 import com.group7.client.dto.leaderboard.LeaderboardResponse;
 import com.group7.client.dto.leaderboard.ListRecordsResponse;
 import com.group7.client.model.Leaderboard;
@@ -70,32 +71,24 @@ public class LeaderboardController extends BaseNetworkController {
 
         // TODO: This part creates network error look at the back-end api
         // TODO: Uncomment to fix
-        //loadLeaderboardTable("weekly");
+        loadLeaderboardTable("weekly");
     }
 
     private void loadLeaderboardTable(String period) {
         tableRecordsList.clear();
-        CommonRequest commonRequest = new CommonRequest();
-        CommonResponse[] commonResponse = new LeaderboardResponse[1];
+        CommonResponse[] commonResponse = new ListRecordsResponse[1];
 
         StatusCode networkStatusCode = mNetworkManager.exchange(
         mApiAddress + "/get/" + period,
                 HttpMethod.GET,
-                commonRequest,
+                null,
                 commonResponse,
-                LeaderboardResponse.class);
+                ListRecordsResponse.class);
 
-        if(isNetworkOperationSuccess(commonResponse[0], networkStatusCode)) {
-            LeaderboardResponse leaderboardResponse = (LeaderboardResponse) commonResponse[0];
-            if(isOperationSuccess(leaderboardResponse)) {
-                ListRecordsResponse listRecordsResponse = (ListRecordsResponse) leaderboardResponse;
-                putLeaderboardRecords(listRecordsResponse);
-                mScreenManager.activatePane("leaderboard_table", null);
-            } else {
-                displayAlert(Objects.requireNonNull(leaderboardResponse.getErrorMessage()));
-            }
-        } else {
-            displayAlert("Network connection error occurred!");
+        if (isOperationSuccess(commonResponse[0], networkStatusCode, ListRecordsResponse.class, "Leaderboard")) {
+            ListRecordsResponse listRecordsResponse = (ListRecordsResponse) commonResponse[0];
+            putLeaderboardRecords(listRecordsResponse);
+            mScreenManager.activatePane("leaderboard_table", null);
         }
     }
 
@@ -122,26 +115,4 @@ public class LeaderboardController extends BaseNetworkController {
         String period = time_selection_combobox.getValue();
         loadLeaderboardTable(period);
     }
-
-    private void displayAlert(String errorMessage) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Display Leaderboard");
-        alert.setContentText(Objects.requireNonNull(errorMessage));
-        alert.showAndWait();
-        loseFocus();
-    }
-
-    private void loseFocus() {
-        informationLabel.requestFocus();
-    }
-
-    private boolean isOperationSuccess(LeaderboardResponse leaderboardResponse) {
-        return leaderboardResponse != null && leaderboardResponse.getStatusCode().equals(StatusCode.SUCCESS);
-    }
-
-    private boolean isNetworkOperationSuccess(CommonResponse commonResponse, StatusCode networkStatusCode) {
-        return commonResponse != null && networkStatusCode.equals(StatusCode.SUCCESS);
-    }
-
 }

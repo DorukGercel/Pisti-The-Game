@@ -22,6 +22,9 @@ public class ListRecordsResponse extends LeaderboardResponse {
                                @JsonProperty("recordEntryList") List<RecordEntry> recordEntryList) {
         super(statusCode, errorMessage);
         mLeaderboardRecordEntryList = new ArrayList<>();
-        mLeaderboardRecordEntryList.addAll(recordEntryList);
+        if (recordEntryList != null && recordEntryList.size() > 0) {
+            // Make null safe
+            mLeaderboardRecordEntryList.addAll(recordEntryList);
+        }
     }
 }

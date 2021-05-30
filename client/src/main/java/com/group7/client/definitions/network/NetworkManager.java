@@ -46,7 +46,7 @@ public class NetworkManager {
                                Class<? extends CommonResponse> responseType) {
         try {
             // Entity sent as request
-            var httpEntity = new HttpEntity<>(request, mHttpHeaders);
+            var httpEntity = request == null ? null :new HttpEntity<>(request, mHttpHeaders);
             // Perform rest exchange
             ResponseEntity<? extends CommonResponse> responseEntity = mRestTemplate.exchange(
                     apiAddress,
