@@ -108,6 +108,7 @@ public class LeaderboardRecordController {
         if(statusCode.equals(StatusCode.SUCCESS)) {
             // TODO: Remove print
             System.out.println(recordEntryList);
+            System.out.println(new ListRecordsResponse(StatusCode.SUCCESS, null, recordEntryList));
             return new ListRecordsResponse(StatusCode.SUCCESS, null, recordEntryList);
         }
         return new LeaderboardResponse(statusCode, "Get records operation failed!");
