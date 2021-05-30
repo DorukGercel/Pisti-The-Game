@@ -99,6 +99,28 @@
     -fx-background-radius: 5;
 }
 
+#reset_password_form_container {
+    -fx-alignment: center;
+}
+
+#reset_password_text {
+    -fx-alignment: center;
+    -fx-background-radius: 10;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-background-color: black;
+}
+
+#reset_password_form {
+    -fx-alignment: center;
+    -fx-background-radius: 10;
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+}
+
+#reset_password_form_return_button {
+    -fx-alignment: center;
+    -fx-background-radius: 5;
+}
+
 #leaderboard_table {
     -fx-alignment: center;
     -fx-background-radius: 10;

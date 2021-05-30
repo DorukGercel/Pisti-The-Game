@@ -26,6 +26,11 @@ public abstract class BaseController implements Initializable {
         informationLabel = new Label();
     }
 
+    /** Open success dialog*/
+    protected void displaySuccess(String headerText, String message) {
+        displayAlert(Alert.AlertType.INFORMATION, "Success", headerText, message);
+    }
+
     /** Open error dialog*/
     protected void displayError(String headerText, String message) {
         displayAlert(Alert.AlertType.ERROR, "Error", headerText, message);

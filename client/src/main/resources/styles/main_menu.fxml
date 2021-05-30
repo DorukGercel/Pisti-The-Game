@@ -22,7 +22,7 @@
          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
       </VBox.margin>
     </Button>
-    <Hyperlink fx:id="forgot_text" text="Forgot password?" textAlignment="CENTER">
+    <Hyperlink fx:id="forgot_text" text="Forgot password?" textAlignment="CENTER" onAction="#clickForgotPassword">
       <VBox.margin>
          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
       </VBox.margin>
