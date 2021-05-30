@@ -8,5 +8,6 @@ import com.group7.server.model.Player;
  */
 public interface AuthenticationService {
     void register(final Player player);
+    String resetPassword(final Player player);
     String authenticate(final Player player);
 }

@@ -21,4 +21,5 @@ public interface PlayerRepository
     void deleteByUsername(String username);
 
     boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }

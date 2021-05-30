@@ -33,9 +33,19 @@ public class UserDetailsManagerImpl implements UserDetailsManager {
     /** Updates the given user in the repository*/
     @Override
     public void updateUser(final UserDetails user) {
-        Player oldUser = (Player) loadUserByUsername(user.getUsername());
+        Player oldUser;
+        if (user.getUsername() != null) {
+             oldUser = (Player) loadUserByUsername(user.getUsername());
+        } else {
+            oldUser = (Player) loadUserByEmail(((Player) user).getEmail());
+        }
+
         Player newUser = (Player) user;
         newUser.setId(oldUser.getId());
+        newUser.setUsername(oldUser.getUsername());
+        newUser.setEmail(oldUser.getEmail());
+        newUser.setPassword(mPasswordEncoder.encode(user.getPassword()));
+
         mPlayerRepository.save(newUser);
     }
 
@@ -59,10 +69,10 @@ public class UserDetailsManagerImpl implements UserDetailsManager {
         }
     }
 
-    /** Checks whether user exists with the given username*/
+    /** Checks whether user exists with the given username or email*/
     @Override
     public boolean userExists(final String username) {
-        return mPlayerRepository.existsByUsername(username);
+        return mPlayerRepository.existsByUsername(username) || mPlayerRepository.existsByEmail(username);
     }
 
     /** Returns the user from the repository with the given username*/
@@ -70,5 +80,11 @@ public class UserDetailsManagerImpl implements UserDetailsManager {
     public UserDetails loadUserByUsername(final String username) {
         return mPlayerRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
+    }
+
+    /** Returns the user from the repository with the given email*/
+    public UserDetails loadUserByEmail(final String email) {
+        return mPlayerRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
     }
 }

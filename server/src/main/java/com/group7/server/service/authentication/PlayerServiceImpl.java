@@ -75,6 +75,32 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     /**
+     * Handles the password reset of the player if he forgot his/her password.
+     *
+     * @param player who sent forgot password request, email must be available
+     * @param credentials stores the new password of the player who sent forgot password request.
+     *                    Initially it's values are empty and they are set in this method.
+
+     * @return the status code according to the success of the operation.
+     *              If operation is successful, returns success status code.
+     *              If operation is not successful, returns fail status code;
+     *                  it indicates that some runtime or SQL related exception occurred.
+     */
+    @Override
+    public StatusCode resetPassword(Player player, Object[] credentials) {
+        try {
+            String newPassword = mAuthenticationService.resetPassword(player);
+            if (newPassword != null) {
+                credentials[0] = newPassword;
+                return StatusCode.SUCCESS;
+            }
+            return StatusCode.FAIL;
+        } catch (Exception e) {
+            return StatusCode.FAIL;
+        }
+    }
+
+    /**
      * Handles player's logout operations. Utilizes active player repository methods.
      *
      * @param sessionId the id of the player in the active player's table.

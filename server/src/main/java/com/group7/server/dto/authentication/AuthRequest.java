@@ -15,7 +15,6 @@ import javax.validation.constraints.NotEmpty;
 public class AuthRequest extends CommonRequest {
     //TODO: Use either user name or password
     /** Username of the player to register/login*/
-    @NotEmpty
     private String username;
 
     /** Password of the player to register/login*/
@@ -23,7 +22,6 @@ public class AuthRequest extends CommonRequest {
     private String password;
 
     /** Email of the player to register/login*/
-    @NotEmpty
     private String email;
 
     @JsonCreator

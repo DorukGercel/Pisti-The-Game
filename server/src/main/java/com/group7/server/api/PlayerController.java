@@ -81,6 +81,36 @@ public class PlayerController {
     }
 
     /**
+     * Handles player's reset password request. Utilizes PlayerService's method to deal with the request.
+     *
+     * @param resetPasswordRequest the request which includes the necessary credentials of the player to reset password;
+     *                             only email is required
+     *
+     * @return the authentication response according to the success of the operation.
+     *                          If operation is successful; returns success status code, new password of the user
+     *                                                    ; error message is null.
+     *                          If operation is not successful; returns fail status code and the error message.
+     */
+    @PutMapping("/resetPassword")
+    @ApiOperation(value = "Handles player's forgot password request. Register required.")
+    public AuthResponse resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest){
+        Object[] credentials = new Object[1];
+        StatusCode statusCode = mPlayerService.resetPassword(
+                new Player(
+                        null,
+                        null,
+                        resetPasswordRequest.getEmail()),
+                credentials
+        );
+
+        if(statusCode.equals(StatusCode.SUCCESS)) {
+            String password = (String) credentials[0];
+            return new ResetPasswordResponse(StatusCode.SUCCESS, null, password);
+        }
+        return new AuthResponse(StatusCode.FAIL, "Reset password attempt failed!");
+    }
+
+    /**
      * Handles player's logout request. Utilizes PlayerService's method to deal with the request.
      *
      * @param logoutRequest the request which includes the session id of the player who sends the request.

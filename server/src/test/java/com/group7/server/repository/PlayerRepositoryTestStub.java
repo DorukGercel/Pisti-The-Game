@@ -39,6 +39,11 @@ public class PlayerRepositoryTestStub implements PlayerRepository {
     }
 
     @Override
+    public boolean existsByEmail(String email) {
+        return false;
+    }
+
+    @Override
     public List<Player> findAll() {
         return null;
     }

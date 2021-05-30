@@ -2,6 +2,7 @@ package com.group7.server.service.authentication;
 
 import com.group7.server.model.Player;
 import com.group7.server.security.utility.JwtUtil;
+import com.group7.server.service.authentication.utility.PasswordGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,6 +35,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void register(Player player) {
         mUserDetailsManager.createUser(player);
     }
+
+    /**
+     * Reset the password of player if he forgot his/her password.
+     *
+     * @param player who sent forgot password request, must have email
+     * @return newly generated random password
+     */
+    @Override
+    public String resetPassword(Player player) {
+        try {
+            if(mUserDetailsManager.userExists(player.getEmail())) {
+                String randomPassword = PasswordGenerator.getRandomPassword();
+                Player newPlayer = player;
+                player.setPassword(randomPassword);
+                mUserDetailsManager.updateUser(newPlayer);
+
+                return randomPassword;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
     /**
      * Handles the creation of JWT Token and authenticate the player.
