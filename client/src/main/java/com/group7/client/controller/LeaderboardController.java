@@ -1,17 +1,20 @@
 package com.group7.client.controller;
 
+import com.group7.client.controller.common.BaseNetworkController;
+import com.group7.client.definitions.leaderboard.RecordEntry;
 import com.group7.client.definitions.screen.ScreenManager;
 import com.group7.client.definitions.common.StatusCode;
 import com.group7.client.definitions.network.NetworkManager;
 import com.group7.client.dto.common.CommonRequest;
 import com.group7.client.dto.common.CommonResponse;
 import com.group7.client.dto.leaderboard.LeaderboardResponse;
+import com.group7.client.dto.leaderboard.ListRecordsResponse;
 import com.group7.client.model.Leaderboard;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,51 +24,55 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
 @Component
-public class LeaderboardController implements Initializable {
+public class LeaderboardController extends BaseNetworkController {
 
-    private ScreenManager mScreenManager;
-    private NetworkManager mNetworkManager;
-    @Value("http://localhost:8080/api/leaderboard") private String apiAddress;
+    @Value("${spring.application.apiAddress.leaderboard}") private String mApiAddress;
 
-    @FXML public TableView<Leaderboard> table;
-    @FXML public TableColumn<Leaderboard, String> username_column;
-    @FXML public TableColumn<Leaderboard, Integer> rank_column;
-    @FXML public TableColumn<Leaderboard, Integer> score_column;
-    @FXML public ComboBox<String> time_selection_combobox;
-    @FXML public Label informationLabel;
+    @FXML private TableView<Leaderboard> paginationTableView;
+    @FXML private TableColumn<Leaderboard, Integer> rank;
+    @FXML private TableColumn<Leaderboard, String> username;
+    @FXML private TableColumn<Leaderboard, Integer> score;
+    @FXML private ComboBox<String> time_selection_combobox;
+    @FXML private Pagination pagination;
 
-    public ObservableList<Leaderboard> list = FXCollections.observableArrayList();
+    private static int rowsPerPage = 15;
+    public ObservableList<Leaderboard> tableRecordsList = FXCollections.observableArrayList();
 
     @Autowired
-    public void setScreenManager(@Lazy ScreenManager screenManager, NetworkManager networkManager) {
+    public void setManagers(@Lazy ScreenManager screenManager, NetworkManager networkManager) {
         this.mScreenManager = screenManager;
         this.mNetworkManager = networkManager;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        rank_column.setCellValueFactory(
+        rank.setCellValueFactory(
                 new PropertyValueFactory<Leaderboard, Integer>("rank"));
-        username_column.setCellValueFactory(
+        username.setCellValueFactory(
                 new PropertyValueFactory<Leaderboard, String>("username"));
-        score_column.setCellValueFactory(
+        score.setCellValueFactory(
                 new PropertyValueFactory<Leaderboard, Integer>("score"));
 
         time_selection_combobox.getItems().addAll( "Last 7 days", "Last 30 days", "All times");
+        /** Default display time is the most recent week*/
         time_selection_combobox.getSelectionModel().select("Last 7 days");
+        loadLeaderboardTable("weekly");
     }
 
-    public void loadLeaderboardTable(String period) {
-        list.clear();
+    private void loadLeaderboardTable(String period) {
+        tableRecordsList.clear();
         CommonRequest commonRequest = new CommonRequest();
         CommonResponse[] commonResponse = new LeaderboardResponse[1];
 
         StatusCode networkStatusCode = mNetworkManager.exchange(
-        apiAddress + "/get/" + period,
+        mApiAddress + "/get/" + period,
                 HttpMethod.GET,
                 commonRequest,
                 commonResponse,
@@ -74,7 +81,8 @@ public class LeaderboardController implements Initializable {
         if(isNetworkOperationSuccess(commonResponse[0], networkStatusCode)) {
             LeaderboardResponse leaderboardResponse = (LeaderboardResponse) commonResponse[0];
             if(isOperationSuccess(leaderboardResponse)) {
-                putLeaderboardRecords(leaderboardResponse);
+                ListRecordsResponse listRecordsResponse = (ListRecordsResponse) leaderboardResponse;
+                putLeaderboardRecords(listRecordsResponse);
                 mScreenManager.activatePane("leaderboard_table", null);
             } else {
                 displayAlert(Objects.requireNonNull(leaderboardResponse.getErrorMessage()));
@@ -83,11 +91,25 @@ public class LeaderboardController implements Initializable {
             displayAlert("Network connection error occurred!");
         }
     }
-    // TODO implement this functionality
-    public void putLeaderboardRecords(LeaderboardResponse leaderboardResponse) {
 
+    private void putLeaderboardRecords(ListRecordsResponse listRecordsResponse) {
+        List<RecordEntry> recordEntryList = listRecordsResponse.getMLeaderboardRecordEntryList();
+        for(int i = 0; i < recordEntryList.size(); i++) {
+            RecordEntry record = recordEntryList.get(i);
+            paginationTableView.getItems().add(new Leaderboard(i+1, record.getPlayerName(), record.getScore()));
+            tableRecordsList.add(new Leaderboard(i+1, record.getPlayerName(), record.getScore()));
+        }
+        int pageCount = (recordEntryList.size() / rowsPerPage) + 1;
+        pagination.setPageCount(pageCount);
+        pagination.setPageFactory(this::createPage);
     }
 
+    private Node createPage(int pageIndex) {
+        int from = pageIndex * rowsPerPage;
+        int to = rowsPerPage;
+        paginationTableView.setItems(FXCollections.observableArrayList(tableRecordsList));
+        return paginationTableView;
+    }
     @FXML
     public void selectFromComboBox(ActionEvent actionEvent) {
         String period = time_selection_combobox.getValue();
