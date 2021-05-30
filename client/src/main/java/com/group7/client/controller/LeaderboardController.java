@@ -1,6 +1,7 @@
 package com.group7.client.controller;
 
 import com.group7.client.controller.common.BaseNetworkController;
+import com.group7.client.definitions.game.MoveType;
 import com.group7.client.definitions.leaderboard.RecordEntry;
 import com.group7.client.definitions.screen.ScreenManager;
 import com.group7.client.definitions.common.StatusCode;
@@ -20,6 +21,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
 
 @Component
 public class LeaderboardController extends BaseNetworkController {
@@ -51,8 +54,9 @@ public class LeaderboardController extends BaseNetworkController {
         this.mNetworkManager = networkManager;
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    /** Init Leaderboard Event listener, sets username*/
+    @EventListener({UserMenuController.InitLeaderboardEvent.class})
+    public void onInitLeaderboardEvent(UserMenuController.InitLeaderboardEvent initLeaderboardEvent) {
         rank.setCellValueFactory(
                 new PropertyValueFactory<Leaderboard, Integer>("rank"));
         username.setCellValueFactory(
@@ -61,9 +65,12 @@ public class LeaderboardController extends BaseNetworkController {
                 new PropertyValueFactory<Leaderboard, Integer>("score"));
 
         time_selection_combobox.getItems().addAll( "Last 7 days", "Last 30 days", "All times");
-        /** Default display time is the most recent week*/
+        // Default display time is the most recent week
         time_selection_combobox.getSelectionModel().select("Last 7 days");
-        loadLeaderboardTable("weekly");
+
+        // TODO: This part creates network error look at the back-end api
+        // TODO: Uncomment to fix
+        //loadLeaderboardTable("weekly");
     }
 
     private void loadLeaderboardTable(String period) {

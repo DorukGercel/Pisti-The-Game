@@ -59,6 +59,7 @@ public class UserMenuController extends BaseNetworkController {
     @FXML
     private void clickLeaderboardButton() {
         mScreenManager.activatePane("leaderboard", null);
+        mScreenManager.activatePane("leaderboard", new InitLeaderboardEvent());
     }
 
     /** Performs logout action*/
@@ -87,6 +88,13 @@ public class UserMenuController extends BaseNetworkController {
     /** Event which indicates the game is started*/
     public static class CreateGameEvent extends ApplicationEvent {
         public CreateGameEvent() {
+            super(UserMenuController.class);
+        }
+    }
+
+    /** Event which indicates the game is started*/
+    public static class InitLeaderboardEvent extends ApplicationEvent {
+        public InitLeaderboardEvent() {
             super(UserMenuController.class);
         }
     }
