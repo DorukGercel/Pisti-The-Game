@@ -4,8 +4,8 @@ import com.group7.client.controller.common.BaseNetworkController;
 import com.group7.client.definitions.common.StatusCode;
 import com.group7.client.definitions.network.NetworkManager;
 import com.group7.client.definitions.screen.ScreenManager;
-import com.group7.client.dto.authentication.ResetPasswordRequest;
-import com.group7.client.dto.authentication.ResetPasswordResponse;
+import com.group7.client.dto.authentication.AuthResponse;
+import com.group7.client.dto.authentication.ForgotPasswordRequest;
 import com.group7.client.dto.common.CommonResponse;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -50,20 +50,20 @@ public class ResetPasswordController extends BaseNetworkController {
         }
 
         // Exchange request and response
-        ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest(email);
-        CommonResponse[] commonResponse = new ResetPasswordResponse[1];
+        ForgotPasswordRequest forgotPasswordRequest = new ForgotPasswordRequest(email);
+        CommonResponse[] commonResponse = new AuthResponse[1];
 
         StatusCode networkStatusCode = mNetworkManager.exchange(
-                mApiAddress + "/resetPassword",
-                HttpMethod.PUT,
-                resetPasswordRequest,
+                mApiAddress + "/forgotPassword",
+                HttpMethod.POST,
+                forgotPasswordRequest,
                 commonResponse,
-                ResetPasswordResponse.class);
+                AuthResponse.class);
 
         // Check if operation is successful
-        if(isOperationSuccess(commonResponse[0], networkStatusCode, ResetPasswordResponse.class, "Reset Password")) {
-            ResetPasswordResponse resetPasswordResponse = (ResetPasswordResponse) commonResponse[0];
-            displaySuccess("New Password", resetPasswordResponse.getNewPassword());
+        if(isOperationSuccess(commonResponse[0], networkStatusCode, AuthResponse.class, "Reset Password")) {
+            AuthResponse resetPasswordResponse = (AuthResponse) commonResponse[0];
+            displaySuccess("Reset Password", "Please check your email!");
             mScreenManager.activatePane("main_menu", null);
         }
         clearFields();
