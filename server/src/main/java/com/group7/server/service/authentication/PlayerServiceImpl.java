@@ -5,9 +5,12 @@ import com.group7.server.model.ActivePlayer;
 import com.group7.server.model.Player;
 import com.group7.server.repository.ActivePlayerRepository;
 import com.group7.server.repository.PlayerRepository;
+import com.group7.server.service.authentication.utility.EmailManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 /**
@@ -21,6 +24,7 @@ public class PlayerServiceImpl implements PlayerService {
     private final AuthenticationService  mAuthenticationService;
     private final PlayerRepository mPlayerRepository;
     private final ActivePlayerRepository mActivePlayerRepository;
+    private final EmailManager mEmailManager;
 
     /**
      * Handles player's register operations. Utilizes  AuthenticationService's method.
@@ -74,10 +78,27 @@ public class PlayerServiceImpl implements PlayerService {
         }
     }
 
+    @Override
+    public StatusCode handleForgotPassword(Player player) {
+        try {
+            Optional<Player> dbPlayer = mPlayerRepository.findByEmail(player.getEmail());
+            if (dbPlayer.isPresent()) {
+                Player registeredPlayer = dbPlayer.get();
+                mEmailManager.sendResetPasswordEmail(registeredPlayer.getId(),
+                        registeredPlayer.getEmail(),
+                        registeredPlayer.getUsername());
+                return StatusCode.SUCCESS;
+            }
+            return StatusCode.FAIL;
+        } catch (Exception e) {
+            return StatusCode.FAIL;
+        }
+    }
+
     /**
      * Handles the password reset of the player if he forgot his/her password.
      *
-     * @param player who sent forgot password request, email must be available
+     * @param player who sent forgot password request, id of the player must be available
      * @param credentials stores the new password of the player who sent forgot password request.
      *                    Initially it's values are empty and they are set in this method.
 
@@ -89,10 +110,13 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public StatusCode resetPassword(Player player, Object[] credentials) {
         try {
-            String newPassword = mAuthenticationService.resetPassword(player);
-            if (newPassword != null) {
-                credentials[0] = newPassword;
-                return StatusCode.SUCCESS;
+            Optional<Player> dbPlayer = mPlayerRepository.findById(player.getId());
+            if (dbPlayer.isPresent()) {
+                String newPassword = mAuthenticationService.resetPassword(dbPlayer.get());
+                if (newPassword != null) {
+                    credentials[0] = newPassword;
+                    return StatusCode.SUCCESS;
+                }
             }
             return StatusCode.FAIL;
         } catch (Exception e) {

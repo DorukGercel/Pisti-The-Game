@@ -36,6 +36,11 @@ public class Player extends BaseModel
     @Column(name = "EMAIL", unique = true, nullable = false)
     private String email;
 
+    /** Set Player with given id*/
+    public Player(Long playerId) {
+        this.setId(playerId);
+    }
+
     /**
      * Methods implemented below are
      * necessary for authentication

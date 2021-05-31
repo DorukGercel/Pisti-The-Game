@@ -37,6 +37,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
+     * Checks whether player with that email is registered
+     *
+     * @param player to check
+     * @return true if user with that email exists
+     */
+    @Override
+    public boolean userExistsByEmail(Player player) {
+        return mUserDetailsManager.userExists(player.getEmail());
+    }
+
+    /**
      * Reset the password of player if he forgot his/her password.
      *
      * @param player who sent forgot password request, must have email

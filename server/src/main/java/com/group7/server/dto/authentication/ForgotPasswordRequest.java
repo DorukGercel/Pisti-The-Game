@@ -9,12 +9,12 @@ import lombok.EqualsAndHashCode;
 /** DTO used for register and login requests*/
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ResetPasswordRequest extends CommonRequest {
+public class ForgotPasswordRequest extends CommonRequest {
     /** Email of the player to register/login*/
     private String email;
 
     @JsonCreator
-    public ResetPasswordRequest(@JsonProperty("email") String email) {
+    public ForgotPasswordRequest(@JsonProperty("email") String email) {
         this.email = email;
     }
 }

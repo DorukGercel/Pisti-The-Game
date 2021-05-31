@@ -6,6 +6,7 @@ import com.group7.server.model.Player;
 import com.group7.server.service.authentication.PlayerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,26 +84,48 @@ public class PlayerController {
     /**
      * Handles player's reset password request. Utilizes PlayerService's method to deal with the request.
      *
-     * @param resetPasswordRequest the request which includes the necessary credentials of the player to reset password;
+     * @param forgotPasswordRequest the request which includes the necessary credentials of the player to reset password;
      *                             only email is required
+     *
+     * @return the authentication response according to the success of the operation.
+     *                          If operation is successful; returns success status code
+     *                                                    ; error message is null.
+     *                          If operation is not successful; returns fail status code and the error message.
+     */
+    @PostMapping("/forgotPassword")
+    @ApiOperation(value = "Handles player's forgot password request. Register required.")
+    public AuthResponse forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        StatusCode statusCode = mPlayerService.handleForgotPassword(
+                new Player(
+                        null,
+                        null,
+                        forgotPasswordRequest.getEmail())
+        );
+
+        if (statusCode.equals(StatusCode.SUCCESS)) {
+            return new AuthResponse(StatusCode.SUCCESS, null);
+        }
+        return new AuthResponse(StatusCode.FAIL, "Reset password attempt failed!");
+    }
+
+    /**
+     * Handles player's reset password request. Utilizes PlayerService's method to deal with the request.
+     *
+     * @param playerId the id of the player with reset password request.
      *
      * @return the authentication response according to the success of the operation.
      *                          If operation is successful; returns success status code, new password of the user
      *                                                    ; error message is null.
      *                          If operation is not successful; returns fail status code and the error message.
      */
-    @PutMapping("/resetPassword")
-    @ApiOperation(value = "Handles player's forgot password request. Register required.")
-    public AuthResponse resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest){
+    @GetMapping("/resetPassword/{playerId}")
+    @ApiOperation(value = "Handles player's reset password request. Register required.")
+    public AuthResponse resetPassword(@PathVariable Long playerId){
         Object[] credentials = new Object[1];
         StatusCode statusCode = mPlayerService.resetPassword(
-                new Player(
-                        null,
-                        null,
-                        resetPasswordRequest.getEmail()),
+                new Player(playerId),
                 credentials
         );
-
         if(statusCode.equals(StatusCode.SUCCESS)) {
             String password = (String) credentials[0];
             return new ResetPasswordResponse(StatusCode.SUCCESS, null, password);

@@ -11,23 +11,27 @@ public class GameEnvironment {
     private List<Short> mMiddleCards;
     private List<Short> mScores;
     private Boolean     mIsPisti;
+    /** Check whether level is over*/
     private Boolean     mGameFinished;
+    /** Check whether game is over*/
+    private Game.GameStatus mGameStatus;
     private String      mMoveType;
 
-    public static GameEnvironment buildPlayerEnvironment(List<Short> handCards, List<Short> middleCards, List<Short> scores, Boolean isPisti, Boolean gameFinished, Game.MoveType moveType) {
-        return new GameEnvironment(handCards, middleCards, scores, isPisti, gameFinished, moveType);
+    public static GameEnvironment buildPlayerEnvironment(List<Short> handCards, List<Short> middleCards, List<Short> scores, Boolean isPisti, Boolean gameFinished, Game.GameStatus gameStatus, Game.MoveType moveType) {
+        return new GameEnvironment(handCards, middleCards, scores, isPisti, gameFinished, gameStatus ,moveType);
     }
 
-    public static GameEnvironment buildPcEnvironment(Short noHandCards, List<Short> middleCards, List<Short> scores, Boolean isPisti, Boolean gameFinished, Game.MoveType moveType) {
-        return new GameEnvironment(noHandCards, middleCards, scores, isPisti, gameFinished, moveType);
+    public static GameEnvironment buildPcEnvironment(Short noHandCards, List<Short> middleCards, List<Short> scores, Boolean isPisti, Boolean gameFinished, Game.GameStatus gameStatus, Game.MoveType moveType) {
+        return new GameEnvironment(noHandCards, middleCards, scores, isPisti, gameFinished, gameStatus, moveType);
     }
 
-    private GameEnvironment(List<Short> handCards, List<Short> middleCards, List<Short> scores, Boolean isPisti, Boolean gameFinished, Game.MoveType moveType){
+    private GameEnvironment(List<Short> handCards, List<Short> middleCards, List<Short> scores, Boolean isPisti, Boolean gameFinished, Game.GameStatus gameStatus, Game.MoveType moveType){
         this.mHandCards = handCards;
         this.mMiddleCards = middleCards;
         this.mScores = scores;
         this.mIsPisti = isPisti;
         this.mGameFinished = gameFinished;
+        this.mGameStatus = gameStatus;
         switch (moveType) {
             case INITIAL -> this.mMoveType = "INITIAL";
             case CARD -> this.mMoveType = "CARD";
@@ -36,12 +40,13 @@ public class GameEnvironment {
         }
     }
 
-    private GameEnvironment(Short noHandCards, List<Short> middleCards, List<Short> scores, Boolean isPisti, Boolean gameFinished, Game.MoveType moveType){
+    private GameEnvironment(Short noHandCards, List<Short> middleCards, List<Short> scores, Boolean isPisti, Boolean gameFinished, Game.GameStatus gameStatus, Game.MoveType moveType){
         this.mNoHandCards = noHandCards;
         this.mMiddleCards = middleCards;
         this.mScores = scores;
         this.mIsPisti = isPisti;
         this.mGameFinished = gameFinished;
+        this.mGameStatus = gameStatus;
         switch (moveType) {
             case INITIAL -> this.mMoveType = "INITIAL";
             case CARD -> this.mMoveType = "CARD";

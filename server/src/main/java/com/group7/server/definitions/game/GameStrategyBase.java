@@ -17,8 +17,8 @@ public abstract class GameStrategyBase implements GameStrategy {
     /** Interact with the game according to move type*/
     public List<GameEnvironment> interact(Game.MoveType moveType, Short cardNo) {
         if (moveType.equals(Game.MoveType.INITIAL)){
-            return mGame.createEnvironment(mGame.createPlayerEnvironment(false, isGameFinished(Game.Side.PLAYER), Game.MoveType.INITIAL),
-                    mGame.createPcEnvironment(false, isGameFinished(Game.Side.PC), Game.MoveType.INITIAL)
+            return mGame.createEnvironment(mGame.createPlayerEnvironment(false, isGameFinished(Game.Side.PLAYER), Game.GameStatus.NORMAL,Game.MoveType.INITIAL),
+                    mGame.createPcEnvironment(false, isGameFinished(Game.Side.PC), Game.GameStatus.NORMAL,Game.MoveType.INITIAL)
             );
         } else if (moveType.equals(Game.MoveType.CARD)){
             return simulateGame(cardNo);
@@ -37,8 +37,8 @@ public abstract class GameStrategyBase implements GameStrategy {
                 mGame.initCards();
                 sentMoveType = Game.MoveType.RESTART;
             }
-            return mGame.createEnvironment(mGame.createPlayerEnvironment(false, isGameFinished(Game.Side.PLAYER), sentMoveType),
-                    mGame.createPcEnvironment(false, isGameFinished(Game.Side.PC), sentMoveType)
+            return mGame.createEnvironment(mGame.createPlayerEnvironment(false, isGameFinished(Game.Side.PLAYER), Game.GameStatus.NORMAL,sentMoveType),
+                    mGame.createPcEnvironment(false, isGameFinished(Game.Side.PC), Game.GameStatus.NORMAL,sentMoveType)
             );
         }
     }
@@ -111,7 +111,15 @@ public abstract class GameStrategyBase implements GameStrategy {
 
     /** Helper function to decide whether game is finished*/
     protected boolean isGameFinished(Game.Side side) {
-        return mGame.getScores(side).get(0) >= (short) 151;
+        boolean isFinished = mGame.getScores(side).get(0) >= (short) 151;
+        return isFinished;
+    }
+
+    // TODO: Implement get game status
+    protected Game.GameStatus getGameStatus() {
+        /*if ()
+        mGame.getScores().get(0) >= (short) 151;*/
+        return null;
     }
 
     /** Type definition of how player took the cards*/

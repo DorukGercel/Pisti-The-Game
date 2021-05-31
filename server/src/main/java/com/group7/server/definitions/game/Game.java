@@ -79,20 +79,20 @@ public class Game {
         return environment;
     }
 
-    public GameEnvironment createPlayerEnvironment(boolean isPisti, boolean gameFinished, Game.MoveType moveType) {
+    public GameEnvironment createPlayerEnvironment(boolean isPisti, boolean gameFinished, GameStatus gameStatus, Game.MoveType moveType) {
         List<Short> handCards = new ArrayList<>(getDeck(Game.Side.PLAYER));
         List<Short> middleCards = new ArrayList<>(getMiddleDeck());
         List<Short> scores = new ArrayList<>(getScores(Game.Side.PLAYER));
 
-        return GameEnvironment.buildPlayerEnvironment(handCards, middleCards, scores, isPisti, gameFinished, moveType);
+        return GameEnvironment.buildPlayerEnvironment(handCards, middleCards, scores, isPisti, gameFinished, gameStatus, moveType);
     }
 
-    public GameEnvironment createPcEnvironment(boolean isPisti, boolean gameFinished, Game.MoveType moveType) {
+    public GameEnvironment createPcEnvironment(boolean isPisti, boolean gameFinished, GameStatus gameStatus, Game.MoveType moveType) {
         Short noHandCards = (short) getDeck(Game.Side.PC).size();
         List<Short> middleCards = new ArrayList<>(getMiddleDeck());
         List<Short> scores = new ArrayList<>(getScores(Game.Side.PC));
 
-        return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti, gameFinished, moveType);
+        return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti, gameFinished, gameStatus, moveType);
     }
 
     /** Helper function to change turns.*/
@@ -250,6 +250,13 @@ public class Game {
         CARD,
         REDEAL,
         RESTART
+    }
+
+    public enum GameStatus {
+        NORMAL,
+        LEVEL_UP,
+        LOST,
+        WIN
     }
 
     /** Type definition of game mode; either vs PC or another player*/
