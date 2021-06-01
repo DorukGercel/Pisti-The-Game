@@ -70,7 +70,6 @@ public class LeaderboardController extends BaseNetworkController {
         time_selection_combobox.getSelectionModel().select("Last 7 days");
 
         // TODO: This part creates network error look at the back-end api
-        // TODO: Uncomment to fix
         loadLeaderboardTable("weekly");
     }
 

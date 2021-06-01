@@ -110,6 +110,8 @@ public abstract class GameStrategyBase implements GameStrategy {
     }
 
     /** Helper function to decide whether game is finished*/
+    // TODO: oyunun bittiğini oyuncuların elinde kart kalmayınca anlamıyor muyuz?
+    // oyun sonunda puanı >= 151 olan taraf o elin kazananı oluyor sadece
     protected boolean isGameFinished(Game.Side side) {
         boolean isFinished = mGame.getScores(side).get(0) >= (short) 151;
         return isFinished;

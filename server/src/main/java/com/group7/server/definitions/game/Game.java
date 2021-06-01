@@ -17,6 +17,8 @@ public class Game {
 
     /** Predefined number of cards*/
     private final Short             NO_CARDS = 52;
+    /** Predefined number of ranks*/
+    private final Short             NO_RANKS = 13;
     /** Predefined number of players*/
     private final Short             NO_PLAYERS = 2;
     /** Predefined number of players*/
@@ -43,6 +45,9 @@ public class Game {
     private       Side                mTurn;
     /** Indicates who won the last cards*/
     private       Side                mLastWin;
+    /** Played cards by both players
+     * 13 length counter list of each rank */
+    private       List<Integer>         mPlayedCards;
 
     /** Constructor; called when a new game is created*/
     public Game(GameConfig.CardTable cardTable){
@@ -53,6 +58,10 @@ public class Game {
         this.mLastWin = Side.NONE;
         registerStrategy();
 
+        this.mPlayedCards = new ArrayList<>(this.NO_RANKS);
+        for(int i = 0; i < this.NO_CARDS; i++) {
+            this.mPlayedCards.add(0);
+        }
         this.mCards = new ArrayList<>(NO_PLAYERS + NO_NON_PLAYER_DECKS);
         for(int deckNo = 0; deckNo < NO_PLAYERS + 2; deckNo++) {
             List<Short> tmpDeck = new ArrayList<>();
@@ -157,12 +166,32 @@ public class Game {
         return getMScores().get(1);
     }
 
+    /** Helper function to increment the count of rank in the played cards.*/
+    public void addCardToPlayedCards(Short cardNo) {
+        Integer rank = getRankOfCard(cardNo);
+        this.mPlayedCards.set(rank, mPlayedCards.get(rank) + 1);
+    }
+
+    /** Helper function to find out whether a rank exists in a deck*/
+    public boolean isRankInDeck(int rank, List<Short> deck) {
+        for(int i = 0; i < deck.size(); i++) {
+            if(rank == getRankOfCard(deck.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Find rank of the given card. There is 13 ranks in each rank */
+    public Integer getRankOfCard(Short cardNo) {
+        return cardNo % 13;
+    }
+
     /** Initializes all decks of cards in the game; helper of constructor*/
     public void initCards(){
         List<Short> mainDeck = getMainDeck();
         for (short cardNo = 0; cardNo < getNO_CARDS(); cardNo++) {
             mainDeck.add(cardNo);
-
         }
         // Shuffle the deck
         Collections.shuffle(mainDeck);
@@ -233,9 +262,14 @@ public class Game {
                 mGameStrategy = new GameStrategyLevel1();
                 mGameStrategy.registerGame(this);
             }
+            case 2 -> {
+                // TODO: Remove print
+                System.out.println("LEVEL 2");
+                mGameStrategy = new GameStrategyLevel2();
+                mGameStrategy.registerGame(this);
+            }
         }
     }
-
 
     /** Type definition to indicate player or PC*/
     public enum Side {
