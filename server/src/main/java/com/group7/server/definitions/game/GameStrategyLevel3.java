@@ -3,9 +3,9 @@ package com.group7.server.definitions.game;
 import java.util.*;
 
 /**
- * Strategy of the game according to level 2 difficulty
+ * Strategy of the game according to level 3 (Bluffing Pisti) difficulty
  */
-public class GameStrategyLevel2 extends GameStrategyBase {
+public class GameStrategyLevel3 extends GameStrategyBase {
     /**Indicates the first move of PC to apply a different strategy at the beginning*/
     private Boolean isFirstPcMove = true;
 
@@ -15,47 +15,87 @@ public class GameStrategyLevel2 extends GameStrategyBase {
 
         // Simulate player movement and create game environment
         gameEnvironmentList.add(
-            mGame.createPlayerEnvironment(
-                    simulateMovement(cardNo, mGame.getMTurn()), isGameFinished(Game.Side.PLAYER), Game.GameStatus.NORMAL, moveType)
+                mGame.createPlayerEnvironment(
+                        simulateMovement(cardNo, mGame.getMTurn(), moveType), isGameFinished(Game.Side.PLAYER), Game.GameStatus.NORMAL, moveType)
         );
 
         // Simulate pc movement and create game environment
         gameEnvironmentList.add(
                 mGame.createPcEnvironment(
-                        simulateMovement(pcStrategicDecideCard(isFirstPcMove), mGame.getMTurn()), isGameFinished(Game.Side.PC), Game.GameStatus.NORMAL, moveType)
+                        simulateMovement(pcStrategicDecideCard(isFirstPcMove), mGame.getMTurn(), moveType), isGameFinished(Game.Side.PC), Game.GameStatus.NORMAL, moveType)
         );
 
         return gameEnvironmentList;
+
     }
 
     /** The method that evaluates the moves of the player or the pc*/
-    private boolean simulateMovement(Short cardNo, Game.Side side) {
+    private boolean simulateMovement(Short cardNo, Game.Side side, Game.MoveType moveType) {
         boolean isPisti = false;
+        // TODO: find how to get the info about to the opponent's challenge will and then set
+        boolean isChallenge = false;
         List<Short> middleDeck = mGame.getMiddleDeck();
         // Player's or PC's deck
         List<Short> currentPlayerDeck = mGame.getDeck(side);
         // Remove the card from player's deck
         currentPlayerDeck.remove(cardNo);
-        // Check if middle is empty or not
-        if(middleDeck.size() > 0) {
-            GameConfig.Card currentPlayerCard = mGame.getMCardTable().getCard(cardNo);
-            if(isMatchedCard(currentPlayerCard)) {
-                // Increment score of player and set last win
-                isPisti = incrementScore(currentPlayerCard, side, false);
-                mGame.setMLastWin(side);
+        GameConfig.Card currentPlayerCard = mGame.getMCardTable().getCard(cardNo);
+
+        if(moveType.equals(Game.MoveType.CARD)) {
+            // Check if middle is empty or not
+            if(middleDeck.size() > 0) {
+                if(isMatchedCard(currentPlayerCard)) {
+                    // Increment score of player and set last win
+                    isPisti = incrementScore(currentPlayerCard, side, false);
+                    mGame.setMLastWin(side);
+                } else {
+                    // Add player card to top of middle
+                    middleDeck.add(cardNo);
+                }
             } else {
                 // Add player card to top of middle
                 middleDeck.add(cardNo);
             }
-        } else {
-            // Add player card to top of middle
-            middleDeck.add(cardNo);
+            // move simulated, the card was played
+            mGame.addCardToPlayedCards(cardNo);
+            // Change turn
+            mGame.invertTurn();
+        } else if(moveType.equals(Game.MoveType.BLUFF)) {
+            // if there is just one face-up card on the table, the player or pc can bluff
+            if(middleDeck.size() == 1) {
+                // currentPlayerCard is claimed to be Pisti
+                if(isChallenge) { // opponent wants to challenge
+                    isPisti =  simulateMovement(cardNo, side, Game.MoveType.CHALLENGE);
+                } else {
+                    isPisti =  simulateMovement(cardNo, side, Game.MoveType.NOT_CHALLENGE);
+                }
+            }
+        } else if(moveType.equals(Game.MoveType.CHALLENGE)) {
+            // opponent does not believe and challenge the player
+            if(isMatchedCard(currentPlayerCard)) {
+                // fake bluff
+                // player who bluffed makes double pisti
+                isPisti = incrementScore(currentPlayerCard, side, false);
+            } else {
+                // real bluff
+                // opponent who challenged the player makes double pisti
+                isPisti = incrementScore(currentPlayerCard, mGame.getOtherSide(side), false);
+            }
+            // move simulated, the card was played
+            mGame.addCardToPlayedCards(cardNo);
+        } else { // Game.MoveType.NOT_CHALLENGE
+            // Check if middle is empty or not
+            if(middleDeck.size() > 0) {
+                // Whatever the card is, it should be counted as Pisti because not challenged
+                // if isDirectPisti, incrementScore does not compare ranks, directly assumes it is a Pisti
+                isPisti = incrementScore(currentPlayerCard, side, true); // Increment score of player and set last win
+                mGame.setMLastWin(side);
+            }
+            // Change turn
+            mGame.invertTurn();
         }
-        // move simulated, the card was played
-        mGame.addCardToPlayedCards(cardNo);
-        // Change turn
-        mGame.invertTurn();
         return isPisti;
+
     }
 
     private Short pcStrategicDecideCard(boolean isFirstPcMove) {
@@ -112,5 +152,4 @@ public class GameStrategyLevel2 extends GameStrategyBase {
         }
         return mGame.getTopCardNo(pcDeck);
     }
-
 }

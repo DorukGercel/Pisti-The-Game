@@ -3,6 +3,7 @@ package com.group7.client.definitions.game;
 public enum MoveType {
     INITIAL,
     CARD,
+    BLUFF,
     REDEAL,
     RESTART;
 
@@ -13,6 +14,9 @@ public enum MoveType {
             }
             case "CARD" -> {
                 return MoveType.CARD;
+            }
+            case "BLUFF" -> {
+                return MoveType.BLUFF;
             }
             case "REDEAL" -> {
                 return MoveType.REDEAL;

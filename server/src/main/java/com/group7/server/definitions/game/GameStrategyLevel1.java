@@ -9,7 +9,7 @@ import java.util.List;
 public class GameStrategyLevel1 extends GameStrategyBase {
 
     @Override
-    public List<GameEnvironment> simulateGame(Short cardNo) {
+    public List<GameEnvironment> simulateGame(Short cardNo, Game.MoveType moveType) {
         List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
 
         // Simulate player movement and create game environment
@@ -37,7 +37,7 @@ public class GameStrategyLevel1 extends GameStrategyBase {
             GameConfig.Card currentPlayerCard = mGame.getMCardTable().getCard(cardNo);
             if (isMatchedCard(currentPlayerCard)){
                 // Increment score of player and set last win
-                isPisti = incrementScore(currentPlayerCard, side);
+                isPisti = incrementScore(currentPlayerCard, side, false);
                 mGame.setMLastWin(side);
             } else {
                 // Add player card to top of middle

@@ -25,6 +25,7 @@ public class GameEnvironment {
         switch (moveType) {
             case INITIAL -> this.mMoveType = "INITIAL";
             case CARD -> this.mMoveType = "CARD";
+            case BLUFF -> this.mMoveType = "BLUFF";
             case REDEAL -> this.mMoveType = "REDEAL";
             case RESTART -> this.mMoveType = "RESTART";
         }
@@ -39,6 +40,7 @@ public class GameEnvironment {
         switch (moveType) {
             case INITIAL -> this.mMoveType = "INITIAL";
             case CARD -> this.mMoveType = "CARD";
+            case BLUFF -> this.mMoveType = "BLUFF";
             case REDEAL -> this.mMoveType = "REDEAL";
             case RESTART -> this.mMoveType = "RESTART";
         }

@@ -130,7 +130,14 @@ public class GameTableController extends BaseNetworkController {
     private void simulateTurn(MoveType moveType, GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
         try {
             if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.REDEAL)) {
-                Platform.runLater(()->simulateInitTurn(moveType, playerGameEnv));
+                Platform.runLater(() -> simulateInitTurn(moveType, playerGameEnv));
+            } else if (moveType.equals(MoveType.BLUFF)) {
+                if((playerGameEnv.getMMiddleCards().size() == 1) && (pcGameEnv.getMMiddleCards().size() == 1)) {
+                    // if there is just one face-up card on the table, the player or pc can bluff
+                    Platform.runLater(() -> simulateBluffTurn(moveType));
+                } else {
+                    displayError("Bluffing Move", "Bluffing cannot be made! Bluffing is possible only when there is just one card on the table");
+                }
             } else if (moveType.equals(MoveType.RESTART)) {
                 Platform.runLater(()->simulateRestartTurn(moveType, playerGameEnv, pcGameEnv));
             } else {
@@ -161,6 +168,11 @@ public class GameTableController extends BaseNetworkController {
         } catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    /** Helper function to perform bluffing*/
+    private void simulateBluffTurn(MoveType moveType) {
+        //TODO: bluff edilen kart ters cevrilip ortaya konacak
     }
 
     /** Helper function to place middle card and set score*/

@@ -16,12 +16,14 @@ public abstract class GameStrategyBase implements GameStrategy {
     @Override
     /** Interact with the game according to move type*/
     public List<GameEnvironment> interact(Game.MoveType moveType, Short cardNo) {
-        if (moveType.equals(Game.MoveType.INITIAL)){
+        if (moveType.equals(Game.MoveType.INITIAL)) {
             return mGame.createEnvironment(mGame.createPlayerEnvironment(false, isGameFinished(Game.Side.PLAYER), Game.GameStatus.NORMAL,Game.MoveType.INITIAL),
                     mGame.createPcEnvironment(false, isGameFinished(Game.Side.PC), Game.GameStatus.NORMAL,Game.MoveType.INITIAL)
             );
-        } else if (moveType.equals(Game.MoveType.CARD)){
-            return simulateGame(cardNo);
+        } else if (moveType.equals(Game.MoveType.CARD)) {
+            return simulateGame(cardNo, Game.MoveType.CARD);
+        } else if (moveType.equals(Game.MoveType.BLUFF)) {
+            return simulateGame(cardNo, Game.MoveType.BLUFF);
         } else {
             List<Short> mainDeck = mGame.getMainDeck();
             Game.MoveType sentMoveType;
@@ -33,7 +35,7 @@ public abstract class GameStrategyBase implements GameStrategy {
                 // Restart with another level
                 //TODO: Remove print
                 System.out.println("Restart");
-                incrementScore(null, mGame.getMLastWin());
+                incrementScore(null, mGame.getMLastWin(), false);
                 mGame.initCards();
                 sentMoveType = Game.MoveType.RESTART;
             }
@@ -44,7 +46,7 @@ public abstract class GameStrategyBase implements GameStrategy {
     }
 
     /** Simulate game according to the strategy*/
-    abstract List<GameEnvironment> simulateGame(Short cardNo);
+    abstract List<GameEnvironment> simulateGame(Short cardNo, Game.MoveType moveType);
 
     /** Helper function to decide if there is a takeover.*/
     protected boolean isMatchedCard(GameConfig.Card playerCard) {
@@ -61,25 +63,43 @@ public abstract class GameStrategyBase implements GameStrategy {
 
     /** Helper function to increment the score of the side who achieved takeover.*/
     // TODO: Q: When pisti achieved does user count the values of the cards? No in this implementation.
-    protected boolean incrementScore(GameConfig.Card playerCard, Game.Side side) {
+    protected boolean incrementScore(GameConfig.Card playerCard, Game.Side side, boolean isDirectPisti) {
         boolean isPisti = false;
+        boolean isBluffOverJack = false;
         short pointsReceived = 0;
         short cardsReceived = 0;
 
         List<Short> middleDeck = mGame.getMiddleDeck();
         GameConfig.Card faceUpCard = mGame.getTopCard(middleDeck);
 
-        // Decide the takeover type
-        TakeoverType takeoverType = GameStrategyBase.TakeoverType.getTakeoverType(faceUpCard, middleDeck.size());
+
+        TakeoverType takeoverType = TakeoverType.PISTI;
+        if(!isDirectPisti) {
+            // Decide the takeover type
+            takeoverType = GameStrategyBase.TakeoverType.getTakeoverType(playerCard, faceUpCard, middleDeck.size());
+        }
+
+        if(takeoverType.equals(TakeoverType.DOUBLE_PISTI)) {
+            // there is just one JACK in the middle
+            isBluffOverJack = true;
+        }
 
         if(playerCard != null) {
             // May be last points so check nullity of player card
             if (takeoverType.equals(TakeoverType.PISTI) || takeoverType.equals(TakeoverType.DOUBLE_PISTI)) {
                 // Take takeover special points by player card and top middle cards
                 short takeoverPoint = SpecialPoint.takeTakeoverPoint(takeoverType);
+                if(isBluffOverJack) {
+                    takeoverPoint += takeoverPoint; // 40 points
+                }
                 mGame.removeTopCard(middleDeck);
                 pointsReceived = (short) (pointsReceived + takeoverPoint);
                 cardsReceived = (short) (cardsReceived + 2);
+                isPisti = true;
+            } else if(takeoverType.equals(TakeoverType.DOUBLE_PISTI_FOR_BLUFFING)) {
+                short takeoverPoint = SpecialPoint.takeTakeoverPoint(takeoverType);
+                // top card in the middle is not taken in bluffing case
+                pointsReceived = (short) (pointsReceived + takeoverPoint);
                 isPisti = true;
             } else {
                 // Take special points of the player card and top middle cards
@@ -91,15 +111,17 @@ public abstract class GameStrategyBase implements GameStrategy {
             }
         }
 
-        // Count the points of the cards received
-        for(Short cardNo : middleDeck) {
-            GameConfig.Card middleCard = mGame.getMCardTable().getCard(cardNo);
-            short middleCardPoint = SpecialPoint.takeCardPoint(middleCard);
-            pointsReceived = (short) (pointsReceived + middleCardPoint);
-            cardsReceived = (short) (cardsReceived + 1);
+        if(!takeoverType.equals(TakeoverType.DOUBLE_PISTI_FOR_BLUFFING)) {
+            // Count the points of the cards received
+            for(Short cardNo : middleDeck) {
+                GameConfig.Card middleCard = mGame.getMCardTable().getCard(cardNo);
+                short middleCardPoint = SpecialPoint.takeCardPoint(middleCard);
+                pointsReceived = (short) (pointsReceived + middleCardPoint);
+                cardsReceived = (short) (cardsReceived + 1);
+            }
+            // Flush the middle deck
+            middleDeck.clear();
         }
-        // Flush the middle deck
-        middleDeck.clear();
 
         // Set the scores (point, card received) of the player (decide as who made takeover)
         List<Short> scores = mGame.getScores(side);
@@ -127,12 +149,17 @@ public abstract class GameStrategyBase implements GameStrategy {
     /** Type definition of how player took the cards*/
     private enum TakeoverType {
         DOUBLE_PISTI,
+        DOUBLE_PISTI_FOR_BLUFFING,
         PISTI,
         REGULAR;
 
-        public static TakeoverType getTakeoverType(GameConfig.Card faceUpCard, int noMiddleCards) {
+        public static TakeoverType getTakeoverType(GameConfig.Card playerCard, GameConfig.Card faceUpCard, int noMiddleCards) {
             if (noMiddleCards == 1 && faceUpCard.getMRank().equals(GameConfig.Card.Rank.JACK)) {
                 return DOUBLE_PISTI;
+            } else if (noMiddleCards == 1 && (faceUpCard.getMRank().equals(playerCard))) {
+                return DOUBLE_PISTI_FOR_BLUFFING;
+            } else if (noMiddleCards == 1 && (faceUpCard.getMRank().equals(playerCard))) {
+                return DOUBLE_PISTI_FOR_BLUFFING;
             } else if (noMiddleCards == 1) { //TODO: If Jack is it still Pisti
                 return PISTI;
             } else {
@@ -157,7 +184,7 @@ public abstract class GameStrategyBase implements GameStrategy {
         }
 
         public static Short takeTakeoverPoint(TakeoverType type) {
-            if (type.equals(TakeoverType.DOUBLE_PISTI)) {
+            if (type.equals(TakeoverType.DOUBLE_PISTI) || type.equals(TakeoverType.DOUBLE_PISTI_FOR_BLUFFING)) {
                 return DOUBLE_PISTI.getPoint();
             } else if (type.equals(TakeoverType.PISTI)) {
                 return PISTI.getPoint();

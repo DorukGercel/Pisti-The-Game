@@ -113,6 +113,15 @@ public class Game {
         }
     }
 
+    /** Helper function to get other side.*/
+    public Game.Side getOtherSide(Game.Side side) {
+        if (side.equals(Game.Side.PLAYER)) {
+            return Game.Side.PC;
+        } else {
+            return Game.Side.PLAYER;
+        }
+    }
+
     /** Helper function to take the top card of given deck.*/
     public GameConfig.Card getTopCard(List<Short> deck) {
         if (deck.size() > 0) {
@@ -268,6 +277,13 @@ public class Game {
                 mGameStrategy = new GameStrategyLevel2();
                 mGameStrategy.registerGame(this);
             }
+            case 3 -> {
+                // TODO: Remove print
+                System.out.println("LEVEL 3");
+                mGameStrategy = new GameStrategyLevel3();
+                mGameStrategy.registerGame(this);
+            }
+
         }
     }
 
@@ -282,6 +298,9 @@ public class Game {
     public enum MoveType {
         INITIAL,
         CARD,
+        BLUFF,
+        CHALLENGE,
+        NOT_CHALLENGE,
         REDEAL,
         RESTART
     }
