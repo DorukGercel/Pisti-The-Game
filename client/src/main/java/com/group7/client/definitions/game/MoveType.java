@@ -4,6 +4,8 @@ public enum MoveType {
     INITIAL,
     CARD,
     BLUFF,
+    CHALLENGE,
+    NOT_CHALLENGE,
     REDEAL,
     RESTART;
 
@@ -17,6 +19,12 @@ public enum MoveType {
             }
             case "BLUFF" -> {
                 return MoveType.BLUFF;
+            }
+            case "CHALLENGE" -> {
+                return MoveType.CHALLENGE;
+            }
+            case "NOT_CHALLENGE" -> {
+                return MoveType.NOT_CHALLENGE;
             }
             case "REDEAL" -> {
                 return MoveType.REDEAL;
