@@ -170,11 +170,11 @@ public abstract class GameStrategyBase implements GameStrategy {
         public static TakeoverType getTakeoverType(GameConfig.Card playerCard, GameConfig.Card faceUpCard, int noMiddleCards) {
             if (noMiddleCards == 1 && faceUpCard.getMRank().equals(GameConfig.Card.Rank.JACK)) {
                 return DOUBLE_PISTI;
-            } else if (noMiddleCards == 1 && (faceUpCard.getMRank().equals(playerCard))) {
+            } else if (noMiddleCards == 1 && (faceUpCard.getMRank().equals(playerCard.getMRank()))) {
                 return DOUBLE_PISTI_FOR_BLUFFING;
-            } else if (noMiddleCards == 1 && (faceUpCard.getMRank().equals(playerCard))) {
+            } else if (noMiddleCards == 1 && !(faceUpCard.getMRank().equals(playerCard.getMRank()))) {
                 return DOUBLE_PISTI_FOR_BLUFFING;
-            } else if (noMiddleCards == 1) { //TODO: If Jack is it still Pisti
+            } else if (noMiddleCards == 1 && faceUpCard.getMRank().equals(playerCard.getMRank())) {
                 return PISTI;
             } else {
                 return REGULAR;

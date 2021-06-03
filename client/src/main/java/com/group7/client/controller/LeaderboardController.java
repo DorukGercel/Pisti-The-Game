@@ -103,15 +103,15 @@ public class LeaderboardController extends BaseNetworkController {
             paginationTableView.getItems().add(new Leaderboard(i+1, record.getPlayerName(), record.getScore()));
             tableRecordsList.add(new Leaderboard(i+1, record.getPlayerName(), record.getScore()));
         }
-        //int pageCount = (recordEntryList.size() / rowsPerPage) + 1;
-        //pagination.setPageCount(pageCount);
-        //pagination.setPageFactory(this::createPage);
+        int pageCount = (recordEntryList.size() / ROWS_PER_PAGE) + 1;
+        pagination.setPageCount(pageCount);
+        pagination.setPageFactory(this::createPage);
     }
 
     private Node createPage(int pageIndex) {
         int from = pageIndex * ROWS_PER_PAGE;
         int to = ROWS_PER_PAGE;
-        paginationTableView.setItems(tableRecordsList);
+        paginationTableView.setItems(FXCollections.observableArrayList(tableRecordsList.subList(from,to)));
         return paginationTableView;
     }
 
