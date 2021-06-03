@@ -43,10 +43,10 @@ public class LeaderboardController extends BaseNetworkController {
     @FXML private TableColumn<Leaderboard, Integer> rank;
     @FXML private TableColumn<Leaderboard, String> username;
     @FXML private TableColumn<Leaderboard, Integer> score;
-    @FXML private ComboBox<String> time_selection_combobox;
+    @FXML private ComboBox<String> period_combobox;
     @FXML private Pagination pagination;
 
-    private static int rowsPerPage = 15;
+    private static final int ROWS_PER_PAGE = 15;
     public ObservableList<Leaderboard> tableRecordsList = FXCollections.observableArrayList();
 
     @Autowired
@@ -65,12 +65,17 @@ public class LeaderboardController extends BaseNetworkController {
         score.setCellValueFactory(
                 new PropertyValueFactory<Leaderboard, Integer>("score"));
 
-        time_selection_combobox.getItems().addAll( "Last 7 days", "Last 30 days", "All times");
+        tableRecordsList.addAll(new Leaderboard(1, "doruk", 33333),
+                new Leaderboard(2, "rabia", 3222),
+                new Leaderboard(3, "hande", 3000));
+
+        paginationTableView.setItems(tableRecordsList);
+        period_combobox.getItems().addAll( "Last 7 days", "Last 30 days", "All times");
         // Default display time is the most recent week
-        time_selection_combobox.getSelectionModel().select("Last 7 days");
+        period_combobox.getSelectionModel().select("Last 7 days");
 
         // TODO: This part creates network error look at the back-end api
-        loadLeaderboardTable("weekly");
+        //loadLeaderboardTable("weekly");
     }
 
     private void loadLeaderboardTable(String period) {
@@ -87,7 +92,7 @@ public class LeaderboardController extends BaseNetworkController {
         if (isOperationSuccess(commonResponse[0], networkStatusCode, ListRecordsResponse.class, "Leaderboard")) {
             ListRecordsResponse listRecordsResponse = (ListRecordsResponse) commonResponse[0];
             putLeaderboardRecords(listRecordsResponse);
-            mScreenManager.activatePane("leaderboard_table", null);
+            mScreenManager.activatePane("leaderboard", null);
         }
     }
 
@@ -98,20 +103,20 @@ public class LeaderboardController extends BaseNetworkController {
             paginationTableView.getItems().add(new Leaderboard(i+1, record.getPlayerName(), record.getScore()));
             tableRecordsList.add(new Leaderboard(i+1, record.getPlayerName(), record.getScore()));
         }
-        int pageCount = (recordEntryList.size() / rowsPerPage) + 1;
-        pagination.setPageCount(pageCount);
-        pagination.setPageFactory(this::createPage);
+        //int pageCount = (recordEntryList.size() / rowsPerPage) + 1;
+        //pagination.setPageCount(pageCount);
+        //pagination.setPageFactory(this::createPage);
     }
 
     private Node createPage(int pageIndex) {
-        int from = pageIndex * rowsPerPage;
-        int to = rowsPerPage;
-        paginationTableView.setItems(FXCollections.observableArrayList(tableRecordsList));
+        int from = pageIndex * ROWS_PER_PAGE;
+        int to = ROWS_PER_PAGE;
+        paginationTableView.setItems(tableRecordsList);
         return paginationTableView;
     }
-    @FXML
+
     public void selectFromComboBox(ActionEvent actionEvent) {
-        String period = time_selection_combobox.getValue();
+        String period = period_combobox.getValue();
         loadLeaderboardTable(period);
     }
 }
