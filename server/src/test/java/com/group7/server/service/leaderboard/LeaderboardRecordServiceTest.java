@@ -49,10 +49,10 @@ public class LeaderboardRecordServiceTest {
         Player testPlayer = new Player("Rabia", "lolFriends", "r@g.com");
         testPlayer.setId(1L);
         Date testDate = new Date();
-        StatusCode statusCode = mLeaderboardRecordService.createRecord(testPlayer.getId(), testDate, 500);
+        StatusCode statusCode = mLeaderboardRecordService.createRecord(testPlayer.getId(), testDate, (short) 500);
         assertEquals(statusCode, StatusCode.SUCCESS);
         // Create a leaderboard record with user who has already been in the leaderboard
-        statusCode = mLeaderboardRecordService.createRecord(testPlayer.getId(), testDate, 500);
+        statusCode = mLeaderboardRecordService.createRecord(testPlayer.getId(), testDate, (short) 500);
         assertEquals(statusCode, StatusCode.FAIL);
     }
 
@@ -63,11 +63,11 @@ public class LeaderboardRecordServiceTest {
          testPlayer.setId(1L);
          Date testDate = new Date();
          LeaderboardRecord testRecord = new LeaderboardRecord(testPlayer, testDate, 500);
-         StatusCode statusCode = mLeaderboardRecordService.createRecord(testPlayer.getId(), testDate, 500);
+         StatusCode statusCode = mLeaderboardRecordService.createRecord(testPlayer.getId(), testDate, (short) 500);
          assertEquals(statusCode, StatusCode.SUCCESS);
          // Create a record to be used in updating
          Date updateDate = new Date();
-         statusCode = mLeaderboardRecordService.updateRecord(1L, testPlayer.getId(), updateDate, 600);
+         statusCode = mLeaderboardRecordService.updateRecord(1L, testPlayer.getId(), updateDate, (short) 600);
          assertEquals(statusCode, StatusCode.SUCCESS);
     }
 
@@ -77,7 +77,7 @@ public class LeaderboardRecordServiceTest {
         Player testPlayer = new Player("Rabia", "lolFriends", "r@g.com");
         testPlayer.setId(1L);
         Date testDate = new Date();
-        StatusCode statusCode = mLeaderboardRecordService.createRecord(testPlayer.getId(), testDate, 500);
+        StatusCode statusCode = mLeaderboardRecordService.createRecord(testPlayer.getId(), testDate, (short) 500);
         assertEquals(statusCode, StatusCode.SUCCESS);
         // Delete an existing record
         statusCode = mLeaderboardRecordService.deleteRecord(1L);

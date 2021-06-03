@@ -53,8 +53,8 @@ public class ActivePlayerRepositoryTest {
         assertTrue(dbActivePlayer.isPresent());
         // Update username
         dbActivePlayer.get().setId(dbActivePlayer.get().getId());
-        dbActivePlayer.get().setScore(100);
-        dbActivePlayer.get().setLevel(3);
+        dbActivePlayer.get().setScore((short) 100);
+        dbActivePlayer.get().setLevel((short) 3);
         dbActivePlayer.get().setGameId(dbActivePlayer.get().getGameId());
         dbActivePlayer.get().setPlayer(dbActivePlayer.get().getPlayer());
         ActivePlayer updatedActivePlayer = mActivePlayerRepository.save(dbActivePlayer.get());

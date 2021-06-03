@@ -61,11 +61,14 @@ public class GameServiceInteractionTest {
         // Fail because of wrong game id
         Short cardNo = (short) -1;
         List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
+        List<Object> gameStatus = new ArrayList<>();
         StatusCode statusCode = mGameService.interactGame(mSessionId,
                 (1L + (Long) mGameId[0]),
                 cardNo,
                 Game.MoveType.INITIAL,
-                gameEnvironmentList);
+                Game.GameStatusCode.NORMAL,
+                gameEnvironmentList,
+                gameStatus);
         assertEquals(statusCode, StatusCode.FAIL);
     }
 
@@ -73,11 +76,14 @@ public class GameServiceInteractionTest {
     public void testInteractGame_Initial_Fail_GameEnv() {
         // Fail because of wrong gameEnvironmentList
         Short cardNo = (short) -1;
+        List<Object> gameStatus = new ArrayList<>();
         StatusCode statusCode = mGameService.interactGame(mSessionId,
                 (Long) mGameId[0],
                 cardNo,
                 Game.MoveType.INITIAL,
-                null);
+                Game.GameStatusCode.NORMAL,
+                null,
+                gameStatus);
         assertEquals(statusCode, StatusCode.FAIL);
     }
 
@@ -86,11 +92,14 @@ public class GameServiceInteractionTest {
         // Make the initial move successfully
         Short cardNo = (short) -1;
         List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
+        List<Object> gameStatus = new ArrayList<>();
         StatusCode statusCode = mGameService.interactGame(mSessionId,
                 (Long) mGameId[0],
                 cardNo,
                 Game.MoveType.INITIAL,
-                gameEnvironmentList);
+                Game.GameStatusCode.NORMAL,
+                gameEnvironmentList,
+                gameStatus);
         assertEquals(statusCode, StatusCode.SUCCESS);
 
         GameEnvironment playerEnv = gameEnvironmentList.get(0);
@@ -113,11 +122,14 @@ public class GameServiceInteractionTest {
         // Make the initial move successfully
         Short cardNo = (short) -1;
         List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
+        List<Object> gameStatus = new ArrayList<>();
         StatusCode statusCode = mGameService.interactGame(mSessionId,
                 (Long) mGameId[0],
                 cardNo,
                 Game.MoveType.INITIAL,
-                gameEnvironmentList);
+                Game.GameStatusCode.NORMAL,
+                gameEnvironmentList,
+                gameStatus);
         assertEquals(statusCode, StatusCode.SUCCESS);
 
         GameEnvironment playerEnv = gameEnvironmentList.get(0);
@@ -135,7 +147,9 @@ public class GameServiceInteractionTest {
                 (Long) mGameId[0],
                 decidedCardNo,
                 Game.MoveType.CARD,
-                newGameEnvironments);
+                Game.GameStatusCode.NORMAL,
+                newGameEnvironments,
+                gameStatus);
 
         // Check status code
         assertEquals(statusCode, StatusCode.SUCCESS);
