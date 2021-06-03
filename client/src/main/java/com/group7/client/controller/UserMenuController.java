@@ -92,7 +92,7 @@ public class UserMenuController extends BaseNetworkController {
         }
     }
 
-    /** Event which indicates the game is started*/
+    /** Event which indicates the leaderboard is started*/
     public static class InitLeaderboardEvent extends ApplicationEvent {
         public InitLeaderboardEvent() {
             super(UserMenuController.class);

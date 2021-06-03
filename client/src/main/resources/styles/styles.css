@@ -176,4 +176,22 @@
     -fx-alignment: center;
 }
 
+#levelboard {
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+}
 
+#level_text_label {
+    -fx-background-color: black;
+    -fx-background-radius: 10;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-alignment: center;
+}
+
+#level_no_label {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-alignment: center;
+}

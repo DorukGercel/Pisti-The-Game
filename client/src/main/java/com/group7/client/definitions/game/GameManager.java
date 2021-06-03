@@ -31,6 +31,8 @@ public class GameManager {
     private final List<Short>           mPlayerCards;
     /** Card in the middle that is updated by player (after move)*/
     private       Short                 mMiddleCard;
+    /** Current level*/
+    private       Short                 mCurrentLevel;
     /** Variable to indicate if game is over*/
     private       Boolean               mGameOver;
     /** Sleep time before display of cards*/
@@ -46,6 +48,7 @@ public class GameManager {
         this.mGameOver = false;
         this.mLock = new ReentrantLock();
         this.mPlayerTurn = mLock.newCondition();
+        this.mCurrentLevel = 1;
     }
 
     /** Thread function where game instance runs*/
@@ -56,9 +59,9 @@ public class GameManager {
                 while (!mGameOver) {
                     mPlayerTurn.wait();
                     TimeUnit.SECONDS.sleep(mSleepTime);
-                    mGameTableController.turnOffDrag();
                     simulateTurn();
                     mGameTableController.turnOnDrag();
+                    mGameTableController.turnOnKeyComb();
                 }
                 mLock.unlock();
             }
@@ -86,12 +89,25 @@ public class GameManager {
         return mGameService.getMiddleCard(middleCardsNo.get(middleCardsNo.size() - 1));
     }
 
+    /** Function which flush player cards after level up and sets new level*/
+    public void handleLevelChange() {
+        mCurrentLevel = (short) (mCurrentLevel + 1);
+        mPlayerCards.clear();
+    }
+
+    /** Function which flush player cards after game over and resets level*/
+    public void handleGameOver() {
+        mCurrentLevel = (short) 1;
+        mPlayerCards.clear();
+        setMGameOver(true);
+    }
+
     /** Helper function to send the move to backend*/
     private void simulateTurn() {
         mPlayerCards.remove(mMiddleCard);
-        mGameTableController.simulateMove(MoveType.CARD, mMiddleCard);
+        mGameTableController.simulateMove(MoveType.CARD, GameStatusCode.NORMAL, mMiddleCard);
         if (mPlayerCards.size() == 0) {
-            mGameTableController.simulateMove(MoveType.REDEAL, mMiddleCard);
+            mGameTableController.simulateMove(MoveType.REDEAL, GameStatusCode.NORMAL, mMiddleCard);
         }
     }
 }

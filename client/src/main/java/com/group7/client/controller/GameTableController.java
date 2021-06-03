@@ -16,18 +16,23 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
@@ -52,11 +57,9 @@ public class GameTableController extends BaseNetworkController {
     @FXML private Label     active_player_score_label;
     @FXML private Label     pc_score_label;
     @FXML private Group     player_area_container;
-    @FXML private Group     middle_area_container;
     @FXML private Circle    middle_area;
     @FXML private Rectangle middle_card;
-    @FXML private Group     pc_area_container;
-    @FXML private Button    start_button;
+    @FXML private Label     level_no_label;
 
     /** Perform initializations*/
     @Override
@@ -76,15 +79,33 @@ public class GameTableController extends BaseNetworkController {
 
     /** Start Game Event listener, sets username*/
     @EventListener({UserMenuController.CreateGameEvent.class})
-    public void onCreateGameEvent(UserMenuController.CreateGameEvent createGameEvent) {
+    public void onCreateGameEvent() {
         active_player_label.setText(mPlayerManager.getUsername());
+        setCurrentLevel();
+        setKeyCombinationListener();
         Executors.newSingleThreadExecutor().execute(() -> mGameManager.run());
-        performInteract(MoveType.INITIAL, (short) -1);
+        performInteract(MoveType.INITIAL, GameStatusCode.NORMAL, (short) -1);
+    }
+
+    /** Cheat Level Up listener*/
+    @EventListener({CheatLevelUpEvent.class})
+    public void onCheatLevelUpEvent() {
+        // TODO: Remove print
+        System.out.println("call");
+        performInteract(MoveType.INITIAL, GameStatusCode.CHEAT_LEVEL_UP, (short) -1);
     }
 
     /** Function which is invoked by game manager to simulate card move*/
-    public void simulateMove(MoveType moveType, short cardNo) {
-        performInteract(moveType, cardNo);
+    public void simulateMove(MoveType moveType, GameStatusCode gameStatusCode, short cardNo) {
+        Platform.runLater(()->performInteract(moveType, gameStatusCode, cardNo));
+    }
+
+    public void turnOnKeyComb() {
+        setKeyCombinationListener();
+    }
+
+    public void turnOffKeyComb() {
+        mScreenManager.getCurrentScene().getAccelerators().clear();
     }
 
     /** Function which turns on drag mode*/
@@ -102,12 +123,14 @@ public class GameTableController extends BaseNetworkController {
     }
 
     /** Helper function send the initial interact request*/
-    private void performInteract(MoveType moveType ,short cardNo) {
+    private void performInteract(MoveType moveType, GameStatusCode gameStatusCode, short cardNo) {
         // Exchange request and response
+        System.out.println(gameStatusCode);
         InteractRequest interactRequest = new InteractRequest(mPlayerManager.getSessionId(),
                 mPlayerManager.getGameId(),
                 cardNo,  //Card no doesn't matter for initial move
-                moveType);
+                moveType,
+                gameStatusCode);
         CommonResponse[] commonResponse = new InteractResponse[1];
 
         StatusCode networkStatusCode = mNetworkManager.exchange(
@@ -118,11 +141,35 @@ public class GameTableController extends BaseNetworkController {
                 InteractResponse.class);
 
         if (isOperationSuccess(commonResponse[0], networkStatusCode, InteractResponse.class, "Interact Game")) {
+            // Check if operation was successful
             InteractResponse interactResponse = (InteractResponse) commonResponse[0];
             // TODO: Remove print
             System.out.println(interactResponse.getPlayerEnvironment());
             System.out.println(interactResponse.getPcEnvironment());
-            simulateTurn(MoveType.convertMoveType(interactResponse.getPlayerEnvironment().getMMoveType()), interactResponse.getPlayerEnvironment(), interactResponse.getPcEnvironment());
+
+            GameStatusCode receivedGameStatusCode = GameStatusCode.convertGameStatusCode(interactResponse.getGameStatusCode());
+            if(receivedGameStatusCode.equals(GameStatusCode.NORMAL)) {
+                // Normal game operation
+                simulateTurn(MoveType.convertMoveType(interactResponse.getPlayerEnvironment().getMMoveType()),
+                        interactResponse.getPlayerEnvironment(),
+                        interactResponse.getPcEnvironment());
+            } else if (receivedGameStatusCode.equals(GameStatusCode.WIN)) {
+                // Won the level so level up
+                performInteract(MoveType.INITIAL, GameStatusCode.LEVEL_UP, (short) -1);
+            } else if (receivedGameStatusCode.equals(GameStatusCode.LOST)) {
+                // Lost the level so close the game
+                displaySuccess("Game Lost", "Sorry for your lost :)");
+                simulateGameOver();
+                mScreenManager.activatePane("user_menu", null);
+            } else if (receivedGameStatusCode.equals(GameStatusCode.GAME_OVER_WIN)) {
+                displaySuccess("Game Won", "Congratulations :)");
+                simulateGameOver();
+                mScreenManager.activatePane("user_menu", null);
+            } else {
+                // Re-initialize the screen after level up
+                simulateLevelUp();
+                performInteract(MoveType.INITIAL, GameStatusCode.NORMAL, (short) -1);
+            }
         }
     }
 
@@ -130,40 +177,28 @@ public class GameTableController extends BaseNetworkController {
     private void simulateTurn(MoveType moveType, GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
         try {
             if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.REDEAL)) {
-                Platform.runLater(() -> simulateInitTurn(moveType, playerGameEnv));
+                simulateInitTurn(moveType, playerGameEnv);
             } else if (moveType.equals(MoveType.BLUFF)) {
                 if((playerGameEnv.getMMiddleCards().size() == 1) && (pcGameEnv.getMMiddleCards().size() == 1)) {
                     // if there is just one face-up card on the table, the player or pc can bluff
-                    Platform.runLater(() -> simulateBluffTurn(moveType));
+                    simulateBluffTurn(moveType);
                 } else {
                     displayError("Bluffing Move", "Bluffing cannot be made! Bluffing is possible only when there is just one card on the table");
                 }
             } else if (moveType.equals(MoveType.RESTART)) {
-                Platform.runLater(()->simulateRestartTurn(moveType, playerGameEnv, pcGameEnv));
+                simulateRestartTurn(moveType, playerGameEnv, pcGameEnv);
             } else {
-                Platform.runLater(() -> simulatePlayerTurn(moveType, MoveTurn.PLAYER, playerGameEnv));
+                simulatePlayerTurn(moveType, MoveTurn.PLAYER, playerGameEnv);
                 // TODO: Remove print
                 System.out.println("a");
-
-                if(playerGameEnv.getMGameFinished()) {
-                    // Check if player won
-                    //TODO: Implement Game Over
-                    mGameManager.setMGameOver(true);
-                    return;
-                }
 
                 TimeUnit.SECONDS.sleep(mSleepTime);
                 // TODO: Remove print
                 System.out.println("b");
-                Platform.runLater(() -> simulatePlayerTurn(moveType, MoveTurn.PC, pcGameEnv));
+                simulatePlayerTurn(moveType, MoveTurn.PC, pcGameEnv);
                 // TODO: Remove print
                 System.out.println("c");
 
-                if(pcGameEnv.getMGameFinished()) {
-                    // Check if pc won
-                    //TODO: Implement Game Over
-                    mGameManager.setMGameOver(true);
-                }
             }
         } catch(Exception e){
             e.printStackTrace();
@@ -195,20 +230,24 @@ public class GameTableController extends BaseNetworkController {
     /** Helper function to perform restart card placing*/
     private void simulateRestartTurn(MoveType moveType, GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
         setBothScores(playerGameEnv, pcGameEnv);
-        if(playerGameEnv.getMGameFinished()) {
-            // Check if player won
-            //TODO: Implement Game Over
-            mGameManager.setMGameOver(true);
-            return;
-        }
-        if(pcGameEnv.getMGameFinished()) {
-            // Check if pc won
-            //TODO: Implement Game Over
-            mGameManager.setMGameOver(true);
-            return;
-        }
         flushContainerAreas();
         simulateInitTurn(moveType, playerGameEnv);
+    }
+
+    /** Helper function to perform level up card placing and scores*/
+    private void simulateLevelUp() {
+        mGameManager.handleLevelChange();
+        flushContainerAreas();
+        clearScores();
+        setCurrentLevel();
+    }
+
+    /** Helper function to perform game over card placing and scores*/
+    private void simulateGameOver() {
+        mGameManager.handleGameOver();
+        flushContainerAreas();
+        clearScores();
+        setCurrentLevel();
     }
 
     /** Helper function to place player cards*/
@@ -235,6 +274,17 @@ public class GameTableController extends BaseNetworkController {
     /** Helper function empty player area and middle area*/
     private void flushContainerAreas() {
         player_area_container.getChildren().clear();
+    }
+
+    /** Helper function to clear scores*/
+    private void clearScores() {
+        setScore(MoveTurn.PLAYER, (short) 0);
+        setScore(MoveTurn.PC, (short) 0);
+    }
+
+    /** Helper function to set viewed level according to the game manager*/
+    private void setCurrentLevel() {
+        level_no_label.setText(mGameManager.getMCurrentLevel().toString());
     }
 
     /** Helper function to place middle card*/
@@ -323,6 +373,8 @@ public class GameTableController extends BaseNetworkController {
                     player_area_container.getChildren().remove(cardGeo);
                     mGameManager.setMMiddleCard(card.getCardNo());
                     event.consume();
+                    turnOffKeyComb();
+                    turnOffDrag();
                     mGameManager.notifyPlayerTurn();
 
                 } else {
@@ -330,5 +382,27 @@ public class GameTableController extends BaseNetworkController {
                 }
             }
         });
+    }
+
+    /** Helper function to set ctrl 9 event listener*/
+    private void setKeyCombinationListener() {
+        // TODO: Remove print
+        System.out.println("set");
+        mScreenManager.getCurrentScene().getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.CONTROL_DOWN), this::onCheatLevelUpEvent);
+    }
+
+    /** Event which indicates the leaderboard is started*/
+    public static class CheatLevelUpEvent extends KeyCombination {
+        private static List<KeyCode> sKeyCodeList = new ArrayList<>();
+        private final  List<KeyCode> neededCodeList;
+
+        public CheatLevelUpEvent() {
+            neededCodeList = Arrays.asList(KeyCode.CONTROL, KeyCode.NUMPAD9);
+        }
+
+        @Override
+        public boolean match(KeyEvent event) {
+            return sKeyCodeList.containsAll(neededCodeList);
+        }
     }
 }

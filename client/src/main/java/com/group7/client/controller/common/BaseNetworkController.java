@@ -4,6 +4,7 @@ import com.group7.client.definitions.common.StatusCode;
 import com.group7.client.definitions.network.NetworkManager;
 import com.group7.client.dto.authentication.LoginResponse;
 import com.group7.client.dto.common.CommonResponse;
+import javafx.application.Platform;
 
 import java.util.Objects;
 
