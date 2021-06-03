@@ -60,8 +60,6 @@ public class GameManager {
                     mPlayerTurn.wait();
                     TimeUnit.SECONDS.sleep(mSleepTime);
                     simulateTurn();
-                    mGameTableController.turnOnDrag();
-                    mGameTableController.turnOnKeyComb();
                 }
                 mLock.unlock();
             }

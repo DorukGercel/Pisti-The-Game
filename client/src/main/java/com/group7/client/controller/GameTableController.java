@@ -12,19 +12,15 @@ import com.group7.client.dto.game.InteractResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpMethod;
@@ -97,7 +93,12 @@ public class GameTableController extends BaseNetworkController {
 
     /** Function which is invoked by game manager to simulate card move*/
     public void simulateMove(MoveType moveType, GameStatusCode gameStatusCode, short cardNo) {
-        Platform.runLater(()->performInteract(moveType, gameStatusCode, cardNo));
+        Platform.runLater(()-> {
+            performInteract(moveType, gameStatusCode, cardNo);
+            // Re-init the key combination and drag drop events
+            turnOnDrag();
+            turnOnKeyComb();
+        });
     }
 
     public void turnOnKeyComb() {
@@ -105,6 +106,7 @@ public class GameTableController extends BaseNetworkController {
     }
 
     public void turnOffKeyComb() {
+        System.out.println("unset");
         mScreenManager.getCurrentScene().getAccelerators().clear();
     }
 
@@ -198,7 +200,6 @@ public class GameTableController extends BaseNetworkController {
                 simulatePlayerTurn(moveType, MoveTurn.PC, pcGameEnv);
                 // TODO: Remove print
                 System.out.println("c");
-
             }
         } catch(Exception e){
             e.printStackTrace();
