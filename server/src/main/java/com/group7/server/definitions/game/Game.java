@@ -68,11 +68,11 @@ public class Game {
         this.mGameStatusCode = GameStatusCode.NORMAL;
         registerStrategy();
 
-        // Set AI deck
+        // [0, ..., 0] size: 13
+        // each element corresponds to a rank
+        // used to track which cards are played
         this.mPlayedCards = new ArrayList<>(this.NO_RANKS);
-        for(int i = 0; i < this.NO_CARDS; i++) {
-            // TODO: Shall we add i instead of 0
-            // TODO: Rabia check check check
+        for(int i = 0; i < this.NO_RANKS; i++) {
             this.mPlayedCards.add(0);
         }
         // Set regular deck

@@ -72,7 +72,8 @@ public abstract class GameStrategyBase implements GameStrategy {
         List<Short> middleDeck = mGame.getMiddleDeck();
         GameConfig.Card faceUpCard = mGame.getTopCard(middleDeck);
 
-        // TODO: Why?
+        // TODO: Why?-> Because getTakeoverType compares ranks while deciding to PISTI
+        // TODO:  But according to bluffing pisti rules, if opponent doesn't challenge, it directly counts as PISTI
         TakeoverType takeoverType = TakeoverType.PISTI;
         if(!isDirectPisti) {
             // Decide the takeover type
@@ -143,6 +144,7 @@ public abstract class GameStrategyBase implements GameStrategy {
                 // Set the game status
                 mGame.setMGameStatusCode(Game.GameStatusCode.WIN);
                 // Set the level x score
+                // TODO: why we subtract?
                 mGame.setMLevelXScore((short) (mGame.getScores(Game.Side.PLAYER).get(0) - mGame.getScores(Game.Side.PC).get(0)));
             } else {
                 mGame.setMGameStatusCode(Game.GameStatusCode.LOST);

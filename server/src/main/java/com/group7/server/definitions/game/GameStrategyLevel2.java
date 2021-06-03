@@ -79,11 +79,11 @@ public class GameStrategyLevel2 extends GameStrategyBase {
                 cardFrequencies.put(cardNo, (short) Collections.frequency(pcDeck, cardNo));
             }
             for (Map.Entry card : cardFrequencies.entrySet()) {
-                Short freq = (Short) card.getKey(); // key is frequency of the card
+                Short freq = (Short) card.getValue(); // value is frequency of the card
                 this.isFirstPcMove = false;
                 if(freq >= 2) {
-                    mGame.addCardToPlayedCards((Short) card.getValue());
-                    return (Short) card.getValue(); // value is card no
+                    mGame.addCardToPlayedCards((Short) card.getKey());
+                    return (Short) card.getKey(); // key is card no
                 } else {
                     mGame.addCardToPlayedCards(mGame.getTopCardNo(pcDeck));
                     return mGame.getTopCardNo(pcDeck);
@@ -91,24 +91,28 @@ public class GameStrategyLevel2 extends GameStrategyBase {
             }
         } else {
             // Check the played cards
+            // we should play most frequently used card, to lower the opponent's pisti chance
             List<Integer> playedCardsTmp = new ArrayList<>(mGame.getMPlayedCards());
-            Integer mostFrequentRankCount = Collections.max(playedCardsTmp);
-            int mostFrequentRankIndex = mGame.getMPlayedCards().indexOf(mostFrequentRankCount);
+            Integer mostFrequentRankCount;
+            int mostFrequentRankIndex;
             while(true) {
+                mostFrequentRankCount = Collections.max(playedCardsTmp);
+                mostFrequentRankIndex = playedCardsTmp.indexOf(mostFrequentRankCount);
                 if(mGame.isRankInDeck(mostFrequentRankIndex, pcDeck)) {
                     for(int i = 0; i < pcDeck.size(); i++) {
                         if(mGame.getRankOfCard(pcDeck.get(i)) == mostFrequentRankIndex) {
+                            mGame.addCardToPlayedCards(pcDeck.get(i));
                             return pcDeck.get(i);
                         }
                     }
                 } else {
                     // TODO: Infinite loop but I think we shall modify played cards in the game
                     // TODO: Rabia check check check
-                    // Remove the rank with current max frequency
+                    // TODO: I suppose not infinite loop, it will enter the above if and return eventually
+                    // Set the rank with current max frequency to -1
                     // Look other ranks that can exist in the deck
-                    playedCardsTmp.remove(mostFrequentRankIndex);
-                    mostFrequentRankCount = Collections.max(playedCardsTmp);
-                    mostFrequentRankIndex = mGame.getMPlayedCards().indexOf(mostFrequentRankCount);
+                    playedCardsTmp.set(mostFrequentRankIndex, -1);
+
                 }
             }
         }
