@@ -16,7 +16,7 @@ public class GameResponse extends CommonResponse {
     /** All args constructor*/
     @JsonCreator
     public GameResponse(@JsonProperty("statusCode") StatusCode statusCode,
-                        @JsonProperty("statusCode") String errorMessage){
+                        @JsonProperty("errorMessage") String errorMessage){
         super(statusCode, errorMessage);
     }
 }

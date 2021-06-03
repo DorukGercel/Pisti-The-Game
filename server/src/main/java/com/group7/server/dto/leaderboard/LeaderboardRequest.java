@@ -24,14 +24,14 @@ public class LeaderboardRequest extends CommonRequest {
 
     private Long recordId;
 
-    private Integer score;
+    private Short score;
 
 
     @JsonCreator
     public LeaderboardRequest(@JsonProperty("playerId") Long playerId,
                               @JsonProperty("date") Date date,
                               @JsonProperty("id") Long recordId,
-                              @JsonProperty("score") Integer score) {
+                              @JsonProperty("score") Short score) {
         this.playerId = playerId;
         this.date = date;
         this.recordId = recordId;

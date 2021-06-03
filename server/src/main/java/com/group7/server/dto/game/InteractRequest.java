@@ -32,26 +32,34 @@ public class InteractRequest extends CommonRequest {
     @NotEmpty
     private String moveType;
 
+    /** Status of the game*/
+    @NotEmpty
+    private String gameStatusCode;
+
     /** All args constructor*/
     @JsonCreator
     public InteractRequest(@JsonProperty("sessionId") Long sessionId,
                            @JsonProperty("gameId") Long gameId,
                            @JsonProperty("cardNo") Short cardNo,
-                           @JsonProperty("moveType") Game.MoveType moveType) {
+                           @JsonProperty("moveType") Game.MoveType moveType,
+                           @JsonProperty("gameStatusCode") Game.GameStatusCode gameStatusCode) {
         this.sessionId = sessionId;
         this.gameId = gameId;
         this.cardNo = cardNo;
 
         switch (moveType) {
-            case INITIAL -> {
-                this.moveType = "INITIAL";
-            }
-            case CARD -> {
-                this.moveType = "CARD";
-            }
-            case REDEAL -> {
-                this.moveType = "REDEAL";
-            }
+            case INITIAL -> this.moveType = "INITIAL";
+            case CARD -> this.moveType = "CARD";
+            case REDEAL -> this.moveType = "REDEAL";
+        }
+
+        switch (gameStatusCode) {
+            case NORMAL -> this.gameStatusCode = "NORMAL";
+            case LEVEL_UP -> this.gameStatusCode = "LEVEL_UP";
+            case CHEAT_LEVEL_UP -> this.gameStatusCode = "CHEAT_LEVEL_UP";
+            case WIN -> this.gameStatusCode = "WIN";
+            case LOST -> this.gameStatusCode = "LOST";
+            case GAME_OVER_WIN -> this.gameStatusCode = "GAME_OVER_WIN";
         }
     }
 }

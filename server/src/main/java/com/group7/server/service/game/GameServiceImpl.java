@@ -6,9 +6,11 @@ import com.group7.server.definitions.game.GameTable;
 import com.group7.server.definitions.common.StatusCode;
 import com.group7.server.model.ActivePlayer;
 import com.group7.server.repository.ActivePlayerRepository;
+import com.group7.server.service.leaderboard.LeaderboardRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,13 +22,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GameServiceImpl implements GameService{
 
-    private final GameTable mGameTable;
-    private final ActivePlayerRepository mActivePlayerRepository;
+    private final GameTable                 mGameTable;
+    private final ActivePlayerRepository    mActivePlayerRepository;
+    private final LeaderboardRecordService  mLeaderboardRecordService;
 
     /** Type definition for different kinds of update operations*/
     private enum UpdateOperationCode{
         INITIALIZE,
-        SCORE
+        SCORE,
+        LEVEL,
+        GAME_OVER
     }
 
     /**
@@ -89,30 +94,90 @@ public class GameServiceImpl implements GameService{
      * @param cardNo the no of the card that is played by the player.
      * @param moveType the type of the move that user made; can be initial, card or re-deal move.
      * @param gameEnvironments the current state of the game; initially it's values are empty and they are set in this method.
+     * @param gameStatus the status of the game; the status code and level x score in the end; initially it's values are empty and they are set in this method.
      * @return the status code according to the success of the operation.
      *               If operation is successful, returns success status code.
      *               If operation is not successful, returns fail status code;
      *                  it indicates that some runtime or SQL related exception occurred.
      */
     @Override
-    public StatusCode interactGame(Long sessionId, Long gameId, Short cardNo, Game.MoveType moveType, List<GameEnvironment> gameEnvironments) {
+    public StatusCode interactGame(Long sessionId, Long gameId, Short cardNo, Game.MoveType moveType, Game.GameStatusCode receivedGameStatusCode, List<GameEnvironment> gameEnvironments, List<Object> gameStatus) {
         try {
             Optional<ActivePlayer> dbActivePlayer = mActivePlayerRepository.findById(sessionId);
             Game currentGame;
             if(dbActivePlayer.isPresent() &&
                     gameId.equals(dbActivePlayer.get().getGameId()) &&
                     ((currentGame = mGameTable.getGame(gameId)) != null) &&
-                    isValidMoveAndCard(cardNo, moveType) && (gameEnvironments != null)){
+                    isValidMoveAndCard(cardNo, moveType) && (gameEnvironments != null) && (gameStatus != null)) {
 
-                List<GameEnvironment> gameEnvironmentList = currentGame.interact(moveType, cardNo);
-                gameEnvironments.addAll(gameEnvironmentList);
-                return StatusCode.SUCCESS;
+                // Eligible to perform operations
+                if(receivedGameStatusCode.equals(Game.GameStatusCode.NORMAL)) {
+                    // Game status is only a regular move
+                    return handleNormalGameOperations(currentGame, dbActivePlayer.get(), cardNo, moveType, gameEnvironments, gameStatus);
+                } else {
+                    // Start new level or game over
+                    return handleSwitchLevelGameOperations(currentGame, dbActivePlayer.get(), receivedGameStatusCode, gameStatus);
+                }
             }
             return StatusCode.FAIL;
         }
         catch (Exception e){
             return StatusCode.FAIL;
         }
+    }
+
+    /** Helper function to deal with normal game operations; NORMAL, WIN, LOST*/
+    private StatusCode handleNormalGameOperations(Game currentGame,
+                                                  ActivePlayer activePlayer,
+                                                  Short cardNo,
+                                                  Game.MoveType moveType,
+                                                  List<GameEnvironment> gameEnvironments,
+                                                  List<Object> gameStatus) {
+        List<Object> gameState = currentGame.interact(moveType, cardNo);
+        // Add game environments
+        gameEnvironments.addAll(getGameEnvList(gameState));
+        // Add game status code from the game
+        gameStatus.add(getGameStatusCode(gameState));
+        if (!getGameStatusCode(gameState).equals(Game.GameStatusCode.NORMAL)) {
+            if(getGameStatusCode(gameState).equals(Game.GameStatusCode.LOST)) {
+                // Remove the game from the games table if lost
+                addLeaderboardRecord(activePlayer);
+                removeGame(activePlayer.getId(), activePlayer.getGameId());
+            }
+            // Add level x score as level is finished (Add to the old level values)
+            gameStatus.add(getLevelXScore(gameState));
+            // Set the active player's level x score
+            return updateActivePlayer(UpdateOperationCode.SCORE, activePlayer, gameStatus.get(1));
+        }
+        return StatusCode.SUCCESS;
+    }
+
+    /** Helper function to deal with level switching game operations; LEVEL_UP, CHEAT_LEVEL_UP, GAME_OVER*/
+    private StatusCode handleSwitchLevelGameOperations(Game currentGame,
+                                                       ActivePlayer activePlayer,
+                                                       Game.GameStatusCode receivedGameStatusCode,
+                                                       List<Object> gameStatus) {
+        if (activePlayer.getLevel() < Game.MAX_LEVEL) {
+            // Max level not reached, level up
+            currentGame.initLevelUp();
+            if (receivedGameStatusCode.equals(Game.GameStatusCode.CHEAT_LEVEL_UP)) {
+                // Add the cheat score
+                updateActivePlayer(UpdateOperationCode.SCORE, activePlayer, Game.WIN_SCORE);
+            }
+            // Set the new level of the player
+            updateActivePlayer(UpdateOperationCode.LEVEL, activePlayer, (short) (activePlayer.getLevel() + (short) 1));
+            gameStatus.add(receivedGameStatusCode);
+        } else {
+            // Max level reached, game over
+            // Add to leaderboard
+            addLeaderboardRecord(activePlayer);
+            // Re-init active player
+            updateActivePlayer(UpdateOperationCode.GAME_OVER, activePlayer, null);
+            // Remove the game from the games table
+            removeGame(activePlayer.getId(), activePlayer.getGameId());
+            gameStatus.add(Game.GameStatusCode.GAME_OVER_WIN);
+        }
+        return StatusCode.SUCCESS;
     }
 
     /** Checks whether given active player is already attached to a game or not.*/
@@ -128,6 +193,25 @@ public class GameServiceImpl implements GameService{
     /** Checks if the given card no and move is valid.*/
     private boolean isValidMoveAndCard(Short cardNo, Game.MoveType moveType){
         return (isValidCardNo(cardNo) || (moveType.equals(Game.MoveType.INITIAL) || moveType.equals(Game.MoveType.REDEAL)));
+    }
+
+    /** Get game env list from game state*/
+    private List<GameEnvironment> getGameEnvList(List<Object> gameState) {
+        return (List<GameEnvironment>) gameState.get(0);
+    }
+
+    /** Get game status code from game state*/
+    private Game.GameStatusCode getGameStatusCode(List<Object> gameState) {
+        return (Game.GameStatusCode) gameState.get(1);
+    }
+
+    /** Get level x score from game state*/
+    private Short getLevelXScore(List<Object> gameState) {
+        return (Short) gameState.get(2);
+    }
+
+    private StatusCode addLeaderboardRecord(ActivePlayer activePlayer) {
+        return mLeaderboardRecordService.createRecord(activePlayer.getPlayer().getId(), new Date(), activePlayer.getScore());
     }
 
     /**
@@ -147,18 +231,52 @@ public class GameServiceImpl implements GameService{
                 case INITIALIZE -> {
                     activePlayer.setId(activePlayer.getId());
                     activePlayer.setPlayer(activePlayer.getPlayer());
-                    activePlayer.setLevel(1);
-                    activePlayer.setScore(0);
+                    activePlayer.setLevel((short) 1);
+                    activePlayer.setScore((short) 0);
                     activePlayer.setGameId((Long) updateValue);
 
                     mActivePlayerRepository.save(activePlayer);
 
                     return StatusCode.SUCCESS;
-                }
-                case SCORE -> {
+
+                } case SCORE -> {
+                    // TODO: Do proper calculation according to levels
+                    // Set Level x score and update level
+                    activePlayer.setId(activePlayer.getId());
+                    activePlayer.setPlayer(activePlayer.getPlayer());
+                    activePlayer.setLevel(activePlayer.getLevel());
+                    activePlayer.setScore((short) ((short) updateValue + activePlayer.getLevel() * activePlayer.getScore()));
+                    activePlayer.setGameId(activePlayer.getGameId());
+
+                    mActivePlayerRepository.save(activePlayer);
+
                     return StatusCode.SUCCESS;
-                }
-                default -> {
+
+                } case LEVEL -> {
+                    // Set Level x score and update level
+                    activePlayer.setId(activePlayer.getId());
+                    activePlayer.setPlayer(activePlayer.getPlayer());
+                    activePlayer.setLevel((short) updateValue);
+                    activePlayer.setScore(activePlayer.getScore());
+                    activePlayer.setGameId(activePlayer.getGameId());
+
+                    mActivePlayerRepository.save(activePlayer);
+
+                    return StatusCode.SUCCESS;
+
+                } case GAME_OVER -> {
+                    // Clear active player's game fields
+                    activePlayer.setId(activePlayer.getId());
+                    activePlayer.setPlayer(activePlayer.getPlayer());
+                    activePlayer.setLevel((short) 0);
+                    activePlayer.setScore((short) 0);
+                    activePlayer.setGameId(-1);
+
+                    mActivePlayerRepository.save(activePlayer);
+
+                    return StatusCode.SUCCESS;
+
+                } default -> {
                     return StatusCode.FAIL;
                 }
 

@@ -16,13 +16,13 @@ public class GameStrategyLevel3 extends GameStrategyBase {
         // Simulate player movement and create game environment
         gameEnvironmentList.add(
                 mGame.createPlayerEnvironment(
-                        simulateMovement(cardNo, mGame.getMTurn(), moveType), isGameFinished(Game.Side.PLAYER), Game.GameStatus.NORMAL, moveType)
+                        simulateMovement(cardNo, mGame.getMTurn(), moveType), moveType)
         );
 
         // Simulate pc movement and create game environment
         gameEnvironmentList.add(
                 mGame.createPcEnvironment(
-                        simulateMovement(pcStrategicDecideCard(isFirstPcMove), mGame.getMTurn(), moveType), isGameFinished(Game.Side.PC), Game.GameStatus.NORMAL, moveType)
+                        simulateMovement(pcStrategicDecideCard(isFirstPcMove), mGame.getMTurn(), moveType), moveType)
         );
 
         return gameEnvironmentList;

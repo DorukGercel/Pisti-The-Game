@@ -17,8 +17,8 @@ public abstract class GameStrategyBase implements GameStrategy {
     /** Interact with the game according to move type*/
     public List<GameEnvironment> interact(Game.MoveType moveType, Short cardNo) {
         if (moveType.equals(Game.MoveType.INITIAL)) {
-            return mGame.createEnvironment(mGame.createPlayerEnvironment(false, isGameFinished(Game.Side.PLAYER), Game.GameStatus.NORMAL,Game.MoveType.INITIAL),
-                    mGame.createPcEnvironment(false, isGameFinished(Game.Side.PC), Game.GameStatus.NORMAL,Game.MoveType.INITIAL)
+            return mGame.createEnvironment(mGame.createPlayerEnvironment(false, Game.MoveType.INITIAL),
+                    mGame.createPcEnvironment(false, Game.MoveType.INITIAL)
             );
         } else if (moveType.equals(Game.MoveType.CARD)) {
             return simulateGame(cardNo, Game.MoveType.CARD);
@@ -39,8 +39,8 @@ public abstract class GameStrategyBase implements GameStrategy {
                 mGame.initCards();
                 sentMoveType = Game.MoveType.RESTART;
             }
-            return mGame.createEnvironment(mGame.createPlayerEnvironment(false, isGameFinished(Game.Side.PLAYER), Game.GameStatus.NORMAL,sentMoveType),
-                    mGame.createPcEnvironment(false, isGameFinished(Game.Side.PC), Game.GameStatus.NORMAL,sentMoveType)
+            return mGame.createEnvironment(mGame.createPlayerEnvironment(false, sentMoveType),
+                    mGame.createPcEnvironment(false, sentMoveType)
             );
         }
     }
@@ -72,7 +72,7 @@ public abstract class GameStrategyBase implements GameStrategy {
         List<Short> middleDeck = mGame.getMiddleDeck();
         GameConfig.Card faceUpCard = mGame.getTopCard(middleDeck);
 
-
+        // TODO: Why?
         TakeoverType takeoverType = TakeoverType.PISTI;
         if(!isDirectPisti) {
             // Decide the takeover type
@@ -128,19 +128,31 @@ public abstract class GameStrategyBase implements GameStrategy {
         scores.set(0, (short) (scores.get(0) + pointsReceived));
         scores.set(1, (short) (scores.get(1) + cardsReceived));
 
+        // Check whether game is finished
+        handleLevelFinished(side);
+
         return isPisti;
     }
 
-    /** Helper function to decide whether game is finished*/
+    /** Helper function to decide whether level is finished and set game status*/
     // TODO: oyunun bittiğini oyuncuların elinde kart kalmayınca anlamıyor muyuz?
     // oyun sonunda puanı >= 151 olan taraf o elin kazananı oluyor sadece
-    protected boolean isGameFinished(Game.Side side) {
-        boolean isFinished = mGame.getScores(side).get(0) >= (short) 151;
-        return isFinished;
+    protected void handleLevelFinished(Game.Side side) {
+        if (mGame.getScores(side).get(0) >= Game.WIN_SCORE) {
+            if (side.equals(Game.Side.PLAYER)) {
+                // Set the game status
+                mGame.setMGameStatusCode(Game.GameStatusCode.WIN);
+                // Set the level x score
+                mGame.setMLevelXScore((short) (mGame.getScores(Game.Side.PLAYER).get(0) - mGame.getScores(Game.Side.PC).get(0)));
+            } else {
+                mGame.setMGameStatusCode(Game.GameStatusCode.LOST);
+                // TODO: What shell we do about levelx score in lose
+            }
+        }
     }
 
     // TODO: Implement get game status
-    protected Game.GameStatus getGameStatus() {
+    protected Game.GameStatusCode getGameStatus() {
         /*if ()
         mGame.getScores().get(0) >= (short) 151;*/
         return null;

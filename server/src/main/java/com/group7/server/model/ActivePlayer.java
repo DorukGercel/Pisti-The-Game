@@ -20,12 +20,12 @@ public class ActivePlayer extends BaseModel {
     /** Current game level*/
     @NotNull
     @Column(name = "LEVEL")
-    private int level;
+    private short level;
 
     /** Current overall score*/
     @NotNull
     @Column(name = "SCORE")
-    private int score;
+    private short score;
 
     /** Currently attached game*/
     @NotNull

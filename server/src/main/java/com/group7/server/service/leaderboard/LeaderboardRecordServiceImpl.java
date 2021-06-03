@@ -35,7 +35,7 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
      * @return return the status code of the operation
      */
     @Override
-    public StatusCode createRecord(Long playerId, Date date, Integer score) {
+    public StatusCode createRecord(Long playerId, Date date, Short score) {
         try {
             Optional<Player> dbPlayer = mPlayerRepository.findById(playerId);
             if(dbPlayer.isEmpty()) {
@@ -74,7 +74,7 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
      */
 
     @Override
-    public StatusCode updateRecord(Long recordId, Long playerId, Date date, Integer score) {
+    public StatusCode updateRecord(Long recordId, Long playerId, Date date, Short score) {
         try {
             LeaderboardRecord record = findRecord(recordId);
             if (record == null) {

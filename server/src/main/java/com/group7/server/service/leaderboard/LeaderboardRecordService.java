@@ -11,8 +11,8 @@ import java.util.List;
  *
  */
 public interface LeaderboardRecordService {
-    StatusCode createRecord(Long playerId, Date date, Integer score);
-    StatusCode updateRecord(Long recordId, Long playerId, Date date, Integer score);
+    StatusCode createRecord(Long playerId, Date date, Short score);
+    StatusCode updateRecord(Long recordId, Long playerId, Date date, Short score);
     StatusCode deleteRecord(Long recordId);
     StatusCode getRecordsByDate(Period period, List<RecordEntry> recordEntryList);
 

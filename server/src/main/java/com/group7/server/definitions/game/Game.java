@@ -15,6 +15,10 @@ import java.util.List;
 @Data
 public class Game {
 
+    /** Predefined win score*/
+    public static final Short       WIN_SCORE = 151;
+    /** Predefined max level*/
+    public static final Short       MAX_LEVEL = 3;
     /** Predefined number of cards*/
     private final Short             NO_CARDS = 52;
     /** Predefined number of ranks*/
@@ -45,30 +49,42 @@ public class Game {
     private       Side                mTurn;
     /** Indicates who won the last cards*/
     private       Side                mLastWin;
+    /** Indicates who won the last cards*/
+    private GameStatusCode mGameStatusCode;
+    /** Points recived in the current level*/
+    private       Short               mLevelXScore;
     /** Played cards by both players
      * 13 length counter list of each rank */
     private       List<Integer>         mPlayedCards;
 
     /** Constructor; called when a new game is created*/
     public Game(GameConfig.CardTable cardTable){
+        // Set initial values
         this.mCardTable = cardTable;
         this.mLevel = 1;
         this.mMode = Mode.SINGLE;
         this.mTurn = Side.PLAYER;
         this.mLastWin = Side.NONE;
+        this.mGameStatusCode = GameStatusCode.NORMAL;
         registerStrategy();
 
+        // Set AI deck
         this.mPlayedCards = new ArrayList<>(this.NO_RANKS);
         for(int i = 0; i < this.NO_CARDS; i++) {
+            // TODO: Shall we add i instead of 0
+            // TODO: Rabia check check check
             this.mPlayedCards.add(0);
         }
+        // Set regular deck
         this.mCards = new ArrayList<>(NO_PLAYERS + NO_NON_PLAYER_DECKS);
         for(int deckNo = 0; deckNo < NO_PLAYERS + 2; deckNo++) {
             List<Short> tmpDeck = new ArrayList<>();
             mCards.add(tmpDeck);
         }
+        // Place cards to the deck, middle and deal to the players
         initCards();
 
+        // Set score board
         this.mScores = new ArrayList<>(NO_PLAYERS);
         for (int i = 0; i < NO_PLAYERS; i++){
             List<Short> scoreList = Arrays.asList((short) 0,(short) 0);
@@ -76,8 +92,38 @@ public class Game {
         }
     }
 
-    public List<GameEnvironment> interact(MoveType moveType, Short cardNo){
-        return mGameStrategy.interact(moveType, cardNo);
+    public void initLevelUp() {
+        setMLevel((short) (getMLevel() + 1));
+        setMTurn(Side.PLAYER);
+        setMLastWin(Side.NONE);
+        setMGameStatusCode(GameStatusCode.NORMAL);
+        registerStrategy();
+
+        // Clear previous decks
+        for(int deckNo = 0; deckNo < NO_PLAYERS + 2; deckNo++) {
+            mCards.get(deckNo).clear();
+        }
+        // Place cards to the deck, middle and deal to the players
+        initCards();
+
+        // Set score board
+        for (int i = 0; i < NO_PLAYERS; i++){
+            List<Short> scoreList = Arrays.asList((short) 0,(short) 0);
+            this.mScores.set(i, scoreList);
+        }
+
+    }
+
+    public List<Object> interact(MoveType moveType, Short cardNo){
+        List<Object> gameState = new ArrayList<>();
+        // Add the current game environment list
+        gameState.add(mGameStrategy.interact(moveType, cardNo));
+        // Add the game status code and the level x score if level finished
+        gameState.add(getMGameStatusCode());
+        if (!getMGameStatusCode().equals(GameStatusCode.NORMAL)) {
+            gameState.add(getMLevelXScore());
+        }
+        return gameState;
     }
 
     public List<GameEnvironment> createEnvironment(GameEnvironment playerEnv, GameEnvironment pcEnv) {
@@ -88,20 +134,20 @@ public class Game {
         return environment;
     }
 
-    public GameEnvironment createPlayerEnvironment(boolean isPisti, boolean gameFinished, GameStatus gameStatus, Game.MoveType moveType) {
+    public GameEnvironment createPlayerEnvironment(boolean isPisti, Game.MoveType moveType) {
         List<Short> handCards = new ArrayList<>(getDeck(Game.Side.PLAYER));
         List<Short> middleCards = new ArrayList<>(getMiddleDeck());
         List<Short> scores = new ArrayList<>(getScores(Game.Side.PLAYER));
 
-        return GameEnvironment.buildPlayerEnvironment(handCards, middleCards, scores, isPisti, gameFinished, gameStatus, moveType);
+        return GameEnvironment.buildPlayerEnvironment(handCards, middleCards, scores, isPisti, moveType);
     }
 
-    public GameEnvironment createPcEnvironment(boolean isPisti, boolean gameFinished, GameStatus gameStatus, Game.MoveType moveType) {
+    public GameEnvironment createPcEnvironment(boolean isPisti, Game.MoveType moveType) {
         Short noHandCards = (short) getDeck(Game.Side.PC).size();
         List<Short> middleCards = new ArrayList<>(getMiddleDeck());
         List<Short> scores = new ArrayList<>(getScores(Game.Side.PC));
 
-        return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti, gameFinished, gameStatus, moveType);
+        return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti, moveType);
     }
 
     /** Helper function to change turns.*/
@@ -228,7 +274,7 @@ public class Game {
     }
 
     /** Helper function to open cards to the middle in the beginning.*/
-    public void openCards() {
+    private void openCards() {
         List<Short> mainDeck = getMainDeck();
         List<Short> middleDeck = getMiddleDeck();
         // If main deck is empty escape
@@ -305,11 +351,13 @@ public class Game {
         RESTART
     }
 
-    public enum GameStatus {
-        NORMAL,
-        LEVEL_UP,
-        LOST,
-        WIN
+    public enum GameStatusCode {
+        NORMAL,     // Just regular response
+        LEVEL_UP,   // Increase the level (received from client)
+        CHEAT_LEVEL_UP, // Increase the level via cheat (received from client)
+        WIN,        // Win the level
+        LOST,       // Lose the level
+        GAME_OVER_WIN // All levels finished and won
     }
 
     /** Type definition of game mode; either vs PC or another player*/

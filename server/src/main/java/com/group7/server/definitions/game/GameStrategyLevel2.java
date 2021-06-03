@@ -16,13 +16,13 @@ public class GameStrategyLevel2 extends GameStrategyBase {
         // Simulate player movement and create game environment
         gameEnvironmentList.add(
             mGame.createPlayerEnvironment(
-                    simulateMovement(cardNo, mGame.getMTurn()), isGameFinished(Game.Side.PLAYER), Game.GameStatus.NORMAL, moveType)
+                    simulateMovement(cardNo, mGame.getMTurn()), moveType)
         );
 
         // Simulate pc movement and create game environment
         gameEnvironmentList.add(
                 mGame.createPcEnvironment(
-                        simulateMovement(pcStrategicDecideCard(isFirstPcMove), mGame.getMTurn()), isGameFinished(Game.Side.PC), Game.GameStatus.NORMAL, moveType)
+                        simulateMovement(pcStrategicDecideCard(isFirstPcMove), mGame.getMTurn()), moveType)
         );
 
         return gameEnvironmentList;
@@ -102,6 +102,8 @@ public class GameStrategyLevel2 extends GameStrategyBase {
                         }
                     }
                 } else {
+                    // TODO: Infinite loop but I think we shall modify played cards in the game
+                    // TODO: Rabia check check check
                     // Remove the rank with current max frequency
                     // Look other ranks that can exist in the deck
                     playedCardsTmp.remove(mostFrequentRankIndex);
