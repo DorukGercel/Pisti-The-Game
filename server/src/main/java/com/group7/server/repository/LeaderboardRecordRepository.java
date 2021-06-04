@@ -26,4 +26,5 @@ public interface LeaderboardRecordRepository
 
     @Query("select lr from LeaderboardRecord lr, Player p where lr.player = p")
     Optional<LeaderboardRecord> findByPlayer(@Param("player") Player player);
+
 }

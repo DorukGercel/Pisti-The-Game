@@ -15,8 +15,10 @@ public interface LeaderboardRecordService {
     StatusCode updateRecord(Long recordId, Long playerId, Date date, Short score);
     StatusCode deleteRecord(Long recordId);
     StatusCode getRecordsByDate(Period period, List<RecordEntry> recordEntryList);
+    StatusCode recordExists(List<Long> recordId, Long playerId);
+    StatusCode updateRecordRequired(Long recordId, Short score);
 
-     enum Period {
+    enum Period {
          ALL_TIMES,
          WEEKLY,
          MONTHLY

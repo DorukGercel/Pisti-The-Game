@@ -139,14 +139,9 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
                         .findByEndDateBetween(
                                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(sevenDaysAgoDate),
                                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(nowDate));
-                // TODO: Remove print
-                //System.out.println(nowDate);
                 recordEntryList.addAll(
                     convertToRecordList(dbLeaderboardRecords)
                 );
-                // TODO: Remove print
-                //System.out.println(recordEntryList);
-                //System.out.println(dbLeaderboardRecords);
             } else if (period.equals(Period.MONTHLY)) {
                 Date thirtyDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(30)));
                 String thirtyDaysAgoDate = formatter.format(thirtyDaysAgo);
@@ -157,16 +152,10 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
                 recordEntryList.addAll(
                         convertToRecordList(dbLeaderboardRecords)
                 );
-                // TODO: Remove print
-                //System.out.println(recordEntryList);
-                //System.out.println(dbLeaderboardRecords);
             } else {
                 /* period == "allTimes" */
                 List<LeaderboardRecord> dbLeaderboardRecords = mLeaderboardRecordRepository.findAll();
                 recordEntryList.addAll(convertToRecordList(dbLeaderboardRecords));
-                // TODO: Remove print
-                //System.out.println(recordEntryList);
-                //System.out.println(dbLeaderboardRecords);
             }
             return StatusCode.SUCCESS;
         } catch (Exception e) {
@@ -176,7 +165,47 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
         }
     }
 
-    /** Helper function to find record*/
+    @Override
+    public StatusCode recordExists(List<Long> recordId, Long playerId) {
+        try {
+            Player player = new Player(playerId);
+            if (mLeaderboardRecordRepository.findByPlayer(player).isPresent()) {
+                // Record found
+                LeaderboardRecord leaderboardRecord = mLeaderboardRecordRepository.findByPlayer(player).get();
+                recordId.add(leaderboardRecord.getId());
+                return StatusCode.SUCCESS;
+            }
+            // Record not found
+            return StatusCode.FAIL;
+        } catch (Exception e) {
+            return StatusCode.FAIL;
+        }
+    }
+
+    /**
+     *
+     *
+     * @param recordId the id of the found record
+     * @param score the newly succeeded score
+     *
+     * @return the status code of the operation
+     */
+    @Override
+    public StatusCode updateRecordRequired(Long recordId, Short score) {
+        try {
+            LeaderboardRecord leaderboardRecord = mLeaderboardRecordRepository.findById(recordId).get();
+            if (leaderboardRecord.getScore() <= score) {
+                // Record found and shall update
+                return StatusCode.SUCCESS;
+            }
+            // Record found but no need to update
+            return StatusCode.FAIL;
+        } catch (Exception e) {
+            return StatusCode.FAIL;
+        }
+    }
+
+    /** Helper function to find record by id*/
     private LeaderboardRecord findRecord(Long recordId) {
         Optional<LeaderboardRecord> dbRecord = mLeaderboardRecordRepository.findById(recordId);
         if(dbRecord.isEmpty()) {

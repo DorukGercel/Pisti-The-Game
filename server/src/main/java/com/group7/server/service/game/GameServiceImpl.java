@@ -10,6 +10,7 @@ import com.group7.server.service.leaderboard.LeaderboardRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -210,8 +211,20 @@ public class GameServiceImpl implements GameService{
         return (Short) gameState.get(2);
     }
 
-    private StatusCode addLeaderboardRecord(ActivePlayer activePlayer) {
-        return mLeaderboardRecordService.createRecord(activePlayer.getPlayer().getId(), new Date(), activePlayer.getScore());
+    /** Helper function to add leaderboard record in the end*/
+    private void addLeaderboardRecord(ActivePlayer activePlayer) {
+        List<Long> recordId = new ArrayList<>();
+        if(mLeaderboardRecordService.recordExists(recordId, activePlayer.getPlayer().getId()).equals(StatusCode.FAIL)) {
+            //TODO: Remove print
+            System.out.println("CREATE");
+            mLeaderboardRecordService.createRecord(activePlayer.getPlayer().getId(), new Date(), activePlayer.getScore());
+        } else{
+            if(mLeaderboardRecordService.updateRecordRequired(recordId.get(0), activePlayer.getScore()).equals(StatusCode.SUCCESS)) {
+                //TODO: Remove print
+                System.out.println("UPDATE");
+                mLeaderboardRecordService.updateRecord(recordId.get(0), activePlayer.getPlayer().getId(), new Date(), activePlayer.getScore());
+            }
+        }
     }
 
     /**

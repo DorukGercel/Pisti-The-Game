@@ -47,6 +47,7 @@ public class LeaderboardRecordRepositoryTestStub implements LeaderboardRecordRep
         return Optional.empty();
     }
 
+
     @Override
     public List<LeaderboardRecord> findAll() {
         Collections.sort(recordList, new Comparator<>() {

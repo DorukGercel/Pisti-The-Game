@@ -8,6 +8,7 @@ import com.group7.server.service.game.GameService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -76,6 +77,23 @@ public class GameController {
         }
         System.out.println(new GameResponse(statusCode, "Interaction with the game failed!"));
         return new GameResponse(statusCode, "Interaction with the game failed!");
+    }
+
+    /**
+     * Removes the game.
+     *
+     * @param sessionId of the active player.
+     * @param gameId of the game.
+     *
+     * @return the game response according to the success of the operation.
+     */
+    @DeleteMapping("/removeGame/{sessionId}/{gameId}")
+    @ApiOperation(value = "Remove the game.")
+    public GameResponse removeGame(@PathVariable Long sessionId, @PathVariable Long gameId) {
+        if(mGameService.removeGame(sessionId, gameId).equals(StatusCode.SUCCESS)) {
+            return new GameResponse(StatusCode.SUCCESS, null);
+        }
+        return new GameResponse(StatusCode.FAIL, "Remove game creation failed!");
     }
 
     /** Helper function to decode string to enum*/

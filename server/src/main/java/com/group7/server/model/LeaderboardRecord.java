@@ -13,6 +13,7 @@ import java.util.Date;
 @Table(name="LEADERBOARD_RECORD")
 public class LeaderboardRecord extends BaseModel {
     /** Reference to the player who played the game */
+    // TODO: Shall it be unique
     @OneToOne
     @JoinColumn(name = "PLAYER_ID", referencedColumnName = "id", unique = true)
     private Player player;
