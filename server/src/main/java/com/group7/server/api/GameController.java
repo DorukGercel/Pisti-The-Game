@@ -50,7 +50,7 @@ public class GameController {
     }
 
     @PutMapping("/interactGame")
-    @ApiOperation(value = "Player interacts with the game. The player can perform initial, card or redeal movements. Login required.")
+    @ApiOperation(value = "Player interacts with the game. The player can perform initial, card, bluff, challenge, not challenge or redeal movements. Login required.")
     public GameResponse interactGame(@RequestBody InteractRequest interactRequest){
         List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
         List<Object> gameStatus = new ArrayList<>();

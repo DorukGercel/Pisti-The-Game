@@ -406,4 +406,16 @@ public class GameTableController extends BaseNetworkController {
             return sKeyCodeList.containsAll(neededCodeList);
         }
     }
+
+    @FXML
+    private void clickBluffButton() {
+
+    }
+
+    @FXML
+    private void clickChallengeButton() {
+
+    }
+
+
 }

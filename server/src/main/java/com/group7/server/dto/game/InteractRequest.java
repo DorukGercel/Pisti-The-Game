@@ -50,7 +50,11 @@ public class InteractRequest extends CommonRequest {
         switch (moveType) {
             case INITIAL -> this.moveType = "INITIAL";
             case CARD -> this.moveType = "CARD";
+            case BLUFF -> this.moveType = "BLUFF";
+            case CHALLENGE -> this.moveType = "CHALLENGE";
+            case NOT_CHALLENGE -> this.moveType = "NOT_CHALLENGE";
             case REDEAL -> this.moveType = "REDEAL";
+            case RESTART -> this.moveType = "RESTART";
         }
 
         switch (gameStatusCode) {

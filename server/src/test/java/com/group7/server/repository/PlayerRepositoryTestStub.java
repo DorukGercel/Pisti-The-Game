@@ -101,7 +101,7 @@ public class PlayerRepositoryTestStub implements PlayerRepository {
     @Override
     public Optional<Player> findById(Long aLong) {
         Player testPlayer = new Player("Rabia", "lolFriends", "r@g.com");
-        testPlayer.setId(1L);
+        testPlayer.setId(aLong);
         return Optional.of(testPlayer);
     }
 
