@@ -214,7 +214,7 @@ public class GameServiceImpl implements GameService{
     /** Helper function to add leaderboard record in the end*/
     private void addLeaderboardRecord(ActivePlayer activePlayer) {
         List<Long> recordId = new ArrayList<>();
-        if(mLeaderboardRecordService.recordExists(recordId, activePlayer.getPlayer().getId()).equals(StatusCode.FAIL)) {
+        if(mLeaderboardRecordService.recordExists(recordId, activePlayer.getPlayer()).equals(StatusCode.FAIL)) {
             //TODO: Remove print
             System.out.println("CREATE");
             mLeaderboardRecordService.createRecord(activePlayer.getPlayer().getId(), new Date(), activePlayer.getScore());

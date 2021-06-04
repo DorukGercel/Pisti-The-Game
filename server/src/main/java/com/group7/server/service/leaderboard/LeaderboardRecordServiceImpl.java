@@ -166,9 +166,8 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
     }
 
     @Override
-    public StatusCode recordExists(List<Long> recordId, Long playerId) {
+    public StatusCode recordExists(List<Long> recordId, Player player) {
         try {
-            Player player = new Player(playerId);
             if (mLeaderboardRecordRepository.findByPlayer(player).isPresent()) {
                 // Record found
                 LeaderboardRecord leaderboardRecord = mLeaderboardRecordRepository.findByPlayer(player).get();

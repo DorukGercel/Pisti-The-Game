@@ -24,7 +24,10 @@ public interface LeaderboardRecordRepository
     List<LeaderboardRecord> findByEndDateBetween(
             @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
-    @Query("select lr from LeaderboardRecord lr, Player p where lr.player = p")
-    Optional<LeaderboardRecord> findByPlayer(@Param("player") Player player);
+    // TODO: Shall we remove this
+    /*@Query("select lr from LeaderboardRecord lr, Player p where lr.player.id = p.id")
+    Optional<LeaderboardRecord> findByPlayer(@Param("player") Player player);*/
+
+    Optional<LeaderboardRecord> findByPlayer(Player player);
 
 }
