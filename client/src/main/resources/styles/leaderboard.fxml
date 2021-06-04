@@ -1,61 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Pagination?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<GridPane alignment="CENTER" hgap="10.0" prefHeight="476.0" prefWidth="646.0" vgap="10.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group7.client.controller.LeaderboardController">
-   <children>
-       <Label fx:id="leaderboard_label" alignment="CENTER" contentDisplay="CENTER" prefHeight="55.0" prefWidth="586.0" text="Leaderboard" textAlignment="CENTER" GridPane.rowIndex="1">
-           <font>
-               <Font name="DejaVu Serif Bold" size="32.0" />
-           </font>
-       </Label>
-      <TableView fx:id="paginationTableView" layoutX="24.0" layoutY="69.0" prefHeight="382.0" prefWidth="586.0" GridPane.rowIndex="2">
-        <columns>
-          <TableColumn fx:id="rank" editable="false" prefWidth="99.20001220703125" resizable="false" sortable="false" text="Rank" />
-          <TableColumn fx:id="username" editable="false" prefWidth="296.00001525878906" resizable="false" sortable="false" text="Username" />
+<GridPane alignment="CENTER" hgap="10.0" prefHeight="476.0" prefWidth="646.0" vgap="10.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group7.client.controller.LeaderboardController">
+    <columnConstraints>
+        <ColumnConstraints />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints />
+        <RowConstraints />
+        <RowConstraints />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints />
+        <RowConstraints />
+        <RowConstraints />
+        <RowConstraints />
+    </rowConstraints>
+
+    <Label fx:id="leaderboard_label" alignment="CENTER" contentDisplay="CENTER" prefHeight="55.0" prefWidth="586.0" text="Leaderboard" textAlignment="CENTER" GridPane.rowIndex="1">
+        <font>
+            <Font name="DejaVu Serif Bold" size="32.0" />
+        </font>
+    </Label>
+    <TableView fx:id="pagination_table_view" layoutX="24.0" layoutY="69.0" prefHeight="382.0" prefWidth="586.0" GridPane.rowIndex="2">
+      <columns>
+          <TableColumn fx:id="rank" editable="false" prefWidth="150.0" resizable="false" sortable="false" text="Rank" />
+          <TableColumn fx:id="username" editable="false" prefWidth="247.0" resizable="false" sortable="false" text="Username" />
           <TableColumn fx:id="score" editable="false" prefWidth="188.79999389648435" resizable="false" sortable="false" text="Score" />
-        </columns>
-      </TableView>
-      <Pagination fx:id="pagination" layoutX="15.0" layoutY="16.0" prefHeight="21.0" prefWidth="586.0" GridPane.rowIndex="7" />
-      <ComboBox fx:id="period_combobox" prefHeight="26.0" prefWidth="164.0" GridPane.rowIndex="13" onAction="#selectFromComboBox"  promptText="Select Period" />
-   </children>
-   <columnConstraints>
-      <ColumnConstraints />
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-   </rowConstraints>
-
+      </columns>
+    </TableView>
+    <ComboBox fx:id="period_combobox" onAction="#selectFromComboBox" prefHeight="26.0" prefWidth="164.0" promptText="Select Period" GridPane.rowIndex="13" />
 </GridPane>

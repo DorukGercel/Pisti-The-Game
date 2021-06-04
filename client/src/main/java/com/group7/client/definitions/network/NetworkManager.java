@@ -68,6 +68,7 @@ public class NetworkManager {
             }
             return StatusCode.FAIL;
         } catch (Exception e) {
+            e.printStackTrace();
             return StatusCode.FAIL;
         }
     }

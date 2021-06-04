@@ -2,7 +2,9 @@ package com.group7.client.model;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import lombok.Data;
 
+@Data
 public class Leaderboard {
     private SimpleIntegerProperty rank;
     private SimpleStringProperty  username;
@@ -14,22 +16,27 @@ public class Leaderboard {
         this.score = new SimpleIntegerProperty(score);
     }
 
-    public Leaderboard(String username, String endDate, Integer rank, Integer score) {
-        getRank(rank);
-        getUsername(username);
-        getScore(score);
-    }
-
-    public Integer getRank(Integer rank) {
+    public Integer getRank() {
         return this.rank.get();
     }
 
-    public String getUsername(String username) {
+    public String getUsername() {
         return this.username.get();
     }
 
-    public Integer getScore(Integer score) {
+    public Integer getScore() {
         return this.score.get();
     }
 
+    public void setRank(int rank) {
+        this.rank.set(rank);
+    }
+
+    public void setUsername(String username) {
+        this.username.set(username);
+    }
+
+    public void setScore(int score) {
+        this.score.set(score);
+    }
 }

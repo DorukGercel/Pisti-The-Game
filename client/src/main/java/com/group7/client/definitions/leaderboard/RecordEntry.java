@@ -2,11 +2,13 @@ package com.group7.client.definitions.leaderboard;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 /** Used in leaderboard dto to indicate records.*/
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class RecordEntry {
     private String playerName;

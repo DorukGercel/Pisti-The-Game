@@ -9,22 +9,21 @@ import lombok.EqualsAndHashCode;
 import java.util.ArrayList;
 import java.util.List;
 
-/** DTO used as response for getting list of records*/
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ListRecordsResponse extends LeaderboardResponse {
     /** List of records according to query*/
-    private List<RecordEntry> mLeaderboardRecordEntryList;
+    private List<RecordEntry> recordEntryList;
 
     /** All args constructor*/
     public ListRecordsResponse(@JsonProperty("statusCode") StatusCode statusCode,
                                @JsonProperty("errorMessage") String errorMessage,
                                @JsonProperty("recordEntryList") List<RecordEntry> recordEntryList) {
         super(statusCode, errorMessage);
-        mLeaderboardRecordEntryList = new ArrayList<>();
+        this.recordEntryList = new ArrayList<>();
         if (recordEntryList != null && recordEntryList.size() > 0) {
             // Make null safe
-            mLeaderboardRecordEntryList.addAll(recordEntryList);
+            this.recordEntryList.addAll(recordEntryList);
         }
     }
 }

@@ -5,10 +5,14 @@ import com.group7.server.definitions.game.Game;
 import com.group7.server.definitions.game.GameConfig;
 import com.group7.server.definitions.game.GameEnvironment;
 import com.group7.server.definitions.game.GameTable;
+<<<<<<< HEAD
 import com.group7.server.repository.ActivePlayerRepositoryTestStub;
 import com.group7.server.repository.LeaderboardRecordRepositoryTestStub;
 import com.group7.server.repository.PlayerRepositoryTestStub;
 import com.group7.server.service.leaderboard.LeaderboardRecordService;
+=======
+import com.group7.server.repository.*;
+>>>>>>> e169ca8... refactor[server]: update game service tests
 import com.group7.server.service.leaderboard.LeaderboardRecordServiceImpl;
 import org.junit.After;
 import org.junit.Before;
@@ -33,8 +37,12 @@ import static org.junit.Assert.assertTrue;
         GameConfig.CardTable.class,
         LeaderboardRecordServiceImpl.class,
         PlayerRepositoryTestStub.class,
+<<<<<<< HEAD
         LeaderboardRecordRepositoryTestStub.class,
         LeaderboardRecordServiceImpl.class})
+=======
+        LeaderboardRecordRepositoryTestStub.class})
+>>>>>>> e169ca8... refactor[server]: update game service tests
 public class GameServiceInteractionTest {
 
     private GameService mGameService;
@@ -63,7 +71,6 @@ public class GameServiceInteractionTest {
         mGameService.removeGame(mActivePlayerRepository.GAME_ASSIGNED_PLAYER_ID, (Long) mGameId[0]);
     }
 
-
     @Test
     public void testInteractGame_Initial_Fail_GameId() {
         // Fail because of wrong game id
@@ -91,6 +98,37 @@ public class GameServiceInteractionTest {
                 Game.MoveType.INITIAL,
                 Game.GameStatusCode.NORMAL,
                 null,
+                gameStatus);
+        assertEquals(statusCode, StatusCode.FAIL);
+    }
+
+    @Test
+    public void testInteractionGame_Initial_Fail_GameStatus() {
+        // Fail because of wrong gameStatus
+        Short cardNo = (short) -1;
+        List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
+        StatusCode statusCode = mGameService.interactGame(mSessionId,
+                (Long) mGameId[0],
+                cardNo,
+                Game.MoveType.INITIAL,
+                Game.GameStatusCode.NORMAL,
+                gameEnvironmentList,
+                null);
+        assertEquals(statusCode, StatusCode.FAIL);
+    }
+
+    @Test
+    public void testInteractGame_Initial_Fail_MoveType() {
+        // Fail because of wrong move type
+        Short cardNo = (short) -1;
+        List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
+        List<Object> gameStatus = new ArrayList<>();
+        StatusCode statusCode = mGameService.interactGame(mSessionId,
+                (Long) mGameId[0],
+                cardNo,
+                Game.MoveType.CARD,
+                Game.GameStatusCode.NORMAL,
+                gameEnvironmentList,
                 gameStatus);
         assertEquals(statusCode, StatusCode.FAIL);
     }
