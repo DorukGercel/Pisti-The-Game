@@ -24,11 +24,11 @@ public class ImageManager {
 
     /** Constructor*/
     public ImageManager(@Value("${spring.application.ui.cardPool}") String poolSource,
-                        @Value("${spring.application.ui.cardWidth}") Integer cardWidth,
-                        @Value("${spring.application.ui.cardHeight}") Integer cardHeight) {
+                        @Value("${spring.application.ui.cardWidth}") String cardWidth,
+                        @Value("${spring.application.ui.cardHeight}") String cardHeight) {
         mCardAtlas = new Image(poolSource);
         mCardImageList = new ArrayList<>();
-        initCardImages(cardWidth, cardHeight);
+        initCardImages(Integer.parseInt(cardWidth), Integer.parseInt(cardHeight));
     }
 
     /** Returns the image of the card with given no*/

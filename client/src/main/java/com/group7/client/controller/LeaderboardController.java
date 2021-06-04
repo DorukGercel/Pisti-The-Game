@@ -27,7 +27,7 @@ public class LeaderboardController extends BaseNetworkController {
     @Value("${spring.application.apiAddress.leaderboard}") private String mApiAddress;
 
     /** FXML fields*/
-    @FXML private TableView<Leaderboard> table;
+    @FXML private TableView<Leaderboard> pagination_table_view;
     @FXML private TableColumn<Leaderboard, Integer> rank;
     @FXML private TableColumn<Leaderboard, String> username;
     @FXML private TableColumn<Leaderboard, Integer> score;
@@ -50,7 +50,7 @@ public class LeaderboardController extends BaseNetworkController {
         score.setCellValueFactory(
                 new PropertyValueFactory<Leaderboard, Integer>("score"));
 
-        table.getItems().clear();
+        pagination_table_view.getItems().clear();
 
         period_combobox.getItems().clear();
         period_combobox.getItems().addAll( "Last 7 days", "Last 30 days", "All times");
@@ -89,13 +89,13 @@ public class LeaderboardController extends BaseNetworkController {
 
     /** Function which displays leaderboard records on the table*/
     private void putLeaderboardRecords(ListRecordsResponse listRecordsResponse) {
-        table.getItems().clear();
+        pagination_table_view.getItems().clear();
         List<RecordEntry> recordEntryList = listRecordsResponse.getRecordEntryList();
         for(int i = 0; i < recordEntryList.size(); i++) {
             RecordEntry record = recordEntryList.get(i);
             // TODO: Remove print
             System.out.println("Record " + record);
-            table.getItems().add(new Leaderboard(i+1, record.getPlayerName(), record.getScore()));
+            pagination_table_view.getItems().add(new Leaderboard(i+1, record.getPlayerName(), record.getScore()));
         }
     }
 
