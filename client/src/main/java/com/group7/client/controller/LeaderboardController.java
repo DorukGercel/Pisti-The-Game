@@ -20,19 +20,20 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/** Controller for the leaderboard table*/
 @Component
 public class LeaderboardController extends BaseNetworkController {
-
+    /** Common api address of the back-end for controller requests*/
     @Value("${spring.application.apiAddress.leaderboard}") private String mApiAddress;
 
-    @FXML private TableView<Leaderboard> pagination_table_view;
+    /** FXML fields*/
+    @FXML private TableView<Leaderboard> table;
     @FXML private TableColumn<Leaderboard, Integer> rank;
     @FXML private TableColumn<Leaderboard, String> username;
     @FXML private TableColumn<Leaderboard, Integer> score;
     @FXML private ComboBox<String> period_combobox;
 
-    private static final int ROWS_PER_PAGE = 15;
-
+    /** Setter injection method*/
     @Autowired
     public void setManagers(@Lazy ScreenManager screenManager, NetworkManager networkManager) {
         this.mScreenManager = screenManager;
@@ -49,23 +50,24 @@ public class LeaderboardController extends BaseNetworkController {
         score.setCellValueFactory(
                 new PropertyValueFactory<Leaderboard, Integer>("score"));
 
-        pagination_table_view.getItems().clear();
+        table.getItems().clear();
 
         period_combobox.getItems().clear();
         period_combobox.getItems().addAll( "Last 7 days", "Last 30 days", "All times");
         // Default display time is the most recent week
         period_combobox.getSelectionModel().select("Last 7 days");
 
-        // TODO: This part creates network error look at the back-end api
         loadLeaderboardTable("weekly");
     }
 
+    /** Choose time period of leaderboard records to be displayed */
     @FXML
     private void selectFromComboBox() {
         String period = period_combobox.getValue();
         loadLeaderboardTable(periodConverter(period));
     }
 
+    /** Function which sends the get request to leaderboard table*/
     private void loadLeaderboardTable(String period) {
         CommonResponse[] commonResponse = new ListRecordsResponse[1];
 
@@ -85,17 +87,19 @@ public class LeaderboardController extends BaseNetworkController {
         }
     }
 
+    /** Function which displays leaderboard records on the table*/
     private void putLeaderboardRecords(ListRecordsResponse listRecordsResponse) {
-        pagination_table_view.getItems().clear();
+        table.getItems().clear();
         List<RecordEntry> recordEntryList = listRecordsResponse.getRecordEntryList();
         for(int i = 0; i < recordEntryList.size(); i++) {
             RecordEntry record = recordEntryList.get(i);
             // TODO: Remove print
             System.out.println("Record " + record);
-            pagination_table_view.getItems().add(new Leaderboard(i+1, record.getPlayerName(), record.getScore()));
+            table.getItems().add(new Leaderboard(i+1, record.getPlayerName(), record.getScore()));
         }
     }
 
+    /** Helper function to change leaderboard table according to time period*/
     private String periodConverter(String tablePeriodValue) {
         if (tablePeriodValue == null || tablePeriodValue.equals("All times")) {
             return "allTimes";
