@@ -6,6 +6,7 @@
 
 #### *Documents*:
 - [General Documentation](http://144.122.71.168:8080/doruk.gercel/group7/src/master/documents/Pisti_the_Game_General_Documentation.pdf)
+- [User Manual](http://144.122.71.168:8080/doruk.gercel/group7/src/master/documents/Pisti_the_Game_User_Manual.pdf)
 - [Database Diagram](http://144.122.71.168:8080/doruk.gercel/group7/src/master/documents/Database%20diagram.png)
 - [Swagger Documentation](http://localhost:8080/swagger-ui.html#/)
 - [Postman Collections](http://144.122.71.168:8080/doruk.gercel/group7/src/master/documents/postman%20collections)
