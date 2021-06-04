@@ -1,12 +1,5 @@
 package com.group7.server.definitions.game;
 
-import com.group7.server.repository.ActivePlayerRepositoryTestStub;
-import com.group7.server.repository.LeaderboardRecordRepositoryTestStub;
-import com.group7.server.repository.PlayerRepositoryTestStub;
-import com.group7.server.service.game.GameServiceImpl;
-import com.group7.server.service.leaderboard.LeaderboardRecordServiceImpl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +37,4 @@ public class CardTableTest {
         GameConfig.Card card = mCardTable.getCard((short) 21);
         assertNotNull(card);
     }
-
-
 }
