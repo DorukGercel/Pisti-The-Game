@@ -130,43 +130,43 @@ public class LeaderboardRecordServiceImpl implements LeaderboardRecordService {
                 return StatusCode.FAIL;
             }
             Date now = new java.util.Date();
-            Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             String nowDate = formatter.format(now);
             if (period.equals(Period.WEEKLY)) {
                 Date sevenDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(7)));
                 String sevenDaysAgoDate = formatter.format(sevenDaysAgo);
                 List<LeaderboardRecord> dbLeaderboardRecords = mLeaderboardRecordRepository
                         .findByEndDateBetween(
-                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(sevenDaysAgoDate),
-                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate));
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(sevenDaysAgoDate),
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(nowDate));
                 // TODO: Remove print
-                System.out.println(nowDate);
+                //System.out.println(nowDate);
                 recordEntryList.addAll(
                     convertToRecordList(dbLeaderboardRecords)
                 );
                 // TODO: Remove print
-                System.out.println(recordEntryList);
-                System.out.println(dbLeaderboardRecords);
+                //System.out.println(recordEntryList);
+                //System.out.println(dbLeaderboardRecords);
             } else if (period.equals(Period.MONTHLY)) {
                 Date thirtyDaysAgo = Date.from(Instant.now().minus(Duration.ofDays(30)));
                 String thirtyDaysAgoDate = formatter.format(thirtyDaysAgo);
                 List<LeaderboardRecord> dbLeaderboardRecords = mLeaderboardRecordRepository
                         .findByEndDateBetween(
-                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(thirtyDaysAgoDate),
-                                new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(nowDate));
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(thirtyDaysAgoDate),
+                                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(nowDate));
                 recordEntryList.addAll(
                         convertToRecordList(dbLeaderboardRecords)
                 );
                 // TODO: Remove print
-                System.out.println(recordEntryList);
-                System.out.println(dbLeaderboardRecords);
+                //System.out.println(recordEntryList);
+                //System.out.println(dbLeaderboardRecords);
             } else {
                 /* period == "allTimes" */
                 List<LeaderboardRecord> dbLeaderboardRecords = mLeaderboardRecordRepository.findAll();
                 recordEntryList.addAll(convertToRecordList(dbLeaderboardRecords));
                 // TODO: Remove print
-                System.out.println(recordEntryList);
-                System.out.println(dbLeaderboardRecords);
+                //System.out.println(recordEntryList);
+                //System.out.println(dbLeaderboardRecords);
             }
             return StatusCode.SUCCESS;
         } catch (Exception e) {

@@ -6,6 +6,10 @@ import com.group7.server.definitions.game.GameConfig;
 import com.group7.server.definitions.game.GameEnvironment;
 import com.group7.server.definitions.game.GameTable;
 import com.group7.server.repository.ActivePlayerRepositoryTestStub;
+import com.group7.server.repository.LeaderboardRecordRepositoryTestStub;
+import com.group7.server.repository.PlayerRepositoryTestStub;
+import com.group7.server.service.leaderboard.LeaderboardRecordService;
+import com.group7.server.service.leaderboard.LeaderboardRecordServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +30,11 @@ import static org.junit.Assert.assertTrue;
         GameTable.class,
         ActivePlayerRepositoryTestStub.class,
         GameConfig.class,
-        GameConfig.CardTable.class})
+        GameConfig.CardTable.class,
+        LeaderboardRecordServiceImpl.class,
+        PlayerRepositoryTestStub.class,
+        LeaderboardRecordRepositoryTestStub.class,
+        LeaderboardRecordServiceImpl.class})
 public class GameServiceInteractionTest {
 
     private GameService mGameService;
