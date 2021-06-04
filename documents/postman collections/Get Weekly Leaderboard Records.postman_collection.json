@@ -18,12 +18,12 @@
 					"raw": "{}"
 				},
 				"url": {
-					"raw": "{{get}}/monthly",
+					"raw": "{{get}}/weekly",
 					"host": [
 						"{{get}}"
 					],
 					"path": [
-						"monthly"
+						"weekly"
 					]
 				}
 			},

@@ -13,7 +13,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb3J1ayIsImF1dGhvcml0aWVzIjpbXSwiaWF0IjoxNjE5ODMxMDcwLCJleHAiOjE2MjExMTI0MDB9.78Br9FRpFMsHNWn2gL_N5-5Ticg-IhIT7eDxXEABXY981Wkm3B3W8ALiKnaS-ThHPQINCu6Ua-6Y2PnRQmx6Uw",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb3J1ayIsImF1dGhvcml0aWVzIjpbXSwiaWF0IjoxNjIxMjkwNTE5LCJleHAiOjE2MjI1ODEyMDB9.vBYOaYhKCODgjkki2PJGVKbCW_591KB5LnvlCia3o79Wxthejo2cywD3HIHpjoFpUWnbD7CXUhCQ6yIIUDYO6w",
 							"type": "string"
 						}
 					]
@@ -22,7 +22,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"playerId\": 1,\r\n  \"date\": \"2021-05-01T00:23:32.520Z\",\r\n  \"id\": 1,\r\n  \"score\": 100\r\n}",
+					"raw": "{\r\n  \"playerId\": 1,\r\n  \"date\": \"2021-05-15T00:23:32.520Z\",\r\n  \"id\": 1,\r\n  \"score\": 100\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
