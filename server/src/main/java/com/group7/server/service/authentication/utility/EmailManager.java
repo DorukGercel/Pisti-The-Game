@@ -56,13 +56,10 @@ public class EmailManager {
 
         content = content.replace("[[name]]", playerName);
         String verifyURL = SITE_URL + "/api/player/resetPassword/" + playerId.toString();
-        //String verifyURL = "https://www.w3schools.com";
 
         content = content.replace("[[URL]]", verifyURL);
 
         helper.setText(content, true);
-
-        System.out.println(content);
 
         mMailSender.send(message);
     }

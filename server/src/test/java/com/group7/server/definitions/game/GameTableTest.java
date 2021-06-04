@@ -14,6 +14,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {GameServiceImpl.class,
@@ -45,10 +47,54 @@ public class GameTableTest {
     }
 
     @Test
-    public void testAddAndDeleteGame() {
+    public void testAddGame() {
         // Second game entry in game table, so its gameId = 2L
         assertEquals((Object) 2L, mGameTable.addNewGame());
-        // Delete that game
-        assertEquals(true, mGameTable.deleteGame(2L));
     }
+
+    @Test
+    public void testDeleteGame_Fail_NullId() {
+        // Delete that game with null id
+        assertEquals(false, mGameTable.deleteGame(null));
+    }
+
+    @Test
+    public void testDeleteGame_Fail_WrongId() {
+        // Delete that game with wrong id
+        assertEquals(false, mGameTable.deleteGame(-1L));
+    }
+
+    @Test
+    public void testDeleteGame_Success() {
+        Long gameId = mGameTable.addNewGame();
+        // Delete that game
+        assertEquals(true, mGameTable.deleteGame(gameId));
+    }
+
+    @Test
+    public void testGetGame_Fail_NullId() {
+        // Get first game
+        Game game = mGameTable.getGame(null);
+        //Game shouldn't be null
+        assertNull(game);
+    }
+
+    @Test
+    public void testGetGame_Fail_WrongId() {
+        // Get first game
+        Game game = mGameTable.getGame(-1L);
+        //Game shouldn't be null
+        assertNull(game);
+    }
+
+    @Test
+    public void testGetGame_Success() {
+        Long gameId = mGameTable.addNewGame();
+        // Get that game
+        Game game = mGameTable.getGame(gameId);
+        //Game shouldn't be null
+        assertNotNull(game);
+    }
+
+
 }

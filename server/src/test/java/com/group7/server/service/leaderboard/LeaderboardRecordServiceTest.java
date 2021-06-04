@@ -88,6 +88,7 @@ public class LeaderboardRecordServiceTest {
     }
 
     //In this test case change date of user's
+    // TODO: Fix this test case dates
     @Test
     public void testGetRecordsByDate() {
         // Create player 1's leaderboard record

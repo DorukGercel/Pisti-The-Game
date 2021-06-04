@@ -7,14 +7,16 @@ import java.util.List;
  * Responsible for controlling states of the game
  */
 public abstract class GameStrategyBase implements GameStrategy {
+    /** Game strategy is bound to*/
     Game mGame;
 
+    /** Called by the game to register strategy*/
     public void registerGame(Game game) {
         this.mGame = game;
     }
 
-    @Override
     /** Interact with the game according to move type*/
+    @Override
     public List<GameEnvironment> interact(Game.MoveType moveType, Short cardNo) {
         if (moveType.equals(Game.MoveType.INITIAL)) {
             return mGame.createEnvironment(mGame.createPlayerEnvironment(false, Game.MoveType.INITIAL),

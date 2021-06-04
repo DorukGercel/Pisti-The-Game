@@ -11,9 +11,13 @@ import com.group7.server.security.UserDetailsServiceImpl;
 import com.group7.server.security.config.JwtRequestFilter;
 import com.group7.server.security.config.PasswordEncoderConfig;
 import com.group7.server.security.config.SecurityConfig;
+import com.group7.server.service.authentication.utility.EmailManager;
+import com.group7.server.service.authentication.utility.PasswordGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -29,7 +33,10 @@ import static org.junit.Assert.assertEquals;
         SecurityConfig.class,
         JwtRequestFilter.class,
         PlayerRepositoryTestStub.class,
-        ActivePlayerRepositoryTestStub.class})
+        ActivePlayerRepositoryTestStub.class,
+        EmailManager.class,
+        JavaMailSenderImpl.class,
+        PasswordGenerator.class})
 @WebAppConfiguration
 public class PlayerServiceTest {
 
