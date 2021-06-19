@@ -22,10 +22,8 @@ public abstract class GameStrategyBase implements GameStrategy {
             return mGame.createEnvironment(mGame.createPlayerEnvironment(false, Game.MoveType.INITIAL),
                     mGame.createPcEnvironment(false, Game.MoveType.INITIAL)
             );
-        } else if (moveType.equals(Game.MoveType.CARD)) {
-            return simulateGame(cardNo, Game.MoveType.CARD);
-        } else if (moveType.equals(Game.MoveType.BLUFF)) {
-            return simulateGame(cardNo, Game.MoveType.BLUFF);
+        } else if (isSimulateMoveType(moveType)) {
+            return simulateGame(cardNo, moveType);
         } else {
             List<Short> mainDeck = mGame.getMainDeck();
             Game.MoveType sentMoveType;
@@ -138,8 +136,6 @@ public abstract class GameStrategyBase implements GameStrategy {
     }
 
     /** Helper function to decide whether level is finished and set game status*/
-    // TODO: oyunun bittiğini oyuncuların elinde kart kalmayınca anlamıyor muyuz?
-    // oyun sonunda puanı >= 151 olan taraf o elin kazananı oluyor sadece
     protected void handleLevelFinished(Game.Side side) {
         if (mGame.getScores(side).get(0) >= Game.WIN_SCORE) {
             if (side.equals(Game.Side.PLAYER)) {
@@ -160,6 +156,14 @@ public abstract class GameStrategyBase implements GameStrategy {
         /*if ()
         mGame.getScores().get(0) >= (short) 151;*/
         return null;
+    }
+
+    /** Helper function to determine if the move is simulateable*/
+    private boolean isSimulateMoveType(Game.MoveType moveType) {
+        return moveType.equals(Game.MoveType.CARD) ||
+                moveType.equals(Game.MoveType.BLUFF) ||
+                moveType.equals(Game.MoveType.CHALLENGE) ||
+                moveType.equals(Game.MoveType.NOT_CHALLENGE);
     }
 
     /** Type definition of how player took the cards*/
