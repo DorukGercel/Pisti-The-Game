@@ -35,6 +35,8 @@ public class GameManager {
     private       Short                 mCurrentLevel;
     /** Variable to indicate if game is over*/
     private       Boolean               mGameOver;
+    /** Variable to indicate if bluff level*/
+    private       Boolean               mBluffLevel;
     /** Sleep time before display of cards*/
     @Value("${spring.application.sleep.short}")
     private       int                   mSleepTime;
@@ -46,6 +48,7 @@ public class GameManager {
         this.mGameTableController = gameTableController;
         this.mPlayerCards = new ArrayList<>();
         this.mGameOver = false;
+        this.mBluffLevel = false;
         this.mLock = new ReentrantLock();
         this.mPlayerTurn = mLock.newCondition();
         this.mCurrentLevel = 1;
@@ -91,6 +94,9 @@ public class GameManager {
     public void handleLevelChange() {
         mCurrentLevel = (short) (mCurrentLevel + 1);
         mPlayerCards.clear();
+        if(mCurrentLevel >= 3) {
+            mBluffLevel = true;
+        }
     }
 
     /** Function which flush player cards after game over and resets level*/

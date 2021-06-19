@@ -12,6 +12,7 @@ import com.group7.client.dto.game.InteractResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
@@ -56,6 +57,9 @@ public class GameTableController extends BaseNetworkController {
     @FXML private Circle    middle_area;
     @FXML private Rectangle middle_card;
     @FXML private Label     level_no_label;
+    @FXML private Button    bluff_button;
+    @FXML private Button    challenge_button;
+    @FXML private Button    dont_challenge_button;
 
     /** Perform initializations*/
     @Override
@@ -122,6 +126,16 @@ public class GameTableController extends BaseNetworkController {
         for (Card card : mPlayerCards) {
             card.getCardGeometry().setOnDragDetected(null);
         }
+    }
+
+    @FXML
+    private void clickBluffButton() {
+
+    }
+
+    @FXML
+    private void clickChallengeButton() {
+
     }
 
     /** Helper function send the initial interact request*/
@@ -200,6 +214,11 @@ public class GameTableController extends BaseNetworkController {
                 simulatePlayerTurn(moveType, MoveTurn.PC, pcGameEnv);
                 // TODO: Remove print
                 System.out.println("c");
+
+                if(mGameManager.getMCurrentLevel() >= 3) {
+                    // Performs bluff level actions
+                    handleBluffLevelActions(pcGameEnv);
+                }
             }
         } catch(Exception e){
             e.printStackTrace();
@@ -286,6 +305,29 @@ public class GameTableController extends BaseNetworkController {
     /** Helper function to set viewed level according to the game manager*/
     private void setCurrentLevel() {
         level_no_label.setText(mGameManager.getMCurrentLevel().toString());
+    }
+
+    /** Helper function to activate bluff level buttons*/
+    private void handleBluffLevelActions(GameEnvironment gameEnvironment) {
+        if(gameEnvironment.getMMiddleCards().size() == 1) {
+            // Bluff options is open
+            setVisibleBluffButton(true);
+        } else if (gameEnvironment.getMMoveType().equals(MoveType.BLUFF)) {
+            // Challenge don't challenge mode
+            turnOffDrag();
+            setVisibleChallengeButtons(true);
+        }
+    }
+
+    /** Helper function to set visibility of the bluff button*/
+    private void setVisibleBluffButton(boolean visible) {
+        bluff_button.setVisible(visible);
+    }
+
+    /** Helper function to set visibility of the challenge buttons*/
+    private void setVisibleChallengeButtons(boolean visible) {
+        challenge_button.setVisible(visible);
+        dont_challenge_button.setVisible(visible);
     }
 
     /** Helper function to place middle card*/
@@ -406,16 +448,4 @@ public class GameTableController extends BaseNetworkController {
             return sKeyCodeList.containsAll(neededCodeList);
         }
     }
-
-    @FXML
-    private void clickBluffButton() {
-
-    }
-
-    @FXML
-    private void clickChallengeButton() {
-
-    }
-
-
 }

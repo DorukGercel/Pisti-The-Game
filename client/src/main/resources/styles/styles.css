@@ -227,3 +227,64 @@
     -fx-text-fill: linear-gradient(#ff5400, #be1d00);
     -fx-alignment: center;
 }
+
+#game_button_container {
+    -fx-alignment: center;
+}
+
+#bluff_button {
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+}
+
+#bluff_button:hover {
+    -fx-background-color: white;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-cursor: hand;
+}
+
+#bluff_button:pressed {
+    -fx-background-color: black;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-cursor: hand;
+}
+
+#challenge_button {
+    -fx-background-color: linear-gradient(#105801, #8ebb00);
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+}
+
+#challenge_button:hover {
+    -fx-background-color: white;
+    -fx-text-fill: linear-gradient(#105801, #8ebb00);
+    -fx-cursor: hand;
+}
+
+#challenge_button:pressed {
+    -fx-background-color: black;
+    -fx-text-fill: linear-gradient(#105801, #8ebb00);
+    -fx-cursor: hand;
+}
+
+#dont_challenge_button {
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+    -fx-background-radius: 10;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+}
+
+#dont_challenge_button:hover {
+    -fx-background-color: white;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-cursor: hand;
+}
+
+#dont_challenge_button:pressed {
+    -fx-background-color: black;
+    -fx-text-fill: linear-gradient(#ff5400, #be1d00);
+    -fx-cursor: hand;
+}
