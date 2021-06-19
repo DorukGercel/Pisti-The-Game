@@ -51,7 +51,7 @@ public class Game {
     private       Side                mLastWin;
     /** Indicates who won the last cards*/
     private GameStatusCode mGameStatusCode;
-    /** Points recived in the current level*/
+    /** Points received in the current level*/
     private       Short               mLevelXScore;
     /** Played cards by both players
      * 13 length counter list of each rank */

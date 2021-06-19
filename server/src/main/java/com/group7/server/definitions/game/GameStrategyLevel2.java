@@ -84,10 +84,8 @@ public class GameStrategyLevel2 extends GameStrategyBase {
                 if(freq >= 2) {
                     mGame.addCardToPlayedCards((Short) card.getKey());
                     return (Short) card.getKey(); // key is card no
-                } else {
-                    mGame.addCardToPlayedCards(mGame.getTopCardNo(pcDeck));
-                    return mGame.getTopCardNo(pcDeck);
                 }
+
             }
         } else {
             // Check the played cards
@@ -106,9 +104,6 @@ public class GameStrategyLevel2 extends GameStrategyBase {
                         }
                     }
                 } else {
-                    // TODO: Infinite loop but I think we shall modify played cards in the game
-                    // TODO: Rabia check check check
-                    // TODO: I suppose not infinite loop, it will enter the above if and return eventually
                     // Set the rank with current max frequency to -1
                     // Look other ranks that can exist in the deck
                     playedCardsTmp.set(mostFrequentRankIndex, -1);
@@ -116,6 +111,7 @@ public class GameStrategyLevel2 extends GameStrategyBase {
                 }
             }
         }
+        mGame.addCardToPlayedCards(mGame.getTopCardNo(pcDeck));
         return mGame.getTopCardNo(pcDeck);
     }
 

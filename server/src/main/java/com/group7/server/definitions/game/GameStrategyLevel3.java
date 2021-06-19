@@ -119,37 +119,38 @@ public class GameStrategyLevel3 extends GameStrategyBase {
                 cardFrequencies.put(cardNo, (short) Collections.frequency(pcDeck, cardNo));
             }
             for (Map.Entry card : cardFrequencies.entrySet()) {
-                Short freq = (Short) card.getKey(); // key is frequency of the card
+                Short freq = (Short) card.getValue(); // value is frequency of the card
                 this.isFirstPcMove = false;
                 if(freq >= 2) {
-                    mGame.addCardToPlayedCards((Short) card.getValue());
-                    return (Short) card.getValue(); // value is card no
-                } else {
-                    mGame.addCardToPlayedCards(mGame.getTopCardNo(pcDeck));
-                    return mGame.getTopCardNo(pcDeck);
+                    mGame.addCardToPlayedCards((Short) card.getKey());
+                    return (Short) card.getKey(); // key is card no
                 }
             }
+            // If there is no card with more than 1 frequency, return the top card of the deck
         } else {
             // Check the played cards
             List<Integer> playedCardsTmp = new ArrayList<>(mGame.getMPlayedCards());
-            Integer mostFrequentRankCount = Collections.max(playedCardsTmp);
-            int mostFrequentRankIndex = mGame.getMPlayedCards().indexOf(mostFrequentRankCount);
+            Integer mostFrequentRankCount;
+            int mostFrequentRankIndex;
             while(true) {
+                mostFrequentRankCount = Collections.max(playedCardsTmp);
+                mostFrequentRankIndex = playedCardsTmp.indexOf(mostFrequentRankCount);
                 if(mGame.isRankInDeck(mostFrequentRankIndex, pcDeck)) {
                     for(int i = 0; i < pcDeck.size(); i++) {
                         if(mGame.getRankOfCard(pcDeck.get(i)) == mostFrequentRankIndex) {
+                            mGame.addCardToPlayedCards(pcDeck.get(i));
                             return pcDeck.get(i);
                         }
                     }
                 } else {
-                    // Remove the rank with current max frequency
+                    // Set the rank with current max frequency to -1
                     // Look other ranks that can exist in the deck
-                    playedCardsTmp.remove(mostFrequentRankIndex);
-                    mostFrequentRankCount = Collections.max(playedCardsTmp);
-                    mostFrequentRankIndex = mGame.getMPlayedCards().indexOf(mostFrequentRankCount);
+                    playedCardsTmp.set(mostFrequentRankIndex, -1);
+
                 }
             }
         }
+        mGame.addCardToPlayedCards(mGame.getTopCardNo(pcDeck));
         return mGame.getTopCardNo(pcDeck);
     }
 }
