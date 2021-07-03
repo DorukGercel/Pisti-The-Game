@@ -193,7 +193,16 @@ public class GameServiceImpl implements GameService{
 
     /** Checks if the given card no and move is valid.*/
     private boolean isValidMoveAndCard(Short cardNo, Game.MoveType moveType){
-        return (isValidCardNo(cardNo) || (moveType.equals(Game.MoveType.INITIAL) || moveType.equals(Game.MoveType.REDEAL)));
+        return isValidCardNo(cardNo) ||
+                isMoveWithoutCard(moveType);
+    }
+
+    private boolean isMoveWithoutCard(Game.MoveType moveType) {
+        return moveType.equals(Game.MoveType.INITIAL) ||
+                moveType.equals(Game.MoveType.REDEAL) ||
+                moveType.equals(Game.MoveType.CHALLENGE) ||
+                moveType.equals(Game.MoveType.NOT_CHALLENGE) ||
+                moveType.equals(Game.MoveType.PASS);
     }
 
     /** Get game env list from game state*/
