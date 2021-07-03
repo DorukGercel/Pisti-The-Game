@@ -47,20 +47,7 @@ public class InteractRequest extends CommonRequest {
         this.sessionId = sessionId;
         this.gameId = gameId;
         this.cardNo = cardNo;
-
-        switch (moveType) {
-            case INITIAL -> this.moveType = "INITIAL";
-            case CARD -> this.moveType = "CARD";
-            case REDEAL -> this.moveType = "REDEAL";
-        }
-
-        switch (gameStatusCode) {
-            case NORMAL -> this.gameStatusCode = "NORMAL";
-            case LEVEL_UP -> this.gameStatusCode = "LEVEL_UP";
-            case CHEAT_LEVEL_UP -> this.gameStatusCode = "CHEAT_LEVEL_UP";
-            case WIN -> this.gameStatusCode = "WIN";
-            case LOST -> this.gameStatusCode = "LOST";
-            case GAME_OVER_WIN -> this.gameStatusCode = "GAME_OVER_WIN";
-        }
+        this.moveType = MoveType.convertMoveTypeToStr(moveType);
+        this.gameStatusCode = GameStatusCode.convertGameStatusCodeToStr(gameStatusCode);
     }
 }

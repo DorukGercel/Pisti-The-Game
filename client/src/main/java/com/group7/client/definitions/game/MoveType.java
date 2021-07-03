@@ -6,33 +6,54 @@ public enum MoveType {
     BLUFF,
     CHALLENGE,
     NOT_CHALLENGE,
+    CHALLENGE_SUCCESS,
+    CHALLENGE_FAIL,
     REDEAL,
-    RESTART;
+    RESTART,
+    PASS,
+    NONE;
 
-    public static MoveType convertMoveType(String moveString) {
-        switch (moveString) {
-            case "INITIAL" -> {
-                return MoveType.INITIAL;
-            }
-            case "CARD" -> {
-                return MoveType.CARD;
-            }
-            case "BLUFF" -> {
-                return MoveType.BLUFF;
-            }
-            case "CHALLENGE" -> {
-                return MoveType.CHALLENGE;
-            }
-            case "NOT_CHALLENGE" -> {
-                return MoveType.NOT_CHALLENGE;
-            }
-            case "REDEAL" -> {
-                return MoveType.REDEAL;
-            }
-            case "RESTART" -> {
-                return MoveType.RESTART;
-            }
-        }
-        return null;
+    public static MoveType convertStrToMoveType(String moveString) {
+        return switch (moveString) {
+            case "INITIAL" -> MoveType.INITIAL;
+            case "CARD" -> MoveType.CARD;
+            case "BLUFF" -> MoveType.BLUFF;
+            case "CHALLENGE" -> MoveType.CHALLENGE;
+            case "NOT_CHALLENGE" -> MoveType.NOT_CHALLENGE;
+            case "CHALLENGE_SUCCESS" -> MoveType.CHALLENGE_SUCCESS;
+            case "CHALLENGE_FAIL" -> MoveType.CHALLENGE_FAIL;
+            case "REDEAL" -> MoveType.REDEAL;
+            case "RESTART" -> MoveType.RESTART;
+            case "PASS" -> PASS;
+            default -> MoveType.NONE;
+        };
+    }
+
+    public static String convertMoveTypeToStr(MoveType moveType) {
+        return switch (moveType) {
+            case INITIAL -> "INITIAL";
+            case CARD -> "CARD";
+            case BLUFF -> "BLUFF";
+            case CHALLENGE -> "CHALLENGE";
+            case NOT_CHALLENGE -> "NOT_CHALLENGE";
+            case CHALLENGE_SUCCESS -> "CHALLENGE_SUCCESS";
+            case CHALLENGE_FAIL -> "CHALLENGE_FAIL";
+            case REDEAL -> "REDEAL";
+            case RESTART -> "RESTART";
+            case PASS -> "PASS";
+            default -> "NONE";
+        };
+    }
+
+    public static boolean isPassMove(MoveType moveType) {
+        return moveType.equals(PASS);
+    }
+
+    public static boolean isChallengeRelatedMove(MoveType moveType) {
+        return moveType.equals(CHALLENGE) || moveType.equals(NOT_CHALLENGE) || moveType.equals(CHALLENGE_SUCCESS) || moveType.equals(CHALLENGE_FAIL);
+    }
+
+    public static boolean isBluffLevelMoveType(MoveType moveType) {
+        return moveType.equals(BLUFF) || isChallengeRelatedMove(moveType);
     }
 }

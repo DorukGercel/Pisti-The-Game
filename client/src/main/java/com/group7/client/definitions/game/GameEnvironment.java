@@ -20,16 +20,7 @@ public class GameEnvironment {
         this.mMiddleCards = middleCards;
         this.mScores = scores;
         this.mIsPisti = isPisti;
-
-        switch (moveType) {
-            case INITIAL -> this.mMoveType = "INITIAL";
-            case CARD -> this.mMoveType = "CARD";
-            case BLUFF -> this.mMoveType = "BLUFF";
-            case CHALLENGE -> this.mMoveType = "CHALLENGE";
-            case NOT_CHALLENGE -> this.mMoveType = "NOT_CHALLENGE";
-            case REDEAL -> this.mMoveType = "REDEAL";
-            case RESTART -> this.mMoveType = "RESTART";
-        }
+        this.mMoveType = MoveType.convertMoveTypeToStr(moveType);
     }
 
     private GameEnvironment(Short noHandCards, List<Short> middleCards, List<Short> scores, Boolean isPisti, MoveType moveType) {
@@ -37,15 +28,6 @@ public class GameEnvironment {
         this.mMiddleCards = middleCards;
         this.mScores = scores;
         this.mIsPisti = isPisti;
-
-        switch (moveType) {
-            case INITIAL -> this.mMoveType = "INITIAL";
-            case CARD -> this.mMoveType = "CARD";
-            case BLUFF -> this.mMoveType = "BLUFF";
-            case CHALLENGE -> this.mMoveType = "CHALLENGE";
-            case NOT_CHALLENGE -> this.mMoveType = "NOT_CHALLENGE";
-            case REDEAL -> this.mMoveType = "REDEAL";
-            case RESTART -> this.mMoveType = "RESTART";
-        }
+        this.mMoveType = MoveType.convertMoveTypeToStr(moveType);
     }
 }
