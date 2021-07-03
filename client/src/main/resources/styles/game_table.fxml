@@ -5,6 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
 <GridPane fx:id="game_table" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group7.client.controller.GameTableController">
     <columnConstraints>
@@ -130,21 +131,26 @@
             </GridPane>
         </Group>
     </VBox>
+    <VBox fx:id="bluff_challenge_text_container" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
+        <Group>
+            <Text fx:id="bluff_challenge_text" strokeType="OUTSIDE" strokeWidth="0.0" visible="false"/>
+        </Group>
+    </VBox>
     <VBox fx:id="game_button_container" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
         <Group>
-            <Button fx:id="bluff_button" visible="false" mnemonicParsing="false" text="Bluff" onAction="#clickBluffButton"/>
+            <Button fx:id="bluff_button" mnemonicParsing="false" onAction="#clickBluffButton" text="Bluff" visible="false" />
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
         </Group>
          <Group>
-             <Button fx:id="challenge_button" visible="false" mnemonicParsing="false" text="Challenge" onAction="#clickChallengeButton"/>
+             <Button fx:id="challenge_button" mnemonicParsing="false" onAction="#clickChallengeButton" text="Challenge" visible="false" />
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
          </Group>
          <Group>
-             <Button fx:id="dont_challenge_button" visible="false" mnemonicParsing="false" text="Don't Challenge" />
+             <Button fx:id="dont_challenge_button" mnemonicParsing="false" onAction="#clickDontChallengeButton" text="Don't Challenge" visible="false" />
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
