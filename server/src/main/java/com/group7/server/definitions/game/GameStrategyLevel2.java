@@ -41,7 +41,7 @@ public class GameStrategyLevel2 extends GameStrategyBase {
             GameConfig.Card currentPlayerCard = mGame.getMCardTable().getCard(cardNo);
             if(isMatchedCard(currentPlayerCard)) {
                 // Increment score of player and set last win
-                isPisti = incrementScore(currentPlayerCard, side, false);
+                isPisti = incrementScore(currentPlayerCard, side);
                 mGame.setMLastWin(side);
             } else {
                 // Add player card to top of middle
