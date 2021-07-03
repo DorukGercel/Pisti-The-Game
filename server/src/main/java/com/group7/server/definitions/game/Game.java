@@ -50,12 +50,12 @@ public class Game {
     /** Indicates who won the last cards*/
     private       Side                mLastWin;
     /** Indicates who won the last cards*/
-    private GameStatusCode mGameStatusCode;
+    private       GameStatusCode      mGameStatusCode;
     /** Points received in the current level*/
     private       Short               mLevelXScore;
     /** Played cards by both players
      * 13 length counter list of each rank */
-    private       List<Integer>         mPlayedCards;
+    private       List<Integer>       mPlayedCards;
 
     /** Constructor; called when a new game is created*/
     public Game(GameConfig.CardTable cardTable){
@@ -221,6 +221,25 @@ public class Game {
         return getMScores().get(1);
     }
 
+    /** Helper function to get top two cards from the middle deck; challenge cards*/
+    public List<GameConfig.Card> getChallengeCards() {
+        //Extract the face up card if middle is not empty
+        List<Short> middleDeck = getMiddleDeck();
+        if (middleDeck.size() < 2) {
+            return null;
+        }
+        List<GameConfig.Card> challengeCards = new ArrayList<>();
+
+        Short challengedCardNo = middleDeck.get(middleDeck.size() - 2);
+        Short challengingCardNo = middleDeck.get(middleDeck.size() - 1);
+
+        // 0 index is the challenged card; 1 index is challenging card
+        challengeCards.add(mCardTable.getCard(challengedCardNo));
+        challengeCards.add(mCardTable.getCard(challengingCardNo));
+
+        return challengeCards;
+    }
+
     /** Helper function to increment the count of rank in the played cards.*/
     public void addCardToPlayedCards(Short cardNo) {
         Integer rank = getRankOfCard(cardNo);
@@ -347,17 +366,98 @@ public class Game {
         BLUFF,
         CHALLENGE,
         NOT_CHALLENGE,
+        CHALLENGE_SUCCESS,
+        CHALLENGE_FAIL,
         REDEAL,
-        RESTART
+        RESTART,
+        PASS,
+        NONE;
+
+        public static MoveType convertStrToMoveType(String moveString) {
+            return switch (moveString) {
+                case "INITIAL" -> MoveType.INITIAL;
+                case "CARD" -> MoveType.CARD;
+                case "BLUFF" -> MoveType.BLUFF;
+                case "CHALLENGE" -> MoveType.CHALLENGE;
+                case "NOT_CHALLENGE" -> MoveType.NOT_CHALLENGE;
+                case "CHALLENGE_SUCCESS" -> MoveType.CHALLENGE_SUCCESS;
+                case "CHALLENGE_FAIL" -> MoveType.CHALLENGE_FAIL;
+                case "REDEAL" -> MoveType.REDEAL;
+                case "RESTART" -> MoveType.RESTART;
+                case "PASS" -> PASS;
+                default -> MoveType.NONE;
+            };
+        }
+
+        public static String convertMoveTypeToStr(MoveType moveType) {
+            return switch (moveType) {
+                case INITIAL -> "INITIAL";
+                case CARD -> "CARD";
+                case BLUFF -> "BLUFF";
+                case CHALLENGE -> "CHALLENGE";
+                case NOT_CHALLENGE -> "NOT_CHALLENGE";
+                case CHALLENGE_SUCCESS -> "CHALLENGE_SUCCESS";
+                case CHALLENGE_FAIL -> "CHALLENGE_FAIL";
+                case REDEAL -> "REDEAL";
+                case RESTART -> "RESTART";
+                case PASS -> "PASS";
+                default -> "NONE";
+            };
+        }
+
+        public static boolean isPassMove(MoveType moveType) {
+            return moveType.equals(PASS);
+        }
+
+        public static boolean isChallengeRelatedMove(MoveType moveType) {
+            return moveType.equals(CHALLENGE) || moveType.equals(NOT_CHALLENGE) || moveType.equals(CHALLENGE_SUCCESS) || moveType.equals(CHALLENGE_FAIL);
+        }
+
+        /** Helper function to determine if the move is simulatable*/
+        public static boolean isSimulateMoveType(Game.MoveType moveType) {
+            return moveType.equals(Game.MoveType.CARD) ||
+                    moveType.equals(Game.MoveType.BLUFF) ||
+                    moveType.equals(Game.MoveType.CHALLENGE) ||
+                    moveType.equals(Game.MoveType.NOT_CHALLENGE) ||
+                    moveType.equals(MoveType.PASS);
+        }
     }
 
     public enum GameStatusCode {
-        NORMAL,     // Just regular response
-        LEVEL_UP,   // Increase the level (received from client)
-        CHEAT_LEVEL_UP, // Increase the level via cheat (received from client)
-        WIN,        // Win the level
-        LOST,       // Lose the level
-        GAME_OVER_WIN // All levels finished and won
+        NORMAL,             // Just regular response
+        LEVEL_UP,           // Increase the level (received from client)
+        CHEAT_LEVEL_UP,     // Increase the level via cheat (received from client)
+        WIN,                // Win the level
+        LOST,               // Lose the level
+        GAME_OVER_WIN,      // Game over and won the game
+        NONE;               // Empty status code
+
+        public static GameStatusCode convertStrToGameStatusCode(String gameStatusCodeString) {
+            return switch (gameStatusCodeString) {
+                case "NORMAL" -> GameStatusCode.NORMAL;
+                case "LEVEL_UP" -> GameStatusCode.LEVEL_UP;
+                case "CHEAT_LEVEL_UP" -> GameStatusCode.CHEAT_LEVEL_UP;
+                case "GAME_OVER_WIN" -> GameStatusCode.GAME_OVER_WIN;
+                default -> GameStatusCode.NONE;
+            };
+        }
+
+        public static String convertGameStatusCodeToStr(GameStatusCode gameStatusCode) {
+            return switch (gameStatusCode) {
+                case NORMAL -> "NORMAL";
+                case LEVEL_UP -> "LEVEL_UP";
+                case CHEAT_LEVEL_UP -> "CHEAT_LEVEL_UP";
+                case WIN -> "WIN";
+                case LOST -> "LOST";
+                case GAME_OVER_WIN -> "GAME_OVER_WIN";
+                default -> "NONE";
+            };
+        }
+
+        /** Helper function to check if game is level switching or game over*/
+        public static boolean isGameLevelSwitching(Game.GameStatusCode gameStatusCode) {
+            return gameStatusCode.equals(Game.GameStatusCode.LEVEL_UP) || gameStatusCode.equals(Game.GameStatusCode.CHEAT_LEVEL_UP) || gameStatusCode.equals(Game.GameStatusCode.GAME_OVER_WIN);
+        }
     }
 
     /** Type definition of game mode; either vs PC or another player*/

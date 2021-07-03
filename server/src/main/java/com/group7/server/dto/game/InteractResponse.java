@@ -30,15 +30,7 @@ public class InteractResponse extends GameResponse {
         super(statusCode, errorMessage);
         this.playerEnvironment = playerEnvironment;
         this.pcEnvironment = pcEnvironment;
-
-        switch (gameStatusCode) {
-            case NORMAL -> this.gameStatusCode = "NORMAL";
-            case LEVEL_UP -> this.gameStatusCode = "LEVEL_UP";
-            case CHEAT_LEVEL_UP -> this.gameStatusCode = "CHEAT_LEVEL_UP";
-            case WIN -> this.gameStatusCode = "WIN";
-            case LOST -> this.gameStatusCode = "LOST";
-            case GAME_OVER_WIN -> this.gameStatusCode = "GAME_OVER_WIN";
-        }
+        this.gameStatusCode = Game.GameStatusCode.convertGameStatusCodeToStr(gameStatusCode);
     }
 
 

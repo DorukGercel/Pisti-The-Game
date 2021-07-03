@@ -60,12 +60,12 @@ public class GameController {
         StatusCode statusCode = mGameService.interactGame(interactRequest.getSessionId(),
                 interactRequest.getGameId(),
                 interactRequest.getCardNo(),
-                decodeMoveType(interactRequest.getMoveType()),
-                decodeGameStatusCode(interactRequest.getGameStatusCode()),
+                Game.MoveType.convertStrToMoveType(interactRequest.getMoveType()),
+                Game.GameStatusCode.convertStrToGameStatusCode(interactRequest.getGameStatusCode()),
                 gameEnvironmentList,
                 gameStatus);
         if(statusCode.equals(StatusCode.SUCCESS)){
-            if (!isGameLevelSwitching(getGameStatusCode(gameStatus))) {
+            if (!Game.GameStatusCode.isGameLevelSwitching(getGameStatusCode(gameStatus))) {
                 // Return response after normal game operation
                 System.out.println(new InteractResponse(statusCode, null, gameEnvironmentList.get(0), gameEnvironmentList.get(1), (Game.GameStatusCode) gameStatus.get(0)));
                 return new InteractResponse(statusCode, null, gameEnvironmentList.get(0), gameEnvironmentList.get(1), (Game.GameStatusCode) gameStatus.get(0));
@@ -94,35 +94,6 @@ public class GameController {
             return new GameResponse(StatusCode.SUCCESS, null);
         }
         return new GameResponse(StatusCode.FAIL, "Remove game creation failed!");
-    }
-
-    /** Helper function to decode string to enum*/
-    private Game.MoveType decodeMoveType(String moveTypeStr) {
-        if(moveTypeStr.equals("INITIAL")){
-            return Game.MoveType.INITIAL;
-        } else if(moveTypeStr.equals("CARD")){
-            return Game.MoveType.CARD;
-        } else if(moveTypeStr.equals("REDEAL")){
-            return Game.MoveType.REDEAL;
-        }
-        return null;
-    }
-
-    /** Helper function to convert game status from string*/
-    private Game.GameStatusCode decodeGameStatusCode(String gameStatusCodeStr) {
-        if (gameStatusCodeStr.equals("NORMAL")) {
-            return Game.GameStatusCode.NORMAL;
-        } else if (gameStatusCodeStr.equals("LEVEL_UP")) {
-            return Game.GameStatusCode.LEVEL_UP;
-        } else if (gameStatusCodeStr.equals("CHEAT_LEVEL_UP")) {
-            return Game.GameStatusCode.CHEAT_LEVEL_UP;
-        }
-        return null;
-    }
-
-    /** Helper function to check if game is level switching or game over*/
-    private boolean isGameLevelSwitching(Game.GameStatusCode gameStatusCode) {
-        return gameStatusCode.equals(Game.GameStatusCode.LEVEL_UP) || gameStatusCode.equals(Game.GameStatusCode.CHEAT_LEVEL_UP) || gameStatusCode.equals(Game.GameStatusCode.GAME_OVER_WIN);
     }
 
     /** Helper function to get game status code from the game status*/
