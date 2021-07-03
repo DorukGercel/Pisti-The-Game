@@ -34,9 +34,15 @@ public class GameManager {
     /** Current level*/
     private       Short                 mCurrentLevel;
     /** Variable to indicate if game is over*/
-    private       Boolean               mGameOver;
+    private       boolean               mGameOver;
     /** Variable to indicate if bluff level*/
-    private       Boolean               mBluffLevel;
+    private       boolean               mBluffLevel;
+    /** Variable to indicate if bluff is enabled*/
+    private       boolean               mBluffEnabled;
+    /** Variable to indicate if challenge is enabled*/
+    private       boolean               mChallengeEnabled;
+    /** Variable to indicate if don't challenge is enabled*/
+    private       boolean               mDontChallengeEnabled;
     /** Sleep time before display of cards*/
     @Value("${spring.application.sleep.short}")
     private       int                   mSleepTime;
@@ -47,8 +53,6 @@ public class GameManager {
         this.mGameService = gameService;
         this.mGameTableController = gameTableController;
         this.mPlayerCards = new ArrayList<>();
-        this.mGameOver = false;
-        this.mBluffLevel = false;
         this.mLock = new ReentrantLock();
         this.mPlayerTurn = mLock.newCondition();
         this.mCurrentLevel = 1;
@@ -74,6 +78,11 @@ public class GameManager {
     /** Function which signals change of turn*/
     public void notifyPlayerTurn() {
         mPlayerTurn.notify();
+    }
+
+    /** Function which enables the bluff mode when button pressed*/
+    public void setBluffEnabled(boolean enabled) {
+        this.mBluffEnabled = enabled;
     }
 
     /** Function which converts the player cards no to card*/
@@ -106,10 +115,45 @@ public class GameManager {
         setMGameOver(true);
     }
 
+    /** Helper function to return move type which is decided by player via controller*/
+    private MoveType getPlayerMoveType() {
+        MoveType moveType = MoveType.CARD;
+        if (mBluffLevel) {
+            // Decide move type
+            if (mBluffEnabled) {
+                moveType = MoveType.BLUFF;
+                // Disable bluff mode
+                mBluffEnabled = false;
+            } else if (mChallengeEnabled) {
+                moveType = MoveType.CHALLENGE;
+                // Disable challenge mode
+                mChallengeEnabled = false;
+            } else if (mDontChallengeEnabled) {
+                moveType = MoveType.NOT_CHALLENGE;
+                // Disable don't challenge mode
+                mDontChallengeEnabled = false;
+            }
+        }
+        return moveType;
+    }
+
+    /** Helper function to remove the middle card from player deck according to move type*/
+    private void removeMiddleCardFromPlayerDeck(MoveType moveType) {
+        if (!(moveType.equals(MoveType.CHALLENGE) || moveType.equals(MoveType.NOT_CHALLENGE))) {
+            // No card to remove in challenge and don't challenge move type
+            // Remove the current allocated middle card
+            mPlayerCards.remove(mMiddleCard);
+        }
+    }
+
     /** Helper function to send the move to backend*/
     private void simulateTurn() {
-        mPlayerCards.remove(mMiddleCard);
-        mGameTableController.simulateMove(MoveType.CARD, GameStatusCode.NORMAL, mMiddleCard);
+        // Decide move type
+        MoveType moveType = getPlayerMoveType();
+        // Remove the current allocated middle card
+        removeMiddleCardFromPlayerDeck(moveType);
+        // Simulate move with network; send to backend
+        mGameTableController.simulateMove(moveType, GameStatusCode.NORMAL, mMiddleCard);
         if (mPlayerCards.size() == 0) {
             mGameTableController.simulateMove(MoveType.REDEAL, GameStatusCode.NORMAL, mMiddleCard);
         }

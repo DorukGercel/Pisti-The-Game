@@ -10,6 +10,7 @@ import com.group7.client.dto.common.CommonResponse;
 import com.group7.client.dto.game.InteractRequest;
 import com.group7.client.dto.game.InteractResponse;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -20,6 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -43,7 +45,13 @@ public class GameTableController extends BaseNetworkController {
     @Value("${spring.application.apiAddress.game}") private String mApiAddress;
     /** Sleep time between display of player and pc cards*/
     @Value("${spring.application.sleep.long}")
-    private int mSleepTime;
+    private int        mSleepTime;
+    /** Flag which indicates whether player can bluff or noy*/
+    private boolean mPlayerCanBluff;
+    /** Flag which indicates whether bluff mode is open, player chose to bluff*/
+    private boolean mPlayerBluffed;
+    /** Flag which indicates that pc bluffed and user shall choose to challenge or not*/
+    private boolean mPcBluffed;
     /** Player cards*/
     private List<Card> mPlayerCards;
     /** Card in the middle*/
@@ -60,6 +68,7 @@ public class GameTableController extends BaseNetworkController {
     @FXML private Button    bluff_button;
     @FXML private Button    challenge_button;
     @FXML private Button    dont_challenge_button;
+    @FXML private Text      bluff_challenge_text;
 
     /** Perform initializations*/
     @Override
@@ -98,44 +107,76 @@ public class GameTableController extends BaseNetworkController {
     /** Function which is invoked by game manager to simulate card move*/
     public void simulateMove(MoveType moveType, GameStatusCode gameStatusCode, short cardNo) {
         Platform.runLater(()-> {
+            // Perform back-end interaction
             performInteract(moveType, gameStatusCode, cardNo);
             // Re-init the key combination and drag drop events
-            turnOnDrag();
-            turnOnKeyComb();
+            simulatePostMove();
         });
     }
 
-    public void turnOnKeyComb() {
-        setKeyCombinationListener();
-    }
-
-    public void turnOffKeyComb() {
-        System.out.println("unset");
-        mScreenManager.getCurrentScene().getAccelerators().clear();
-    }
-
-    /** Function which turns on drag mode*/
-    public void turnOnDrag() {
-        for (Card card : mPlayerCards) {
-            setCardDragAndDropListener(card);
+    /** Function which is invoked before simulate move started; after ui interaction*/
+    private void simulatePostGuiInteract() {
+        if (mPlayerCanBluff) {
+            // Disable player can bluff
+            mPlayerCanBluff = false;
+            setVisibleBluffButton(false);
         }
+        if(mPlayerBluffed) {
+            // Disable player bluff mode and rearrange bluff button
+            mPlayerBluffed = false;
+            enableClickBluffButton();
+            setVisibleBluffButton(false);
+        }
+        if(mPcBluffed) {
+            // Disable pc bluff mode and disable challenge buttonss
+            mPcBluffed = false;
+            setVisibleChallengeButtons(false);
+        }
+        if(bluff_challenge_text.isVisible()) {
+            bluff_challenge_text.setVisible(false);
+        }
+        turnOffKeyComb();
+        turnOffDrag();
+        // Notify the game manager to indicate gui interaction is over
+        mGameManager.notifyPlayerTurn();
     }
 
-    /** Function which turns off drag mode*/
-    public void turnOffDrag() {
-        for (Card card : mPlayerCards) {
-            card.getCardGeometry().setOnDragDetected(null);
+    /** Function which is invoked after simulate move is finished*/
+    private void simulatePostMove() {
+        if (!mPcBluffed){
+            // Re-init drag drop events
+            turnOnDrag();
         }
+        // Re-init the key combination
+        turnOnKeyComb();
     }
 
     @FXML
     private void clickBluffButton() {
-
+        // Set player bluffed to turn over the card placement in middle
+        mPlayerBluffed = true;
+        // Disable the button
+        disableClickBluffButton();
+        // Enable bluff mode in the game manager
+        mGameManager.setBluffEnabled(true);
     }
 
     @FXML
     private void clickChallengeButton() {
+        synchronized (mGameManager.getMPlayerTurn()) {
+            // Challenge made
+            mGameManager.setMChallengeEnabled(true);
+            simulatePostGuiInteract();
+        }
+    }
 
+    @FXML
+    private void clickDontChallengeButton() {
+        synchronized (mGameManager.getMPlayerTurn()) {
+            // Don't challenge made
+            mGameManager.setMDontChallengeEnabled(true);
+            simulatePostGuiInteract();
+        }
     }
 
     /** Helper function send the initial interact request*/
@@ -163,18 +204,17 @@ public class GameTableController extends BaseNetworkController {
             System.out.println(interactResponse.getPlayerEnvironment());
             System.out.println(interactResponse.getPcEnvironment());
 
-            GameStatusCode receivedGameStatusCode = GameStatusCode.convertGameStatusCode(interactResponse.getGameStatusCode());
+            GameStatusCode receivedGameStatusCode = GameStatusCode.convertStrToGameStatusCode(interactResponse.getGameStatusCode());
             if(receivedGameStatusCode.equals(GameStatusCode.NORMAL)) {
                 // Normal game operation
-                simulateTurn(MoveType.convertMoveType(interactResponse.getPlayerEnvironment().getMMoveType()),
-                        interactResponse.getPlayerEnvironment(),
+                simulateTurn(interactResponse.getPlayerEnvironment(),
                         interactResponse.getPcEnvironment());
             } else if (receivedGameStatusCode.equals(GameStatusCode.WIN)) {
                 // Won the level so level up
                 performInteract(MoveType.INITIAL, GameStatusCode.LEVEL_UP, (short) -1);
             } else if (receivedGameStatusCode.equals(GameStatusCode.LOST)) {
                 // Lost the level so close the game
-                displaySuccess("Game Lost", "Sorry for your lost :)");
+                displaySuccess("Game Lost", "Sorry for your lost :(");
                 simulateGameOver();
                 mScreenManager.activatePane("user_menu", null);
             } else if (receivedGameStatusCode.equals(GameStatusCode.GAME_OVER_WIN)) {
@@ -190,53 +230,114 @@ public class GameTableController extends BaseNetworkController {
     }
 
     /** Helper function to place the cards according to move type*/
-    private void simulateTurn(MoveType moveType, GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
+    private void simulateTurn(GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
         try {
-            if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.REDEAL)) {
-                simulateInitTurn(moveType, playerGameEnv);
-            } else if (moveType.equals(MoveType.BLUFF)) {
-                if((playerGameEnv.getMMiddleCards().size() == 1) && (pcGameEnv.getMMiddleCards().size() == 1)) {
-                    // if there is just one face-up card on the table, the player or pc can bluff
-                    simulateBluffTurn(moveType);
-                } else {
-                    displayError("Bluffing Move", "Bluffing cannot be made! Bluffing is possible only when there is just one card on the table");
-                }
-            } else if (moveType.equals(MoveType.RESTART)) {
-                simulateRestartTurn(moveType, playerGameEnv, pcGameEnv);
+            // Get the move types of both the player and pc
+            MoveType playerMoveType = MoveType.convertStrToMoveType(playerGameEnv.getMMoveType());
+            MoveType pcMoveType = MoveType.convertStrToMoveType(pcGameEnv.getMMoveType());
+            // Decide the conditions according to the move types
+            if (playerMoveType.equals(MoveType.INITIAL) || playerMoveType.equals(MoveType.REDEAL)) {
+                simulateInitTurn(playerMoveType, playerGameEnv);
+            } else if (playerMoveType.equals(MoveType.RESTART)) {
+                simulateRestartTurn(playerMoveType, playerGameEnv, pcGameEnv);
             } else {
-                simulatePlayerTurn(moveType, MoveTurn.PLAYER, playerGameEnv);
+                simulatePlayerTurn(playerMoveType, MoveTurn.PLAYER, playerGameEnv);
                 // TODO: Remove print
                 System.out.println("a");
-
                 TimeUnit.SECONDS.sleep(mSleepTime);
                 // TODO: Remove print
                 System.out.println("b");
-                simulatePlayerTurn(moveType, MoveTurn.PC, pcGameEnv);
+                simulatePlayerTurn(pcMoveType, MoveTurn.PC, pcGameEnv);
                 // TODO: Remove print
                 System.out.println("c");
 
-                if(mGameManager.getMCurrentLevel() >= 3) {
-                    // Performs bluff level actions
-                    handleBluffLevelActions(pcGameEnv);
-                }
+                // PC Game Env is actually the current state of the game
+                simulatePostTurn(pcGameEnv);
             }
         } catch(Exception e){
             e.printStackTrace();
         }
     }
 
-    /** Helper function to perform bluffing*/
-    private void simulateBluffTurn(MoveType moveType) {
-        //TODO: bluff edilen kart ters cevrilip ortaya konacak
+    /** Helper function to achieve level turn events, after player and pc moves*/
+    private void simulatePostTurn(GameEnvironment currentGameEnv) {
+        if(mGameManager.getMCurrentLevel() >= 3) {
+            // Performs bluff level actions
+            handleBluffLevelActions(currentGameEnv);
+        }
+    }
+
+    private void simulateBluffTurn(MoveType moveType, MoveTurn moveTurn, GameEnvironment gameEnvironment) {
+        // TODO: Correct the texts
+        if(moveType.equals(MoveType.BLUFF) && moveTurn.equals(MoveTurn.PLAYER)) {
+            // TODO: Remove print
+            System.out.println(moveTurn + " " + moveType);
+            // Player made the bluff
+            bluff_challenge_text.setVisible(true);
+            bluff_challenge_text.setText(mPlayerManager.getUsername() + " Bluffed!");
+        } else if(moveType.equals(MoveType.BLUFF) && moveTurn.equals(MoveTurn.PC)) {
+            // TODO: Remove print
+            System.out.println(moveTurn + " " + moveType);
+            // PC made the bluff
+            mPcBluffed = true;
+            bluff_challenge_text.setVisible(true);
+            bluff_challenge_text.setText("PC Bluffed!");
+            mMiddleCard = mGameManager.getMiddleCard(gameEnvironment);
+            placeMiddleCard(moveTurn, moveType);
+            setVisibleChallengeButtons(true);
+        } else if (moveTurn.equals(MoveTurn.PLAYER) && MoveType.isChallengeRelatedMove(moveType)) {
+            // TODO: Remove print
+            System.out.println(moveTurn + " " + moveType);
+            // Player challenge is successful or not
+            String challengeText = moveType.equals(MoveType.CHALLENGE_SUCCESS) ? " Challenge Success!" : " Challenge Fail!";
+            bluff_challenge_text.setVisible(true);
+            bluff_challenge_text.setText(mPlayerManager.getUsername() + challengeText);
+            placeMiddleCardAndSetScore(moveType, moveTurn, gameEnvironment);
+        } else if (moveTurn.equals(MoveTurn.PC) && MoveType.isChallengeRelatedMove(moveType)) {
+            // TODO: Remove print
+            System.out.println(moveTurn + " " + moveType);
+            // PC challenged or didn't challenged
+            String challengeText = !moveType.equals(MoveType.NOT_CHALLENGE) ? " Challenged!" : " Didn't Challenge!";
+            bluff_challenge_text.setVisible(true);
+            bluff_challenge_text.setText("PC" + challengeText);
+            placeMiddleCardAndSetScore(moveType, moveTurn, gameEnvironment);
+            // Player needs to perform a pass movement
+            // TODO: Remove print
+            System.out.println("PASS + LOOP");
+            performInteract(MoveType.PASS, GameStatusCode.NORMAL, (short) -1);
+        }
     }
 
     /** Helper function to place middle card and set score*/
-    private void simulatePlayerTurn(MoveType moveType, MoveTurn moveTurn,GameEnvironment gameEnvironment) {
-        // Place the card in the middle
+    private void placeMiddleCardAndSetScore(MoveType moveType, MoveTurn moveTurn, GameEnvironment gameEnvironment) {
+        // Place the card in the middle, get the card according to card no
         mMiddleCard = mGameManager.getMiddleCard(gameEnvironment);
         placeMiddleCard(moveTurn, moveType);
         // Set score
         setScore(moveTurn, gameEnvironment.getMScores().get(0));
+    }
+
+    /** Helper function to decide the move type of player and simulate player turn*/
+    private void simulatePlayerTurn(MoveType moveType, MoveTurn moveTurn, GameEnvironment gameEnvironment) {
+        if (MoveType.isBluffLevelMoveType(moveType)) {
+            simulateBluffTurn(moveType, moveTurn, gameEnvironment);
+        } else {
+            placeMiddleCardAndSetScore(moveType, moveTurn, gameEnvironment);
+        }
+    }
+
+    /** Helper function to place middle card*/
+    private void placeMiddleCard(MoveTurn moveTurn, MoveType moveType) {
+        if (mMiddleCard == null) {
+            // If there is no card in the middle, set color to table color
+            middle_card.setFill(Color.BURLYWOOD);
+        } else if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.RESTART) || moveType.equals(MoveType.CHALLENGE_SUCCESS) || (moveType.equals(MoveType.CARD) && moveTurn.equals(MoveTurn.PC))) {
+            // If new level was restarted, game was initialized, or pc made a card move to be simulated, place the card
+            middle_card.setFill(mMiddleCard.getCardGeometry().getFill());
+        } else if (moveType.equals(MoveType.BLUFF) && moveTurn.equals(MoveTurn.PC)) {
+            // Pc bluff card placement; reversed placement
+            middle_card.setFill(Color.SADDLEBROWN);
+        }
     }
 
     /** Helper function to perform initial card placing*/
@@ -308,14 +409,11 @@ public class GameTableController extends BaseNetworkController {
     }
 
     /** Helper function to activate bluff level buttons*/
-    private void handleBluffLevelActions(GameEnvironment gameEnvironment) {
-        if(gameEnvironment.getMMiddleCards().size() == 1) {
+    private void handleBluffLevelActions(GameEnvironment currentGameEnvironment) {
+        if(currentGameEnvironment.getMMiddleCards().size() == 1) {
             // Bluff options is open
+            mPlayerCanBluff = true;
             setVisibleBluffButton(true);
-        } else if (gameEnvironment.getMMoveType().equals(MoveType.BLUFF)) {
-            // Challenge don't challenge mode
-            turnOffDrag();
-            setVisibleChallengeButtons(true);
         }
     }
 
@@ -328,15 +426,6 @@ public class GameTableController extends BaseNetworkController {
     private void setVisibleChallengeButtons(boolean visible) {
         challenge_button.setVisible(visible);
         dont_challenge_button.setVisible(visible);
-    }
-
-    /** Helper function to place middle card*/
-    private void placeMiddleCard(MoveTurn moveTurn, MoveType moveType) {
-        if (mMiddleCard == null) {
-            middle_card.setFill(Color.BURLYWOOD);
-        } else if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.RESTART) || moveTurn.equals(MoveTurn.PC)) {
-            middle_card.setFill(mMiddleCard.getCardGeometry().getFill());
-        }
     }
 
     /** Helper function to set scores in the boards for both sides*/
@@ -352,6 +441,18 @@ public class GameTableController extends BaseNetworkController {
             return;
         }
         pc_score_label.setText(score.toString());
+    }
+
+    /** Helper function to enable bluff*/
+    private void enableClickBluffButton() {
+        bluff_button.setDisable(false);
+        bluff_button.setText("Bluff");
+    }
+
+    /** Helper function to disable bluff button after click*/
+    private void disableClickBluffButton() {
+        bluff_button.setDisable(true);
+        bluff_button.setText("Bluff Mode On");
     }
 
     /** Helper function to attach drag and drop listener to middle area*/
@@ -381,7 +482,13 @@ public class GameTableController extends BaseNetworkController {
             Dragboard dragboard = event.getDragboard();
             boolean success = false;
             if (dragboard.hasImage()) {
-                middle_card.setFill(new ImagePattern(dragboard.getImage()));
+                if (!mPlayerBluffed) {
+                    // Normal card placement to the middle
+                    middle_card.setFill(new ImagePattern(dragboard.getImage()));
+                } else {
+                    // Bluff card placement; reversed placement
+                    middle_card.setFill(Color.SADDLEBROWN);
+                }
                 success = true;
             }
             event.setDropCompleted(success);
@@ -416,10 +523,7 @@ public class GameTableController extends BaseNetworkController {
                     player_area_container.getChildren().remove(cardGeo);
                     mGameManager.setMMiddleCard(card.getCardNo());
                     event.consume();
-                    turnOffKeyComb();
-                    turnOffDrag();
-                    mGameManager.notifyPlayerTurn();
-
+                    simulatePostGuiInteract();
                 } else {
                     event.consume();
                 }
@@ -432,6 +536,31 @@ public class GameTableController extends BaseNetworkController {
         // TODO: Remove print
         System.out.println("set");
         mScreenManager.getCurrentScene().getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.CONTROL_DOWN), this::onCheatLevelUpEvent);
+    }
+
+    /** Function that turns on cheat buttons*/
+    private void turnOnKeyComb() {
+        setKeyCombinationListener();
+    }
+
+    /** Function that turns off cheat buttons*/
+    private void turnOffKeyComb() {
+        System.out.println("unset");
+        mScreenManager.getCurrentScene().getAccelerators().clear();
+    }
+
+    /** Function which turns on drag mode*/
+    private void turnOnDrag() {
+        for (Card card : mPlayerCards) {
+            setCardDragAndDropListener(card);
+        }
+    }
+
+    /** Function which turns off drag mode*/
+    private void turnOffDrag() {
+        for (Card card : mPlayerCards) {
+            card.getCardGeometry().setOnDragDetected(null);
+        }
     }
 
     /** Event which indicates the leaderboard is started*/
