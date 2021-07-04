@@ -48,7 +48,7 @@ public class MultiplayerGame extends Game{
         mLock.lock();
         try {
             setCurrentState(MultiplayerGameState.RUNNING);
-            mGameRun.notify();
+            mGameRun.signal();
         } finally {
             mLock.unlock();
         }
