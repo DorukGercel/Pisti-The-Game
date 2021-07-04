@@ -12,6 +12,7 @@ import java.util.List;
  */
 public interface GameService {
     StatusCode initGame(Long sessionId, Object[] gameId);
+    StatusCode initMultiplayerGame(Long sessionId, Object[] gameId);
     StatusCode interactGame(Long sessionId, Long gameId, Short cardNo, Game.MoveType moveType, Game.GameStatusCode gameStatusCode, List<GameEnvironment> gameEnvironmentList, List<Object> gameStatus);
     StatusCode removeGame(Long sessionId, Long gameId);
 }

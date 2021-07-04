@@ -49,6 +49,17 @@ public class GameController {
         return new GameResponse(statusCode, "New game creation failed!");
     }
 
+    @PutMapping("/startMultiplayerGame")
+    @ApiOperation(value = "Creates a new multiplayer game and connects the player to the game. Login required.")
+    public GameResponse startMultiplayerGame(@RequestBody InitGameRequest initGameRequest){
+        Long[] gameId = new Long[1];
+        StatusCode statusCode = mGameService.initMultiplayerGame(initGameRequest.getSessionId(),gameId);
+        if(statusCode.equals(StatusCode.SUCCESS)) {
+            return new InitGameResponse(statusCode, null, gameId[0]);
+        }
+        return new GameResponse(statusCode, "New game creation failed!");
+    }
+
     @PutMapping("/interactGame")
     @ApiOperation(value = "Player interacts with the game. The player can perform initial, card, bluff, challenge, not challenge or redeal movements. Login required.")
     public GameResponse interactGame(@RequestBody InteractRequest interactRequest){

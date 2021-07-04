@@ -30,9 +30,11 @@ public class GameServiceImpl implements GameService{
     /** Type definition for different kinds of update operations*/
     private enum UpdateOperationCode{
         INITIALIZE,
+        INITIALIZE_MULTI,
         SCORE,
         LEVEL,
-        GAME_OVER
+        GAME_OVER,
+        GAME_OVER_MULTI
     }
 
     /**
@@ -61,6 +63,35 @@ public class GameServiceImpl implements GameService{
             return StatusCode.FAIL;
         }
     }
+
+    /**
+     * Responsible for initializing and starting a new multiplayer game.
+     *
+     * @param sessionId the id of the active player who wants to start a new game.
+     * @param gameId the id of the game created; initially it's values are empty and they are set in this method.
+     * @return the status code according to the success of the operation.
+     *               If operation is successful, returns success status code.
+     *               If operation is not successful, returns fail status code;
+     *                  it indicates that some runtime or SQL related exception occurred.
+     */
+    @Override
+    public StatusCode initMultiplayerGame(Long sessionId, Object[] gameId){
+        try {
+            Optional<ActivePlayer> dbActivePlayer = mActivePlayerRepository.findById(sessionId);
+            // Check if the player logged in and is not attached to another game
+            if(dbActivePlayer.isPresent() && !isAttachedToGame(dbActivePlayer.get())){
+                gameId[0] = mGameTable.addNewMultiplayerGame();
+                // Set the active player's level and attach to the newly created game
+                return updateActivePlayer(UpdateOperationCode.INITIALIZE_MULTI, dbActivePlayer.get(), gameId[0]);
+            }
+            return StatusCode.FAIL;
+        } catch (Exception e){
+            e.printStackTrace();
+            return StatusCode.FAIL;
+        }
+    }
+
+
 
     /**
      * Responsible for removing a game entry from the game table.
@@ -158,7 +189,7 @@ public class GameServiceImpl implements GameService{
                                                        ActivePlayer activePlayer,
                                                        Game.GameStatusCode receivedGameStatusCode,
                                                        List<Object> gameStatus) {
-        if (activePlayer.getLevel() < Game.MAX_LEVEL) {
+        if (activePlayer.getLevel() < Game.SINGLE_MAX_LEVEL) {
             // Max level not reached, level up
             currentGame.initLevelUp();
             if (receivedGameStatusCode.equals(Game.GameStatusCode.CHEAT_LEVEL_UP)) {
@@ -168,15 +199,28 @@ public class GameServiceImpl implements GameService{
             // Set the new level of the player
             updateActivePlayer(UpdateOperationCode.LEVEL, activePlayer, (short) (activePlayer.getLevel() + (short) 1));
             gameStatus.add(receivedGameStatusCode);
-        } else {
-            // Max level reached, game over
-            // Add to leaderboard
-            addLeaderboardRecord(activePlayer);
-            // Re-init active player
+        } else if (activePlayer.getLevel() < Game.MAX_LEVEL) {
+            if (receivedGameStatusCode.equals(Game.GameStatusCode.CHEAT_LEVEL_UP)) {
+                // Add the cheat score
+                updateActivePlayer(UpdateOperationCode.SCORE, activePlayer, Game.WIN_SCORE);
+            }
+            // Set the new level of the player
+            updateActivePlayer(UpdateOperationCode.LEVEL, activePlayer, (short) (activePlayer.getLevel() + (short) 1));
+            // Remove single player game id
             updateActivePlayer(UpdateOperationCode.GAME_OVER, activePlayer, null);
             // Remove the game from the games table
             removeGame(activePlayer.getId(), activePlayer.getGameId());
             gameStatus.add(Game.GameStatusCode.GAME_OVER_WIN);
+        } else {
+            // TODO: Adapt to multiplayer
+            // Max level reached, game over
+            // Add to leaderboard
+            addLeaderboardRecord(activePlayer);
+            // Re-init active player
+            updateActivePlayer(UpdateOperationCode.GAME_OVER_MULTI, activePlayer, null);
+            // Remove the game from the games table
+            removeGame(activePlayer.getId(), activePlayer.getGameId());
+            gameStatus.add(Game.GameStatusCode.GAME_OVER_MULTI_WIN);
         }
         return StatusCode.SUCCESS;
     }
@@ -260,6 +304,16 @@ public class GameServiceImpl implements GameService{
                     mActivePlayerRepository.save(activePlayer);
 
                     return StatusCode.SUCCESS;
+                } case INITIALIZE_MULTI -> {
+                    activePlayer.setId(activePlayer.getId());
+                    activePlayer.setPlayer(activePlayer.getPlayer());
+                    activePlayer.setLevel(activePlayer.getLevel());
+                    activePlayer.setScore(activePlayer.getScore());
+                    activePlayer.setGameId((Long) updateValue);
+
+                    mActivePlayerRepository.save(activePlayer);
+
+                    return StatusCode.SUCCESS;
 
                 } case SCORE -> {
                     // TODO: Do proper calculation according to levels
@@ -287,6 +341,18 @@ public class GameServiceImpl implements GameService{
                     return StatusCode.SUCCESS;
 
                 } case GAME_OVER -> {
+                    // Clear active player's only game id field
+                    activePlayer.setId(activePlayer.getId());
+                    activePlayer.setPlayer(activePlayer.getPlayer());
+                    activePlayer.setLevel(activePlayer.getLevel());
+                    activePlayer.setScore(activePlayer.getScore());
+                    activePlayer.setGameId(-1);
+
+                    mActivePlayerRepository.save(activePlayer);
+
+                    return StatusCode.SUCCESS;
+
+                } case GAME_OVER_MULTI -> {
                     // Clear active player's game fields
                     activePlayer.setId(activePlayer.getId());
                     activePlayer.setPlayer(activePlayer.getPlayer());
