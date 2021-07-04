@@ -132,6 +132,7 @@ public class ScreenManager {
             mPaneMap.put(paneName, new Pair<>(pane, parentName));
         }
         catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException();
         }
     }
