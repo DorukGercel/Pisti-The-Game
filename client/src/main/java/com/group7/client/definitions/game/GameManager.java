@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -32,50 +31,22 @@ public class GameManager extends BaseGameManager{
     /** Thread function where game instance runs*/
     public void run() {
         try {
-            synchronized (mPlayerTurn) {
-                mLock.lock();
-                while (!mGameOver) {
-                    mPlayerTurn.wait();
-                    TimeUnit.SECONDS.sleep(mSleepTime);
-                    simulateTurn();
-                }
-                mLock.unlock();
+            //TODO: Remove print
+            System.out.println("SINGLE TIME");
+            mLock.lock();
+            while (!mGameOver) {
+                mPlayerTurn.await();
+                //TODO: Remove print
+                System.out.println("Exit await");
+                TimeUnit.SECONDS.sleep(mSleepTime);
+                simulateTurn();
             }
+            mLock.unlock();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /** Helper function to return move type which is decided by player via controller*/
-    private MoveType getPlayerMoveType() {
-        MoveType moveType = MoveType.CARD;
-        if (mBluffLevel) {
-            // Decide move type
-            if (mBluffEnabled) {
-                moveType = MoveType.BLUFF;
-                // Disable bluff mode
-                mBluffEnabled = false;
-            } else if (mChallengeEnabled) {
-                moveType = MoveType.CHALLENGE;
-                // Disable challenge mode
-                mChallengeEnabled = false;
-            } else if (mDontChallengeEnabled) {
-                moveType = MoveType.NOT_CHALLENGE;
-                // Disable don't challenge mode
-                mDontChallengeEnabled = false;
-            }
-        }
-        return moveType;
-    }
-
-    /** Helper function to remove the middle card from player deck according to move type*/
-    private void removeMiddleCardFromPlayerDeck(MoveType moveType) {
-        if (!(moveType.equals(MoveType.CHALLENGE) || moveType.equals(MoveType.NOT_CHALLENGE))) {
-            // No card to remove in challenge and don't challenge move type
-            // Remove the current allocated middle card
-            mPlayerCards.remove(mMiddleCard);
-        }
-    }
 
     /** Helper function to send the move to backend*/
     private void simulateTurn() {

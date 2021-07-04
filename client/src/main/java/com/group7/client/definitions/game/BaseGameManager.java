@@ -43,7 +43,9 @@ abstract public class BaseGameManager {
 
     /** Function which signals change of turn*/
     public void notifyPlayerTurn() {
-        mPlayerTurn.notify();
+        mLock.lock();
+        mPlayerTurn.signal();
+        mLock.unlock();
     }
 
     /** Function which enables the bluff mode when button pressed*/
@@ -79,5 +81,36 @@ abstract public class BaseGameManager {
         mCurrentLevel = (short) 1;
         mPlayerCards.clear();
         setMGameOver(true);
+    }
+
+    /** Helper function to return move type which is decided by player via controller*/
+    protected MoveType getPlayerMoveType() {
+        MoveType moveType = MoveType.CARD;
+        if (mBluffLevel) {
+            // Decide move type
+            if (mBluffEnabled) {
+                moveType = MoveType.BLUFF;
+                // Disable bluff mode
+                mBluffEnabled = false;
+            } else if (mChallengeEnabled) {
+                moveType = MoveType.CHALLENGE;
+                // Disable challenge mode
+                mChallengeEnabled = false;
+            } else if (mDontChallengeEnabled) {
+                moveType = MoveType.NOT_CHALLENGE;
+                // Disable don't challenge mode
+                mDontChallengeEnabled = false;
+            }
+        }
+        return moveType;
+    }
+
+    /** Helper function to remove the middle card from player deck according to move type*/
+    protected void removeMiddleCardFromPlayerDeck(MoveType moveType) {
+        if (!(moveType.equals(MoveType.CHALLENGE) || moveType.equals(MoveType.NOT_CHALLENGE))) {
+            // No card to remove in challenge and don't challenge move type
+            // Remove the current allocated middle card
+            mPlayerCards.remove(mMiddleCard);
+        }
     }
 }

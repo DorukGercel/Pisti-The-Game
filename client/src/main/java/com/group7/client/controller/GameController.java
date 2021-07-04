@@ -116,20 +116,17 @@ abstract public class GameController  extends BaseNetworkController {
 
     @FXML
     protected void clickChallengeButton() {
-        synchronized (mGameManager.getMPlayerTurn()) {
-            // Challenge made
-            mGameManager.setMChallengeEnabled(true);
-            simulatePostGuiInteract();
-        }
+        // Challenge made
+        mGameManager.setMChallengeEnabled(true);
+        simulatePostGuiInteract();
     }
 
     @FXML
     protected void clickDontChallengeButton() {
-        synchronized (mGameManager.getMPlayerTurn()) {
-            // Don't challenge made
-            mGameManager.setMDontChallengeEnabled(true);
-            simulatePostGuiInteract();
-        }
+        // Don't challenge made
+        mGameManager.setMDontChallengeEnabled(true);
+        simulatePostGuiInteract();
+
     }
 
 
@@ -333,17 +330,16 @@ abstract public class GameController  extends BaseNetworkController {
         });
         // Set drag done listener to card geometry
         cardGeo.setOnDragDone(event -> {
-            synchronized (mGameManager.getMPlayerTurn()) {
-                if (event.getTransferMode() == TransferMode.MOVE) {
-                    // Turn off visibility after drag
-                    player_area_container.getChildren().remove(cardGeo);
-                    mGameManager.setMMiddleCard(card.getCardNo());
-                    event.consume();
-                    simulatePostGuiInteract();
-                } else {
-                    event.consume();
-                }
+            if (event.getTransferMode() == TransferMode.MOVE) {
+                // Turn off visibility after drag
+                player_area_container.getChildren().remove(cardGeo);
+                mGameManager.setMMiddleCard(card.getCardNo());
+                event.consume();
+                simulatePostGuiInteract();
+            } else {
+                event.consume();
             }
+
         });
     }
 

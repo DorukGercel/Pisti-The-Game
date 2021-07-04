@@ -39,6 +39,11 @@ public class MultiplayerGameTableController extends GameController{
 
     }
 
+    @Override
+    protected void performInteract(MoveType moveType, GameStatusCode gameStatusCode, short cardNo) {
+
+    }
+
     /** In multiplayer key combinations are not necessary*/
     @Override
     protected void turnOnKeyComb() {
@@ -48,11 +53,6 @@ public class MultiplayerGameTableController extends GameController{
     /** In multiplayer key combinations are not necessary*/
     @Override
     protected void turnOffKeyComb() {
-
-    }
-
-    @Override
-    protected void performInteract(MoveType moveType, GameStatusCode gameStatusCode, short cardNo) {
 
     }
 }
