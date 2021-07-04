@@ -22,6 +22,12 @@ public class GameConfig {
     public Game game(final CardTable cardTable){
         return new Game(cardTable);
     }
+
+    @Bean(name = "MultiplayerGame")
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public MultiplayerGame multiplayerGame(final CardTable cardTable){
+        return new MultiplayerGame(cardTable);
+    }
     
     /** Definition of the card in the game*/
     @Data
