@@ -79,7 +79,7 @@ public class MultiplayerGameTableController extends GameController{
             setVisibleBluffButton(false);
         }
         if(mPcBluffed) {
-            // Disable pc bluff mode and disable challenge buttonss
+            // Disable pc bluff mode and disable challenge buttons
             mPcBluffed = false;
             setVisibleChallengeButtons(false);
         }
@@ -169,7 +169,8 @@ public class MultiplayerGameTableController extends GameController{
                 simulateInitTurn(sentMoveType, playerGameEnv);
             } else if (playerMoveType.equals(MoveType.RESTART)) {
                 simulateRestartTurn(playerMoveType, playerGameEnv);
-            } else if (playerMoveType.equals(MoveType.READ)) {
+            } else if (isReadOperation(sentMoveType, playerMoveType)) {
+                // Read operation; opponent performed the move
                 simulatePlayerTurn(playerMoveType, MoveTurn.PC, playerGameEnv);
                 // PC Game Env is actually the current state of the game
                 simulatePostTurn(playerGameEnv.getMIsMoveTurn(), playerGameEnv);
@@ -220,6 +221,7 @@ public class MultiplayerGameTableController extends GameController{
             mMiddleCard = mGameManager.getMiddleCard(gameEnvironment);
             placeMiddleCard(moveTurn, moveType);
             setVisibleChallengeButtons(true);
+            turnOffDrag();
         } else if (moveTurn.equals(MoveTurn.PLAYER) && MoveType.isChallengeRelatedMove(moveType)) {
             // TODO: Remove print
             System.out.println(moveTurn + " " + moveType);
@@ -227,7 +229,7 @@ public class MultiplayerGameTableController extends GameController{
             String challengeText = moveType.equals(MoveType.CHALLENGE_SUCCESS) ? " Challenge Success!" : " Challenge Fail!";
             bluff_challenge_text.setVisible(true);
             bluff_challenge_text.setText(mPlayerManager.getUsername() + challengeText);
-            placeMiddleCardAndSetScore(moveType, moveTurn, gameEnvironment);
+            placeMiddleCardAndSetScore(moveType, gameEnvironment);
         } else if (moveTurn.equals(MoveTurn.PC) && MoveType.isChallengeRelatedMove(moveType)) {
             // TODO: Remove print
             System.out.println(moveTurn + " " + moveType);
@@ -235,24 +237,24 @@ public class MultiplayerGameTableController extends GameController{
             String challengeText = !moveType.equals(MoveType.NOT_CHALLENGE) ? " Challenged!" : " Didn't Challenge!";
             bluff_challenge_text.setVisible(true);
             bluff_challenge_text.setText("PC" + challengeText);
-            placeMiddleCardAndSetScore(moveType, moveTurn, gameEnvironment);
+            placeMiddleCardAndSetScore(moveType, gameEnvironment);
             // Player needs to perform a pass movement
             // TODO: Remove print
             System.out.println("PASS + LOOP");
-            performInteract(MoveType.PASS, GameStatusCode.NORMAL, (short) -1);
+            //performInteract(MoveType.PASS, GameStatusCode.NORMAL, (short) -1);
+            mGameManager.setMPassEnabled(true);
         }
     }
 
     private void decideTurn(GameEnvironment playerGameEnv) {
         if (playerGameEnv.getMIsMoveTurn().equals(true)) {
             // Player's turn
-            if(mGameManager.isRedealRequired()) {
-                // Doesn't have cards, time to redeal
+            if(mGameManager.isRedealRequired() || mGameManager.isPassRequired()) {
+                // Doesn't have cards, time to redeal OR pass required after challenge
                 mGameManager.notifyPlayerTurn();
                 return;
             }
-            // Player's turn so drag open; waiting to make a move
-            turnOnDrag();
+            // Player's turn so drag must stay open; waiting to make a move
             match_text.setText("YOUR TURN");
             return;
         }
@@ -261,6 +263,11 @@ public class MultiplayerGameTableController extends GameController{
         match_text.setText("OPPONENT'S TURN");
         mGameManager.setReadEnabled(true);
         mGameManager.notifyPlayerTurn();
+    }
+
+    /** Determines whether move is read related*/
+    private boolean isReadOperation(MoveType sentMoveType, MoveType receivedMoveType) {
+        return sentMoveType.equals(MoveType.READ) || receivedMoveType.equals(MoveType.READ);
     }
 
     /** In multiplayer key combinations are not necessary*/

@@ -34,6 +34,8 @@ abstract public class BaseGameManager {
     protected       boolean               mChallengeEnabled;
     /** Variable to indicate if don't challenge is enabled*/
     protected       boolean               mDontChallengeEnabled;
+    /** Variable to indicate if it is time for player to pass*/
+    protected       boolean               mPassEnabled;
     /** Variable to indicate if it is time for player to read*/
     protected       boolean               mReadEnabled;
     /** Sleep time before display of cards*/
@@ -92,12 +94,22 @@ abstract public class BaseGameManager {
 
     /** Function to determine player needs to send redeal request*/
     public boolean isRedealRequired() {
-        return mPlayerCards.size() == 0;
+        // No cards and no need to pass
+        return (mPlayerCards.size() == 0) && !isPassRequired();
+    }
+
+    /** Function to determine player needs to send pass request*/
+    public boolean isPassRequired() {
+        return mPassEnabled;
     }
 
     /** Helper function to return move type which is decided by player via controller*/
     protected MoveType getPlayerMoveType() {
         MoveType moveType = MoveType.CARD;
+        if(isRedealRequired()) {
+            // Check if no card available
+            moveType = MoveType.REDEAL;
+        }
         if (mBluffLevel) {
             // Decide move type
             if (mBluffEnabled) {
@@ -116,10 +128,11 @@ abstract public class BaseGameManager {
                 moveType = MoveType.READ;
                 // Disable don't challenge mode
                 mReadEnabled = false;
+            } else if (mPassEnabled) {
+                moveType = MoveType.PASS;
+                // Disable don't challenge mode
+                mPassEnabled = false;
             }
-        }
-        if(isRedealRequired()) {
-            moveType = MoveType.REDEAL;
         }
         return moveType;
     }

@@ -100,7 +100,7 @@ abstract public class GameController  extends BaseNetworkController {
 
     /** Helper function to place middle card and set score; for multiplayer mode*/
     protected void placeMiddleCardAndSetScore(MoveType moveType, GameEnvironment gameEnvironment) {
-        MoveTurn moveTurn = moveType.equals(MoveType.READ) ? MoveTurn.PC : MoveTurn.PLAYER;
+        MoveTurn moveTurn = (moveType.equals(MoveType.READ) || moveType.equals(MoveType.PASS)) ? MoveTurn.PC : MoveTurn.PLAYER;
         // Place the card in the middle, get the card according to card no
         mMiddleCard = mGameManager.getMiddleCard(gameEnvironment);
         placeMiddleCard(moveTurn, moveType);
@@ -126,7 +126,7 @@ abstract public class GameController  extends BaseNetworkController {
         if (mMiddleCard == null) {
             // If there is no card in the middle, set color to table color
             middle_card.setFill(Color.BURLYWOOD);
-        } else if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.READ) || moveType.equals(MoveType.RESTART) || moveType.equals(MoveType.CHALLENGE_SUCCESS) || (moveType.equals(MoveType.CARD) && moveTurn.equals(MoveTurn.PC))) {
+        } else if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.READ) || moveType.equals(MoveType.PASS) || moveType.equals(MoveType.RESTART) || moveType.equals(MoveType.CHALLENGE_SUCCESS) || (moveType.equals(MoveType.CARD) && moveTurn.equals(MoveTurn.PC))) {
             // If new level was restarted, game was initialized, or pc made a card move to be simulated, place the card
             middle_card.setFill(mMiddleCard.getCardGeometry().getFill());
         } else if (moveType.equals(MoveType.BLUFF) && moveTurn.equals(MoveTurn.PC)) {
