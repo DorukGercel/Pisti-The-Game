@@ -152,6 +152,15 @@ public class Game {
         return GameEnvironment.buildPcEnvironment(noHandCards, middleCards, scores, isPisti, moveType);
     }
 
+    public GameEnvironment createMultiplayerEnvironment(Side side, boolean isPisti, boolean isMoveTurn, Game.MoveType moveType) {
+        List<Short> handCards = new ArrayList<>(getDeck(side));
+        List<Short> middleCards = new ArrayList<>(getMiddleDeck());
+        List<Short> scores = new ArrayList<>(getScores(side));
+        List<Short> opponentScores = new ArrayList<>(getScores(getOtherSide(side)));
+
+        return GameEnvironment.buildMultiplayerEnvironment(handCards, middleCards, scores, opponentScores, isPisti, isMoveTurn, moveType);
+    }
+
     /** Helper function to change turns.*/
     public void invertTurn() {
         if (getMTurn().equals(Game.Side.PLAYER)) {
@@ -350,7 +359,6 @@ public class Game {
                 mGameStrategy = new GameStrategyLevel3();
                 mGameStrategy.registerGame(this);
             }
-
         }
     }
 
@@ -372,6 +380,7 @@ public class Game {
         CHALLENGE_FAIL,
         REDEAL,
         RESTART,
+        READ,
         PASS,
         NONE;
 
@@ -386,6 +395,7 @@ public class Game {
                 case "CHALLENGE_FAIL" -> MoveType.CHALLENGE_FAIL;
                 case "REDEAL" -> MoveType.REDEAL;
                 case "RESTART" -> MoveType.RESTART;
+                case "READ" -> MoveType.READ;
                 case "PASS" -> PASS;
                 default -> MoveType.NONE;
             };
@@ -402,6 +412,7 @@ public class Game {
                 case CHALLENGE_FAIL -> "CHALLENGE_FAIL";
                 case REDEAL -> "REDEAL";
                 case RESTART -> "RESTART";
+                case READ -> "READ";
                 case PASS -> "PASS";
                 default -> "NONE";
             };
@@ -421,8 +432,19 @@ public class Game {
                     moveType.equals(Game.MoveType.BLUFF) ||
                     moveType.equals(Game.MoveType.CHALLENGE) ||
                     moveType.equals(Game.MoveType.NOT_CHALLENGE) ||
-                    moveType.equals(MoveType.PASS);
+                    moveType.equals(Game.MoveType.READ) ||
+                    moveType.equals(Game.MoveType.PASS);
         }
+
+        public static boolean isMoveWithoutCard(Game.MoveType moveType) {
+            return moveType.equals(Game.MoveType.INITIAL) ||
+                    moveType.equals(Game.MoveType.REDEAL) ||
+                    moveType.equals(Game.MoveType.CHALLENGE) ||
+                    moveType.equals(Game.MoveType.NOT_CHALLENGE) ||
+                    moveType.equals(Game.MoveType.READ) ||
+                    moveType.equals(Game.MoveType.PASS);
+        }
+
     }
 
     public enum GameStatusCode {
