@@ -2,6 +2,7 @@ package com.group7.server.definitions.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -18,6 +19,18 @@ public class MultiplayerGame extends Game{
     private final Condition mGameRun;
     /** Condition variable used for synchronization of multiplayer game move perform*/
     private final Condition mMovePerform;
+    /** Condition variable used for synchronization of multiplayer game move read*/
+    private final Condition mReadPerform;
+    /** Flag which indicated the move is simulated*/
+    private final AtomicBoolean mGameStateUpdated;
+    /** Flag which indicated the move is simulated*/
+    private final AtomicBoolean   mRedealUpdated;
+    /** Flag which indicated the move is simulated*/
+    private final AtomicBoolean   mRestartUpdated;
+    /** Flag which indicated the move is bluff*/
+    private final AtomicBoolean   mBluffUpdated;
+    /** Flag which indicated the move is challenge related*/
+    private final AtomicBoolean   mChallengeUpdated;
     /** Current activity state of multiplayer game*/
     private       MultiplayerGameState mCurrentState;
     /** Id of the first player*/
@@ -25,12 +38,6 @@ public class MultiplayerGame extends Game{
     /** Id of the second player;
      *  naming is as pc to match with the single player mode and prevent typos*/
     private       Long      mPcId;
-    /** Flag which indicaated the move is simulated*/
-    private       boolean   mGameStateUpdated;
-    /** Flag which indicaated the move is simulated*/
-    private       boolean   mRedealUpdated;
-    /** Flag which indicaated the move is simulated*/
-    private       boolean   mRestartUpdated;
 
     /**
      * Constructor; called when a new game is created
@@ -44,6 +51,12 @@ public class MultiplayerGame extends Game{
         this.mLock = new ReentrantLock();
         this.mGameRun = mLock.newCondition();
         this.mMovePerform = mLock.newCondition();
+        this.mReadPerform = mLock.newCondition();
+        this.mGameStateUpdated = new AtomicBoolean(false);
+        this.mRedealUpdated = new AtomicBoolean(false);
+        this.mRestartUpdated = new AtomicBoolean(false);
+        this.mBluffUpdated = new AtomicBoolean(false);
+        this.mChallengeUpdated = new AtomicBoolean(false);
         registerStrategy();
     }
 
@@ -84,15 +97,30 @@ public class MultiplayerGame extends Game{
         List<Object> gameState;
         mLock.lock();
         Side currentPlayerSide = getSidePlayer(activePlayerId);
-        if(currentPlayerSide.equals(getMTurn())) {
+        if(currentPlayerSide.equals(getMTurn()) && !mGameStateUpdated.get()) {
+            // TODO: Remove print
+            System.out.println("ENTER MAKE");
+            // The right turn player enters and previous read already exited
             gameState = interactStrategy(moveType, cardNo);
             MoveType gameEnvMoveType = getGameStateMoveType(gameState);
             setRedealRestartFlags(gameEnvMoveType);
-            mGameStateUpdated = true;
+            mGameStateUpdated.set(true);
             mMovePerform.signal();
+            try {
+                mReadPerform.await();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // TODO: Remove print
+            System.out.println("EXIT MAKE");
         } else {
+            // TODO: Remove print
+            System.out.println("ENTER READ");
             gameState = interactRead(currentPlayerSide);
-            mGameStateUpdated = false;
+            mGameStateUpdated.set(false);
+            mReadPerform.signal();
+            // TODO: Remove print
+            System.out.println("EXIT READ");
         }
         mLock.unlock();
         return gameState;
@@ -113,7 +141,7 @@ public class MultiplayerGame extends Game{
         boolean isMoveTurn;
         List<Object> gameState = new ArrayList<>();
         List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
-        while (!mGameStateUpdated) {
+        while (!mGameStateUpdated.get()) {
             try {
                 mMovePerform.await();
             } catch (Exception e){
@@ -182,20 +210,30 @@ public class MultiplayerGame extends Game{
     /** Helper function to set restart and redeal flags according to move type*/
     private void setRedealRestartFlags(MoveType moveType) {
         if(moveType.equals(MoveType.REDEAL)) {
-            mRedealUpdated = true;
+            mRedealUpdated.set(true);
         } else if (moveType.equals(MoveType.RESTART)) {
-            mRestartUpdated = true;
+            mRestartUpdated.set(true);
+        } else if (moveType.equals(MoveType.BLUFF)) {
+            mBluffUpdated.set(true);
+        } else if (MoveType.isChallengeRelatedMove(moveType)) {
+            mChallengeUpdated.set(true);
         }
     }
 
     /** Helper function to obtain reader players move type; read, redeal, restart*/
     private MoveType decideReaderMoveType() {
-        if (mRedealUpdated) {
-            mRedealUpdated = false;
+        if (mRedealUpdated.get()) {
+            mRedealUpdated.set(false);
             return MoveType.REDEAL;
-        } else if (mRestartUpdated) {
-            mRestartUpdated = false;
+        } else if (mRestartUpdated.get()) {
+            mRestartUpdated.set(false);
             return MoveType.RESTART;
+        } else if (mBluffUpdated.get()) {
+            mBluffUpdated.set(false);
+            return MoveType.BLUFF;
+        } else if (mChallengeUpdated.get()) {
+            mChallengeUpdated.set(false);
+            return MoveType.CHALLENGE;
         }
         return MoveType.READ;
     }
