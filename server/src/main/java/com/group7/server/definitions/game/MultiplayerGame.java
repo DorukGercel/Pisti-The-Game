@@ -1,6 +1,7 @@
 package com.group7.server.definitions.game;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created with a new multiplayer game request.
  * Attention: Be careful dealing with remove method of ArrayList
  * */
+@Getter
+@Setter
 public class MultiplayerGame extends Game {
     /** Lock used for synchronization*/
     private final Lock mLock;
@@ -25,6 +28,8 @@ public class MultiplayerGame extends Game {
     private final Condition mReadPerform;
     /** Flag which indicated the move is simulated*/
     private final AtomicBoolean mGameStateUpdated;
+    /** Flag which indicated the read is simulated*/
+    private final AtomicBoolean mReadUpdated;
     /** Flag which indicated the move is simulated*/
     private final AtomicBoolean   mRedealUpdated;
     /** Flag which indicated the move is simulated*/
@@ -55,6 +60,7 @@ public class MultiplayerGame extends Game {
         this.mMovePerform = mLock.newCondition();
         this.mReadPerform = mLock.newCondition();
         this.mGameStateUpdated = new AtomicBoolean(false);
+        this.mReadUpdated = new AtomicBoolean(false);
         this.mRedealUpdated = new AtomicBoolean(false);
         this.mRestartUpdated = new AtomicBoolean(false);
         this.mBluffUpdated = new AtomicBoolean(false);
@@ -109,7 +115,10 @@ public class MultiplayerGame extends Game {
             mGameStateUpdated.set(true);
             mMovePerform.signal();
             try {
-                mReadPerform.await();
+                while (!mReadUpdated.get()) {
+                    mReadPerform.await();
+                }
+                mReadUpdated.set(false);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -120,6 +129,7 @@ public class MultiplayerGame extends Game {
             System.out.println("ENTER READ");
             gameState = interactRead(currentPlayerSide);
             mGameStateUpdated.set(false);
+            mReadUpdated.set(true);
             mReadPerform.signal();
             // TODO: Remove print
             System.out.println("EXIT READ");

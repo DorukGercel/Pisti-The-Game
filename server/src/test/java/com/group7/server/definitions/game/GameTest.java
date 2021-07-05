@@ -39,7 +39,7 @@ public class GameTest {
     @Test
     public void testGameInitialSetup_Success() {
         assertEquals(java.util.Optional.of((short) 151).get(), Game.WIN_SCORE);
-        assertEquals(java.util.Optional.of((short) 3).get(), Game.MAX_LEVEL);
+        assertEquals(java.util.Optional.of((short) 4).get(), Game.MAX_LEVEL);
         assertEquals(java.util.Optional.of((short) 52).get(), mGame.getNO_CARDS());
         assertEquals(java.util.Optional.of((short) 13).get(), mGame.getNO_RANKS());
         assertEquals(java.util.Optional.of((short) 2).get(), mGame.getNO_PLAYERS());
