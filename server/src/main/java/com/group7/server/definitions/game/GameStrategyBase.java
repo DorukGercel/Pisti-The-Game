@@ -20,9 +20,7 @@ public abstract class GameStrategyBase implements GameStrategy {
     public List<GameEnvironment> interact(Game.MoveType moveType, Short cardNo) {
         if (moveType.equals(Game.MoveType.INITIAL)) {
             // Move type of initialization
-            return mGame.createEnvironment(mGame.createPlayerEnvironment(false, Game.MoveType.INITIAL),
-                    mGame.createPcEnvironment(false, Game.MoveType.INITIAL)
-            );
+            return simulateInitial();
         } else if (Game.MoveType.isSimulateMoveType(moveType)) {
             // Move type of card, bluff, challenge, not challenge
             // TODO: Remove print
@@ -30,29 +28,42 @@ public abstract class GameStrategyBase implements GameStrategy {
             // TODO: Implement game over
             return simulateGame(cardNo, moveType);
         } else {
-            // Move type of redeal and restart
-            List<Short> mainDeck = mGame.getMainDeck();
-            Game.MoveType sentMoveType;
-            if(mainDeck.size() > 0) {
-                // Redeal in a round
-                mGame.dealCards();
-                sentMoveType = Game.MoveType.REDEAL;
-            } else {
-                // Restart with another level
-                //TODO: Remove print
-                System.out.println("Restart");
-                incrementScore(null, mGame.getMLastWin());
-                mGame.initCards();
-                sentMoveType = Game.MoveType.RESTART;
-            }
-            return mGame.createEnvironment(mGame.createPlayerEnvironment(false, sentMoveType),
-                    mGame.createPcEnvironment(false, sentMoveType)
-            );
+            return simulateRedeal();
         }
     }
 
     /** Simulate game according to the strategy*/
-    abstract List<GameEnvironment> simulateGame(Short cardNo, Game.MoveType moveType);
+    abstract public List<GameEnvironment> simulateGame(Short cardNo, Game.MoveType moveType);
+
+    /** Simulate initial movement*/
+    protected List<GameEnvironment> simulateInitial() {
+        // Move type of initialization
+        return mGame.createEnvironment(mGame.createPlayerEnvironment(false, Game.MoveType.INITIAL),
+                mGame.createPcEnvironment(false, Game.MoveType.INITIAL)
+        );
+    }
+
+    /** Simulate redeal or restart*/
+    protected List<GameEnvironment> simulateRedeal() {
+        // Move type of redeal and restart
+        List<Short> mainDeck = mGame.getMainDeck();
+        Game.MoveType sentMoveType;
+        if(mainDeck.size() > 0) {
+            // Redeal in a round
+            mGame.dealCards();
+            sentMoveType = Game.MoveType.REDEAL;
+        } else {
+            // Restart with another level
+            //TODO: Remove print
+            System.out.println("Restart");
+            incrementScore(null, mGame.getMLastWin());
+            mGame.initCards();
+            sentMoveType = Game.MoveType.RESTART;
+        }
+        return mGame.createEnvironment(mGame.createPlayerEnvironment(false, sentMoveType),
+                mGame.createPcEnvironment(false, sentMoveType)
+        );
+    }
 
     /** Helper function to decide if there is a takeover.*/
     protected boolean isMatchedCard(GameConfig.Card playerCard) {
