@@ -39,17 +39,17 @@ abstract public class GameController  extends BaseNetworkController {
     protected Card       mMiddleCard;
 
     /** FXML fields*/
-    @FXML protected Label active_player_label;
+    @FXML protected Label     active_player_label;
     @FXML protected Label     active_player_score_label;
     @FXML protected Label     pc_score_label;
-    @FXML protected Group player_area_container;
-    @FXML protected Circle middle_area;
+    @FXML protected Group     player_area_container;
+    @FXML protected Circle    middle_area;
     @FXML protected Rectangle middle_card;
     @FXML protected Label     level_no_label;
-    @FXML protected Button bluff_button;
+    @FXML protected Button    bluff_button;
     @FXML protected Button    challenge_button;
     @FXML protected Button    dont_challenge_button;
-    @FXML protected Text bluff_challenge_text;
+    @FXML protected Text      bluff_challenge_text;
 
     /** Perform initializations*/
     @Override
@@ -68,41 +68,10 @@ abstract public class GameController  extends BaseNetworkController {
     abstract protected void performInteract(MoveType moveType, GameStatusCode gameStatusCode, short cardNo);
 
     /** Function which is invoked after simulate move is finished*/
-    protected void simulatePostMove() {
-        if (!mPcBluffed){
-            // Re-init drag drop events
-            turnOnDrag();
-        }
-        // Re-init the key combination
-        turnOnKeyComb();
-    }
+    abstract protected void simulatePostMove();
 
     /** Function which is invoked before simulate move started; after ui interaction*/
-    protected void simulatePostGuiInteract() {
-        if (mPlayerCanBluff) {
-            // Disable player can bluff
-            mPlayerCanBluff = false;
-            setVisibleBluffButton(false);
-        }
-        if(mPlayerBluffed) {
-            // Disable player bluff mode and rearrange bluff button
-            mPlayerBluffed = false;
-            enableClickBluffButton();
-            setVisibleBluffButton(false);
-        }
-        if(mPcBluffed) {
-            // Disable pc bluff mode and disable challenge buttonss
-            mPcBluffed = false;
-            setVisibleChallengeButtons(false);
-        }
-        if(bluff_challenge_text.isVisible()) {
-            bluff_challenge_text.setVisible(false);
-        }
-        turnOffKeyComb();
-        turnOffDrag();
-        // Notify the game manager to indicate gui interaction is over
-        mGameManager.notifyPlayerTurn();
-    }
+    abstract protected void simulatePostGuiInteract();
 
     @FXML
     protected void clickBluffButton() {
@@ -129,6 +98,19 @@ abstract public class GameController  extends BaseNetworkController {
 
     }
 
+    /** Helper function to place middle card and set score; for multiplayer mode*/
+    protected void placeMiddleCardAndSetScore(MoveType moveType, GameEnvironment gameEnvironment) {
+        MoveTurn moveTurn = moveType.equals(MoveType.READ) ? MoveTurn.PC : MoveTurn.PLAYER;
+        // Place the card in the middle, get the card according to card no
+        mMiddleCard = mGameManager.getMiddleCard(gameEnvironment);
+        placeMiddleCard(moveTurn, moveType);
+        // Set score
+        if(moveTurn.equals(MoveTurn.PLAYER)) {
+            setScore(moveTurn, gameEnvironment.getMScores().get(0));
+            return;
+        }
+        setScore(moveTurn, gameEnvironment.getMOpponentScores().get(0));
+    }
 
     /** Helper function to place middle card and set score*/
     protected void placeMiddleCardAndSetScore(MoveType moveType, MoveTurn moveTurn, GameEnvironment gameEnvironment) {
@@ -144,7 +126,7 @@ abstract public class GameController  extends BaseNetworkController {
         if (mMiddleCard == null) {
             // If there is no card in the middle, set color to table color
             middle_card.setFill(Color.BURLYWOOD);
-        } else if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.RESTART) || moveType.equals(MoveType.CHALLENGE_SUCCESS) || (moveType.equals(MoveType.CARD) && moveTurn.equals(MoveTurn.PC))) {
+        } else if (moveType.equals(MoveType.INITIAL) || moveType.equals(MoveType.READ) || moveType.equals(MoveType.RESTART) || moveType.equals(MoveType.CHALLENGE_SUCCESS) || (moveType.equals(MoveType.CARD) && moveTurn.equals(MoveTurn.PC))) {
             // If new level was restarted, game was initialized, or pc made a card move to be simulated, place the card
             middle_card.setFill(mMiddleCard.getCardGeometry().getFill());
         } else if (moveType.equals(MoveType.BLUFF) && moveTurn.equals(MoveTurn.PC)) {
@@ -164,6 +146,13 @@ abstract public class GameController  extends BaseNetworkController {
     /** Helper function to perform restart card placing*/
     protected void simulateRestartTurn(MoveType moveType, GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
         setBothScores(playerGameEnv, pcGameEnv);
+        flushContainerAreas();
+        simulateInitTurn(moveType, playerGameEnv);
+    }
+
+    /** Helper function to perform restart card placing*/
+    protected void simulateRestartTurn(MoveType moveType, GameEnvironment playerGameEnv) {
+        setBothScores(playerGameEnv);
         flushContainerAreas();
         simulateInitTurn(moveType, playerGameEnv);
     }
@@ -245,6 +234,12 @@ abstract public class GameController  extends BaseNetworkController {
     protected void setBothScores(GameEnvironment playerGameEnv, GameEnvironment pcGameEnv) {
         setScore(MoveTurn.PLAYER, playerGameEnv.getMScores().get(0));
         setScore(MoveTurn.PC, pcGameEnv.getMScores().get(0));
+    }
+
+    /** Helper function to set scores in the boards for both sides*/
+    protected void setBothScores(GameEnvironment playerGameEnv) {
+        setScore(MoveTurn.PLAYER, playerGameEnv.getMScores().get(0));
+        setScore(MoveTurn.PC, playerGameEnv.getMOpponentScores().get(0));
     }
 
     /** Helper function to set score in the board for a side*/
@@ -351,7 +346,7 @@ abstract public class GameController  extends BaseNetworkController {
     }
 
     /** Function which turns off drag mode*/
-    private void turnOffDrag() {
+    protected void turnOffDrag() {
         for (Card card : mPlayerCards) {
             card.getCardGeometry().setOnDragDetected(null);
         }

@@ -64,6 +64,45 @@ public class GameTableController extends GameController {
         });
     }
 
+    /** Function which is invoked after simulate move is finished*/
+    @Override
+    protected void simulatePostMove() {
+        if (!mPcBluffed){
+            // Re-init drag drop events
+            turnOnDrag();
+        }
+        // Re-init the key combination
+        turnOnKeyComb();
+    }
+
+    /** Function which is invoked before simulate move started; after ui interaction*/
+    @Override
+    protected void simulatePostGuiInteract() {
+        if (mPlayerCanBluff) {
+            // Disable player can bluff
+            mPlayerCanBluff = false;
+            setVisibleBluffButton(false);
+        }
+        if(mPlayerBluffed) {
+            // Disable player bluff mode and rearrange bluff button
+            mPlayerBluffed = false;
+            enableClickBluffButton();
+            setVisibleBluffButton(false);
+        }
+        if(mPcBluffed) {
+            // Disable pc bluff mode and disable challenge buttonss
+            mPcBluffed = false;
+            setVisibleChallengeButtons(false);
+        }
+        if(bluff_challenge_text.isVisible()) {
+            bluff_challenge_text.setVisible(false);
+        }
+        turnOffKeyComb();
+        turnOffDrag();
+        // Notify the game manager to indicate gui interaction is over
+        mGameManager.notifyPlayerTurn();
+    }
+
     /** Helper function send the initial interact request*/
     @Override
     protected void performInteract(MoveType moveType, GameStatusCode gameStatusCode, short cardNo) {

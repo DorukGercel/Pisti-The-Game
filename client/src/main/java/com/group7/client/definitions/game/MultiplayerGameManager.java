@@ -25,7 +25,9 @@ public class MultiplayerGameManager extends BaseGameManager{
         this.mPlayerCards = new ArrayList<>();
         this.mLock = new ReentrantLock();
         this.mPlayerTurn = mLock.newCondition();
-        this.mCurrentLevel = 4;
+        this.mMiddleCard = -1;      // Card move is initially considered null
+        this.mCurrentLevel = 4;     // Start level is 4 for multiplayer
+        this.mBluffLevel = true;
     }
 
     /** Thread function where game instance runs*/
@@ -34,8 +36,16 @@ public class MultiplayerGameManager extends BaseGameManager{
             mLock.lock();
             // TODO: Remove print
             System.out.println("MULTI TIME");
+            System.out.println("Enter await");
+            mPlayerTurn.await();
+            //TODO: Remove print
+            System.out.println("Exit await");
+            TimeUnit.SECONDS.sleep(mSleepTime);
+            simulateInitial();
             while (!mGameOver) {
-                mPlayerTurn.wait();
+                // TODO: Remove print
+                System.out.println("Enter await");
+                mPlayerTurn.await();
                 //TODO: Remove print
                 System.out.println("Exit await");
                 TimeUnit.SECONDS.sleep(mSleepTime);
@@ -47,6 +57,10 @@ public class MultiplayerGameManager extends BaseGameManager{
         }
     }
 
+    private void simulateInitial() {
+        mGameController.simulateMove(MoveType.INITIAL, GameStatusCode.NORMAL, (short) -1);
+    }
+
     /** Helper function to send the move to backend*/
     private void simulateTurn() {
         // Decide move type
@@ -55,8 +69,5 @@ public class MultiplayerGameManager extends BaseGameManager{
         removeMiddleCardFromPlayerDeck(moveType);
         // Simulate move with network; send to backend
         mGameController.simulateMove(moveType, GameStatusCode.NORMAL, mMiddleCard);
-        if (mPlayerCards.size() == 0) {
-            mGameController.simulateMove(MoveType.REDEAL, GameStatusCode.NORMAL, mMiddleCard);
-        }
     }
 }

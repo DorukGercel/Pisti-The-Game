@@ -34,6 +34,8 @@ abstract public class BaseGameManager {
     protected       boolean               mChallengeEnabled;
     /** Variable to indicate if don't challenge is enabled*/
     protected       boolean               mDontChallengeEnabled;
+    /** Variable to indicate if it is time for player to read*/
+    protected       boolean               mReadEnabled;
     /** Sleep time before display of cards*/
     @Value("${spring.application.sleep.short}")
     protected       int                   mSleepTime;
@@ -51,6 +53,11 @@ abstract public class BaseGameManager {
     /** Function which enables the bluff mode when button pressed*/
     public void setBluffEnabled(boolean enabled) {
         this.mBluffEnabled = enabled;
+    }
+
+    /** Function which enables the read mode when it is not player's turn*/
+    public void setReadEnabled(boolean enabled) {
+        this.mReadEnabled = enabled;
     }
 
     /** Function which converts the player cards no to card*/
@@ -83,6 +90,11 @@ abstract public class BaseGameManager {
         setMGameOver(true);
     }
 
+    /** Function to determine player needs to send redeal request*/
+    public boolean isRedealRequired() {
+        return mPlayerCards.size() == 0;
+    }
+
     /** Helper function to return move type which is decided by player via controller*/
     protected MoveType getPlayerMoveType() {
         MoveType moveType = MoveType.CARD;
@@ -100,7 +112,14 @@ abstract public class BaseGameManager {
                 moveType = MoveType.NOT_CHALLENGE;
                 // Disable don't challenge mode
                 mDontChallengeEnabled = false;
+            } else if (mReadEnabled) {
+                moveType = MoveType.READ;
+                // Disable don't challenge mode
+                mReadEnabled = false;
             }
+        }
+        if(isRedealRequired()) {
+            moveType = MoveType.REDEAL;
         }
         return moveType;
     }
