@@ -76,12 +76,14 @@ public class GameServiceImpl implements GameService{
      *                  it indicates that some runtime or SQL related exception occurred.
      */
     @Override
-    public StatusCode initMultiplayerGame(Long sessionId, Object[] gameId){
+    public StatusCode initMultiplayerGame(Long sessionId, Object[] gameId, Object[] opponentUsername){
         try {
             Optional<ActivePlayer> dbActivePlayer = mActivePlayerRepository.findById(sessionId);
             // Check if the player logged in and is not attached to another game
             if(dbActivePlayer.isPresent() && !isAttachedToGame(dbActivePlayer.get())){
                 gameId[0] = mGameTable.assignToNewMultiplayerGame(sessionId);
+                //Set the usernames of player
+                opponentUsername[0] = getOpponentUsername(sessionId, (Long) gameId[0]);
                 // Set the active player's level and attach to the newly created game
                 return updateActivePlayer(UpdateOperationCode.INITIALIZE_MULTI, dbActivePlayer.get(), gameId[0]);
             }
@@ -332,6 +334,25 @@ public class GameServiceImpl implements GameService{
                 mLeaderboardRecordService.updateRecord(recordId.get(0), activePlayer.getPlayer().getId(), new Date(), activePlayer.getScore());
             }
         }
+    }
+
+    /** Helper function to find opponent's username*/
+    private String getOpponentUsername(Long currentPlayerId, Long currentMultiplayerGameId) {
+        Optional<ActivePlayer> opponentPlayer;
+        MultiplayerGame multiplayerGame = mGameTable.getMultiplayerGame(currentMultiplayerGameId);
+        Long playerId = multiplayerGame.getPlayerId();
+        Long pcId = multiplayerGame.getPcId();
+        if(currentPlayerId.equals(playerId)) {
+            // If player requested; opponent is pc
+            opponentPlayer = mActivePlayerRepository.findById(pcId);
+        } else {
+            // If pc requested; opponent is player
+            opponentPlayer = mActivePlayerRepository.findById(playerId);
+        }
+        if(opponentPlayer.isPresent()) {
+            return opponentPlayer.get().getPlayer().getUsername();
+        }
+        return "PC";
     }
 
     /**

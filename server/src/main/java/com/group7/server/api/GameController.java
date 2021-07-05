@@ -53,9 +53,10 @@ public class GameController {
     @ApiOperation(value = "Creates a new multiplayer game and connects the player to the game. Login required.")
     public GameResponse startMultiplayerGame(@RequestBody InitGameRequest initGameRequest){
         Long[] gameId = new Long[1];
-        StatusCode statusCode = mGameService.initMultiplayerGame(initGameRequest.getSessionId(),gameId);
+        String[] opponentUsername = new String[1];
+        StatusCode statusCode = mGameService.initMultiplayerGame(initGameRequest.getSessionId(),gameId, opponentUsername);
         if(statusCode.equals(StatusCode.SUCCESS)) {
-            return new InitGameResponse(statusCode, null, gameId[0]);
+            return new MultiplayerInitGameResponse(statusCode, null, gameId[0], opponentUsername[0]);
         }
         return new GameResponse(statusCode, "New game creation failed!");
     }

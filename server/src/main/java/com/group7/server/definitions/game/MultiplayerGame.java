@@ -1,5 +1,7 @@
 package com.group7.server.definitions.game;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created with a new multiplayer game request.
  * Attention: Be careful dealing with remove method of ArrayList
  * */
-public class MultiplayerGame extends Game{
+public class MultiplayerGame extends Game {
     /** Lock used for synchronization*/
     private final Lock mLock;
     /** Condition variable used for synchronization of multiplayer game start*/
@@ -124,6 +126,16 @@ public class MultiplayerGame extends Game{
         }
         mLock.unlock();
         return gameState;
+    }
+
+    /** Player (1st player) id getter*/
+    public Long getPlayerId() {
+        return this.mPlayerId;
+    }
+
+    /** Pc (2nd player) id getter*/
+    public Long getPcId() {
+        return this.mPcId;
     }
 
     /** The player interacts with the strategy and makes a move*/
