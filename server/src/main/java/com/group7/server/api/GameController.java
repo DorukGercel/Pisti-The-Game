@@ -65,7 +65,7 @@ public class GameController {
     public GameResponse interactGame(@RequestBody InteractRequest interactRequest){
         List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
         List<Object> gameStatus = new ArrayList<>();
-
+        // TODO: Remove print
         System.out.println(interactRequest);
 
         StatusCode statusCode = mGameService.interactGame(interactRequest.getSessionId(),
@@ -89,6 +89,39 @@ public class GameController {
         System.out.println(new GameResponse(statusCode, "Interaction with the game failed!"));
         return new GameResponse(statusCode, "Interaction with the game failed!");
     }
+
+    @PutMapping("/interactMultiplayerGame")
+    @ApiOperation(value = "Player interacts with the multiplayer game. The player can perform initial, card, bluff, challenge, not challenge or redeal movements. Login required.")
+    public GameResponse interactMultiplayerGame(@RequestBody InteractRequest interactRequest){
+        List<GameEnvironment> gameEnvironmentList = new ArrayList<>();
+        List<Object> gameStatus = new ArrayList<>();
+        // TODO: Remove print
+        System.out.println(interactRequest);
+
+        StatusCode statusCode = mGameService.interactMultiplayerGame(interactRequest.getSessionId(),
+                interactRequest.getGameId(),
+                interactRequest.getCardNo(),
+                Game.MoveType.convertStrToMoveType(interactRequest.getMoveType()),
+                Game.GameStatusCode.convertStrToGameStatusCode(interactRequest.getGameStatusCode()),
+                gameEnvironmentList,
+                gameStatus);
+
+        if(statusCode.equals(StatusCode.SUCCESS)){
+            if (!Game.GameStatusCode.isGameLevelSwitching(getGameStatusCode(gameStatus))) {
+                // Return response after normal game operation
+                System.out.println(new MultiplayerInteractResponse(statusCode, null, gameEnvironmentList.get(0), (Game.GameStatusCode) gameStatus.get(0)));
+                return new MultiplayerInteractResponse(statusCode, null, gameEnvironmentList.get(0), (Game.GameStatusCode) gameStatus.get(0));
+            } else {
+                // Return response after level up
+                System.out.println(new MultiplayerInteractResponse(statusCode, null, null, (Game.GameStatusCode) gameStatus.get(0)));
+                return new MultiplayerInteractResponse(statusCode, null, null, (Game.GameStatusCode) gameStatus.get(0));
+            }
+        }
+        System.out.println(new GameResponse(statusCode, "Interaction with the multiplayer game failed!"));
+        return new GameResponse(statusCode, "Interaction with the multiplayer game failed!");
+    }
+
+
 
     /**
      * Removes the game.

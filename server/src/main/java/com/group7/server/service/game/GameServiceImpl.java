@@ -4,6 +4,7 @@ import com.group7.server.definitions.game.Game;
 import com.group7.server.definitions.game.GameEnvironment;
 import com.group7.server.definitions.game.GameTable;
 import com.group7.server.definitions.common.StatusCode;
+import com.group7.server.definitions.game.MultiplayerGame;
 import com.group7.server.model.ActivePlayer;
 import com.group7.server.repository.ActivePlayerRepository;
 import com.group7.server.service.leaderboard.LeaderboardRecordService;
@@ -80,7 +81,7 @@ public class GameServiceImpl implements GameService{
             Optional<ActivePlayer> dbActivePlayer = mActivePlayerRepository.findById(sessionId);
             // Check if the player logged in and is not attached to another game
             if(dbActivePlayer.isPresent() && !isAttachedToGame(dbActivePlayer.get())){
-                gameId[0] = mGameTable.addNewMultiplayerGame();
+                gameId[0] = mGameTable.assignToNewMultiplayerGame(sessionId);
                 // Set the active player's level and attach to the newly created game
                 return updateActivePlayer(UpdateOperationCode.INITIALIZE_MULTI, dbActivePlayer.get(), gameId[0]);
             }
@@ -90,8 +91,6 @@ public class GameServiceImpl implements GameService{
             return StatusCode.FAIL;
         }
     }
-
-
 
     /**
      * Responsible for removing a game entry from the game table.
@@ -154,6 +153,43 @@ public class GameServiceImpl implements GameService{
             return StatusCode.FAIL;
         }
         catch (Exception e){
+            return StatusCode.FAIL;
+        }
+    }
+
+    /**
+     * Responsible for interacting the multiplayer game and providing communication between game and player.
+     *
+     * @param sessionId the id of the active player who wants to start a new game.
+     * @param gameId the id of the game to be interacted with.
+     * @param cardNo the no of the card that is played by the player.
+     * @param moveType the type of the move that user made; can be initial, card or re-deal move.
+     * @param gameEnvironments the current state of the game; initially it's values are empty and they are set in this method.
+     * @param gameStatus the status of the game; the status code and level x score in the end; initially it's values are empty and they are set in this method.
+     * @return the status code according to the success of the operation.
+     *               If operation is successful, returns success status code.
+     *               If operation is not successful, returns fail status code;
+     *                  it indicates that some runtime or SQL related exception occurred.
+     */
+    @Override
+    public StatusCode interactMultiplayerGame(Long sessionId, Long gameId, Short cardNo, Game.MoveType moveType, Game.GameStatusCode receivedGameStatusCode, List<GameEnvironment> gameEnvironments, List<Object> gameStatus) {
+        try {
+            Optional<ActivePlayer> dbActivePlayer = mActivePlayerRepository.findById(sessionId);
+            MultiplayerGame currentMultiplayerGame;
+            if(dbActivePlayer.isPresent() &&
+                    gameId.equals(dbActivePlayer.get().getGameId()) &&
+                    ((currentMultiplayerGame = mGameTable.getMultiplayerGame(gameId)) != null) &&
+                    isValidMoveAndCard(cardNo, moveType) && (gameEnvironments != null) && (gameStatus != null)) {
+                // Eligible to perform operations
+                if(receivedGameStatusCode.equals(Game.GameStatusCode.NORMAL)) {
+                    // Game status is only a regular move
+                    return handleNormalMultiplayerGameOperations(currentMultiplayerGame, dbActivePlayer.get(), cardNo, moveType, gameEnvironments, gameStatus);
+                }
+            }
+            return StatusCode.FAIL;
+        }
+        catch (Exception e){
+            e.printStackTrace();
             return StatusCode.FAIL;
         }
     }
@@ -225,6 +261,32 @@ public class GameServiceImpl implements GameService{
         return StatusCode.SUCCESS;
     }
 
+    /** Helper function to deal with normal multiplayer game operations; NORMAL, WIN, LOST*/
+    private StatusCode handleNormalMultiplayerGameOperations(MultiplayerGame currentMultiplayerGame,
+                                                  ActivePlayer activePlayer,
+                                                  Short cardNo,
+                                                  Game.MoveType moveType,
+                                                  List<GameEnvironment> gameEnvironments,
+                                                  List<Object> gameStatus) {
+        List<Object> gameState = currentMultiplayerGame.interactMultiplayer(activePlayer.getId(), moveType, cardNo);
+        // Add game environments
+        gameEnvironments.addAll(getGameEnvList(gameState));
+        // Add game status code from the game
+        gameStatus.add(getGameStatusCode(gameState));
+        if (!getGameStatusCode(gameState).equals(Game.GameStatusCode.NORMAL)) {
+            if(getGameStatusCode(gameState).equals(Game.GameStatusCode.LOST)) {
+                // Remove the game from the games table if lost
+                addLeaderboardRecord(activePlayer);
+                removeGame(activePlayer.getId(), activePlayer.getGameId());
+            }
+            // Add level x score as level is finished (Add to the old level values)
+            gameStatus.add(getLevelXScore(gameState));
+            // Set the active player's level x score
+            return updateActivePlayer(UpdateOperationCode.SCORE, activePlayer, gameStatus.get(1));
+        }
+        return StatusCode.SUCCESS;
+    }
+
     /** Checks whether given active player is already attached to a game or not.*/
     private boolean isAttachedToGame(ActivePlayer activePlayer){
         return activePlayer.getGameId() >= 0;
@@ -238,15 +300,7 @@ public class GameServiceImpl implements GameService{
     /** Checks if the given card no and move is valid.*/
     private boolean isValidMoveAndCard(Short cardNo, Game.MoveType moveType){
         return isValidCardNo(cardNo) ||
-                isMoveWithoutCard(moveType);
-    }
-
-    private boolean isMoveWithoutCard(Game.MoveType moveType) {
-        return moveType.equals(Game.MoveType.INITIAL) ||
-                moveType.equals(Game.MoveType.REDEAL) ||
-                moveType.equals(Game.MoveType.CHALLENGE) ||
-                moveType.equals(Game.MoveType.NOT_CHALLENGE) ||
-                moveType.equals(Game.MoveType.PASS);
+                Game.MoveType.isMoveWithoutCard(moveType);
     }
 
     /** Get game env list from game state*/
