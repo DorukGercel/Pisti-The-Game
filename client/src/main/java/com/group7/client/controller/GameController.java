@@ -40,6 +40,7 @@ abstract public class GameController  extends BaseNetworkController {
 
     /** FXML fields*/
     @FXML protected Label     active_player_label;
+    @FXML protected Label     pc_label;
     @FXML protected Label     active_player_score_label;
     @FXML protected Label     pc_score_label;
     @FXML protected Group     player_area_container;

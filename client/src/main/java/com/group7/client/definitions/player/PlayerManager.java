@@ -15,4 +15,6 @@ public class PlayerManager {
     private Long gameId;
     /** Name of the player*/
     private String username;
+    /** Name of the opponent player*/
+    private String opponentUsername;
 }

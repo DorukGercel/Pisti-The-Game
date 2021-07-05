@@ -9,6 +9,7 @@ import com.group7.client.dto.common.CommonResponse;
 import com.group7.client.dto.game.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -17,7 +18,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class MultiplayerGameTableController extends GameController{
@@ -97,21 +97,27 @@ public class MultiplayerGameTableController extends GameController{
     private void performStartMultiplayerGame() {
         // Exchange request and response
         InitGameRequest initGameRequest = new InitGameRequest(mPlayerManager.getSessionId());
-        CommonResponse[] commonResponse = new InitGameResponse[1];
+        CommonResponse[] commonResponse = new MultiplayerInitGameResponse[1];
 
         StatusCode networkStatusCode = mNetworkManager.exchange(
                 mApiAddress + "/startMultiplayerGame",
                 HttpMethod.PUT,
                 initGameRequest,
                 commonResponse,
-                InitGameResponse.class);
+                MultiplayerInitGameResponse.class);
 
         // Check if operation is successful
-        if (isOperationSuccess(commonResponse[0], networkStatusCode, InitGameResponse.class, "Start Multiplayer Game")) {
-            InitGameResponse initGameResponse = (InitGameResponse) commonResponse[0];
+        if (isOperationSuccess(commonResponse[0], networkStatusCode, MultiplayerInitGameResponse.class, "Start Multiplayer Game")) {
+            MultiplayerInitGameResponse initGameResponse = (MultiplayerInitGameResponse) commonResponse[0];
             // Set the new game id
             match_text.setText("TIME TO START");
             mPlayerManager.setGameId(initGameResponse.getGameId());
+            mPlayerManager.setOpponentUsername(initGameResponse.getOpponentUsername());
+            // TODO: Remove print
+            System.out.println(mPlayerManager.getOpponentUsername());
+            Platform.runLater(() -> pc_label.setText(mPlayerManager.getOpponentUsername()));
+            // TODO: Remove print
+            System.out.println(pc_label.getText());
             mGameManager.notifyPlayerTurn();
         }
     }
@@ -203,6 +209,7 @@ public class MultiplayerGameTableController extends GameController{
         }
     }
 
+    /** Helper function to simulate the bluff related turn*/
     private void simulateBluffTurn(MoveType moveType, MoveTurn moveTurn, GameEnvironment gameEnvironment) {
         // TODO: Correct the texts
         if(moveType.equals(MoveType.BLUFF) && moveTurn.equals(MoveTurn.PLAYER)) {
@@ -217,7 +224,7 @@ public class MultiplayerGameTableController extends GameController{
             // PC made the bluff
             mPcBluffed = true;
             bluff_challenge_text.setVisible(true);
-            bluff_challenge_text.setText("PC Bluffed!");
+            bluff_challenge_text.setText(mPlayerManager.getOpponentUsername() + " Bluffed!");
             mMiddleCard = mGameManager.getMiddleCard(gameEnvironment);
             placeMiddleCard(moveTurn, moveType);
             setVisibleChallengeButtons(true);
@@ -236,7 +243,7 @@ public class MultiplayerGameTableController extends GameController{
             // PC challenged or didn't challenged
             String challengeText = !moveType.equals(MoveType.NOT_CHALLENGE) ? " Challenged!" : " Didn't Challenge!";
             bluff_challenge_text.setVisible(true);
-            bluff_challenge_text.setText("PC" + challengeText);
+            bluff_challenge_text.setText(mPlayerManager.getOpponentUsername() + challengeText);
             placeMiddleCardAndSetScore(moveType, gameEnvironment);
             // Player needs to perform a pass movement
             // TODO: Remove print

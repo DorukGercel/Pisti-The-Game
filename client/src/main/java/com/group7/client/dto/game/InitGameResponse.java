@@ -5,10 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group7.client.definitions.common.StatusCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
 /** DTO used for start new game responses*/
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class InitGameResponse extends GameResponse {
