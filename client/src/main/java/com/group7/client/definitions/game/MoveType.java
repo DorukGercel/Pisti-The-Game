@@ -10,6 +10,7 @@ public enum MoveType {
     CHALLENGE_FAIL,
     REDEAL,
     RESTART,
+    READ,
     PASS,
     NONE;
 
@@ -24,6 +25,7 @@ public enum MoveType {
             case "CHALLENGE_FAIL" -> MoveType.CHALLENGE_FAIL;
             case "REDEAL" -> MoveType.REDEAL;
             case "RESTART" -> MoveType.RESTART;
+            case "READ" -> MoveType.READ;
             case "PASS" -> PASS;
             default -> MoveType.NONE;
         };
@@ -40,6 +42,7 @@ public enum MoveType {
             case CHALLENGE_FAIL -> "CHALLENGE_FAIL";
             case REDEAL -> "REDEAL";
             case RESTART -> "RESTART";
+            case READ -> "READ";
             case PASS -> "PASS";
             default -> "NONE";
         };

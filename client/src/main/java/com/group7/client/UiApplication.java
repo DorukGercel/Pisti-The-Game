@@ -30,8 +30,11 @@ public class UiApplication extends Application {
     /** Closes application context in exit*/
     @Override
     public void stop() {
+        // Close context
         applicationContext.close();
         Platform.exit();
+        // Clean all threads if any left
+        System.exit(0);
     }
 
     /** Event which indicates the app is ready to create stage*/

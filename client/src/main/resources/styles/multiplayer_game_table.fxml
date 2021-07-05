@@ -19,9 +19,11 @@
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
     </rowConstraints>
     <Group fx:id="pc_area_container" GridPane.columnIndex="1">
-      <GridPane.margin>
-         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
-      </GridPane.margin></Group>
+        <GridPane.margin>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+        </GridPane.margin>
+        <Text fx:id="match_text" strokeType="OUTSIDE" strokeWidth="0.0"/>
+    </Group>
     <VBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2">
         <GridPane.margin>
             <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
@@ -133,7 +135,7 @@
     </VBox>
     <VBox fx:id="bluff_challenge_text_container" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
         <Group>
-            <Text fx:id="bluff_challenge_text" strokeType="OUTSIDE" strokeWidth="0.0" visible="false"/>
+            <Text fx:id="bluff_challenge_text" strokeType="OUTSIDE" strokeWidth="0.0" visible="false" />
         </Group>
     </VBox>
     <VBox fx:id="game_button_container" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
