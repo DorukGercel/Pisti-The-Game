@@ -13,6 +13,8 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>server</name>
 	<description>Server Side of Pişti the Game</description>
+	<packaging>war</packaging>
+
 	<properties>
 		<java.version>16</java.version>
 	</properties>
@@ -20,6 +22,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<!--TOMCAT-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
