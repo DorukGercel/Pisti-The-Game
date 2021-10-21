@@ -21,3 +21,5 @@ This is a desktop Pişti Game with both server and client sides. The game has th
 ###### Attention: In Postman Collection, Interact Game-Card is actually the simulation of the game therefore the input-output pairs may not match in different game instances.
 ###### Attention: In Postman execution order please mind the notes in the Swagger file.
 
+#### *Side Notes*:
+This project is originally developed in Gogs as the remote server.
