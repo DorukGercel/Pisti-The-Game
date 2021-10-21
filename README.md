@@ -22,4 +22,5 @@ This is a desktop Pişti Game with both server and client sides. The game has th
 ###### Attention: In Postman execution order please mind the notes in the Swagger file.
 
 #### *Side Notes*:
-This project is originally developed in Gogs as the remote server.
+- This project is originally developed in Gogs as the remote server. Therefore the names of the contributors are different from the Github account names.
+- Please note that the user must have both smtp mail account and mariadb database in-order to run the program.
