@@ -4,6 +4,9 @@
 - Rabia Varol 2237881
 - Doruk Gerçel 2310027
 
+#### *Explanation*:
+This is a desktop Pişti Game with both server and client sides. The game has three different singleplayer modes with increasing difficulty (third level is bluffing pişti) and a multiplayer level (fourth level). This game is the term project of METU CENG 453 for the Spring 2021 semester.
+
 #### *Documents*:
 - [General Documentation](https://github.com/DorukGercel/Pisti-The-Game/blob/master/documents/Pisti_the_Game_General_Documentation.pdf)
 - [User Manual](https://github.com/DorukGercel/Pisti-The-Game/blob/master/documents/Pisti_the_Game_User_Manual.pdf)
