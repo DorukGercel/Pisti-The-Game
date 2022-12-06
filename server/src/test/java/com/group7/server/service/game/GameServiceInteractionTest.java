@@ -5,14 +5,11 @@ import com.group7.server.definitions.game.Game;
 import com.group7.server.definitions.game.GameConfig;
 import com.group7.server.definitions.game.GameEnvironment;
 import com.group7.server.definitions.game.GameTable;
-<<<<<<< HEAD
 import com.group7.server.repository.ActivePlayerRepositoryTestStub;
 import com.group7.server.repository.LeaderboardRecordRepositoryTestStub;
 import com.group7.server.repository.PlayerRepositoryTestStub;
 import com.group7.server.service.leaderboard.LeaderboardRecordService;
-=======
 import com.group7.server.repository.*;
->>>>>>> e169ca8... refactor[server]: update game service tests
 import com.group7.server.service.leaderboard.LeaderboardRecordServiceImpl;
 import org.junit.After;
 import org.junit.Before;
@@ -37,12 +34,9 @@ import static org.junit.Assert.assertTrue;
         GameConfig.CardTable.class,
         LeaderboardRecordServiceImpl.class,
         PlayerRepositoryTestStub.class,
-<<<<<<< HEAD
         LeaderboardRecordRepositoryTestStub.class,
         LeaderboardRecordServiceImpl.class})
-=======
-        LeaderboardRecordRepositoryTestStub.class})
->>>>>>> e169ca8... refactor[server]: update game service tests
+
 public class GameServiceInteractionTest {
 
     private GameService mGameService;

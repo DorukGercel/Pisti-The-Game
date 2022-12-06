@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  server:
+    build: ./server
+    image: pisti/server
+    container_name: pisti-server
+    hostname: server
+    volumes:
+      - server-sync:/home/pisti-server
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080"
+    expose:
+      - 8080
+    links:
+      - db
+    depends_on:
+      - db
+  db:
+    container_name: pisti-maria
+    image: mariadb:10.6
+    restart: always
+    hostname: db
+    environment:
+      MYSQL_ROOT_PASSWORD: pisti
+      MYSQL_DATABASE: pisti
+      MYSQL_USER: pisti
+      MYSQL_PASSWORD: pisti
+    expose:
+      - "40000"
+    ports:
+      - "40000:3306"
+    volumes:
+      - database-vol:/var/lib/mysql
+
+volumes:
+  database-vol:
+  server-sync:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "${PWD}/server"
