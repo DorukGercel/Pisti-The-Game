@@ -29,9 +29,9 @@ services:
       MYSQL_USER: pisti
       MYSQL_PASSWORD: pisti
     expose:
-      - "40000"
+      - "3306"
     ports:
-      - "40000:3306"
+      - "3306:3306"
     volumes:
       - database-vol:/var/lib/mysql
 
